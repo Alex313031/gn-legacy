@@ -1,6 +1,8 @@
 #ifndef HELLOWIN32_MAIN_H_
 #define HELLOWIN32_MAIN_H_
 
+#include "version.h"
+
 #include <windows.h>
 #include <commctrl.h>
 #include <tchar.h>
@@ -20,7 +22,9 @@ static const LPCWSTR kHelloWin32Title = L"Hello World Win32";
 
 const LPCWSTR kHelloWin32Class = L"HelloWin32Class";
 
-void AppendTextToEditControl(HWND hWnd, const std::wstring line);
+static void AppendTextToEditControl(HWND hWnd, const std::wstring line);
+
+static const std::wstring GetVersionW();
 
 void OutputText(HWND hWnd);
 

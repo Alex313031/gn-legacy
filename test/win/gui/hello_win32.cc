@@ -46,7 +46,7 @@ void AppendTextToEditControl(HWND hWnd, const std::wstring line) {
 
 void OutputText(HWND hWnd) {
   hTextOut = CreateWindowExW(0, L"EDIT", nullptr,
-      WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL,
+      WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE | ES_AUTOVSCROLL,
       6, 6, 300, 200, hWnd, (HMENU)IDC_TEXT1, gHinst, nullptr);
   AppendTextToEditControl(hTextOut, textout);
 }
@@ -70,12 +70,22 @@ ATOM RegisterWndClass(HINSTANCE hInstance) {
   return RegisterClassExW(&wcex);
 }
 
+const std::wstring GetVersionW() {
+  std::wostringstream wostr;
+  wostr << VERSION_STRING;
+  const std::wstring retval = wostr.str();
+  return retval;
+}
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   bool success = false;
   gHinst = hInstance;
   std::wostringstream wostr;
   const unsigned long long testval = TestReturn69();
   const unsigned long long testval2 = TestReturn420();
+  wostr << L"Hello World!" << L"\r\n" << L"This is hello_win32.exe ver. "
+        << GetVersionW() << L"\r\n" << std::endl;
+  wostr << L"The following lines check that the static and dynamic libraries were compiled/loaded correctly:" << L"\r\n" << std::endl;
   wostr << L"salute.lib testval = " << std::hex << testval << L"\r\n"
         << L"heller.dll testval2 = " << testval2 << std::dec << std::endl;
   const std::wstring out = wostr.str();

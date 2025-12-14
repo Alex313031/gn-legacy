@@ -1,0 +1,14 @@
+target_os = "win"
+target_cpu = "x86"
+
+is_debug = true
+is_official_build = false
+
+cpp_std = 17
+winver = "xp"
+
+use_common_controls = true
+use_unicode = true
+
+console_subsystem = false
+windowed_subsystem = true

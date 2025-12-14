@@ -12,6 +12,7 @@ executable("hello_win32") {
   configs += [ "//build/config/win:windowed_subsystem" ]
   sources = [
     "gui/hello_win32.cc",
+    "gui/hello_win32.h",
     "gui/resource.h",
     "gui/resource.rc",
     "gui/version.h",
@@ -30,6 +31,7 @@ executable("hello_win32") {
 executable("hello_console") {
   sources = [
     "console/hello_console.cc",
+    "console/resource.rc",
   ]
   include_dirs = [
     "static_lib",
@@ -52,6 +54,7 @@ shared_library("heller") {
   sources = [
     "dll/hello_shared.cc",
     "dll/hello_shared.h",
+    "dll/resource.rc",
   ]
 }
 

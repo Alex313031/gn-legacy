@@ -1,9 +1,6 @@
-// Microsoft Visual C++ generated resource script.
-
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
-// Generated from the TEXTINCLUDE resource.
 
 #ifndef APSTUDIO_INVOKED
 #include "version.h"
@@ -21,20 +18,15 @@
 
 #undef APSTUDIO_READONLY_SYMBOLS
 
-// Embed manifest for common controls and DPI support
 #ifdef __MINGW32__
-//APP_MANIFEST RT_MANIFEST "hello_world.manifest"
+APP_MANIFEST RT_MANIFEST "hello_world.manifest"
 #endif // __MINGW32__
 
-// Application Icons
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
 
-IDI_CRYOCALC   ICON  "hello_world.ico"
-IDI_SMALL      ICON  "small.ico"
+IDI_HELLOWORLD   ICON  "hello_world.ico"
+IDI_SMALL        ICON  "small.ico"
 
 #ifdef APSTUDIO_INVOKED
-// TEXTINCLUDE
 
 1 TEXTINCLUDE
 BEGIN
@@ -58,16 +50,7 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 
-// String Table
-
-STRINGTABLE
-BEGIN
-   IDC_CRYOCALC CRYOCALC_MAIN_WNDCLASS
-END
-
-// Main Application Menu
-
-IDC_CRYOCALC MENU DISCARDABLE
+IDC_HELLOWORLD MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
@@ -80,19 +63,14 @@ BEGIN
     END
 END
 
-// Keyboard Accelerators
-
-IDC_CRYOCALC ACCELERATORS
+IDC_HELLOWORLD ACCELERATORS
 BEGIN
     "?",       IDM_ABOUT, ASCII,   ALT // "?"
     VK_OEM_2,  IDM_ABOUT, VIRTKEY, ALT // "/"
-    VK_ESCAPE, IDM_CEXIT, VIRTKEY, NOINVERT// "Esc"
+    VK_ESCAPE, IDM_EXIT,  VIRTKEY, NOINVERT// "Esc"
 END
 
-// About Dialog Box
-
-// Everything is RES, X, Y, Width, Height, Style
-IDD_ABOUTBOX DIALOGEX 0, 0, 116, 56
+IDD_ABOUTBOX DIALOGEX 0, 0, 120, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION ABOUT_TITLE
 FONT 8, "MS Shell Dlg"
@@ -103,24 +81,21 @@ BEGIN
     DEFPUSHBUTTON   "OK", IDOK, 50, 35, 40, 14, WS_GROUP
 END
 
-// Dialog DESIGNINFO
-
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
-        LEFTMARGIN,   7
+        LEFTMARGIN,   12
         RIGHTMARGIN,  163
-        TOPMARGIN,    7
-        BOTTOMMARGIN, 55
+        TOPMARGIN,    12
+        BOTTOMMARGIN, 58
     END
 END
 #endif
 
 #endif
 
-// Version Information
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION
  PRODUCTVERSION MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION

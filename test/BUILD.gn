@@ -1,8 +1,14 @@
 # Copyright 2025 Alex313031
 
 group("hello_all") {
-  public_deps = [
-    "linux:hello_linux",
-    "win:hello_win",
-  ]
+  public_deps = []
+  if (is_linux) {
+    public_deps += [
+      "linux:hello_linux",
+    ]
+  } else if (is_win) {
+    public_deps += [
+      "win:hello_win",
+    ]
+  }
 }

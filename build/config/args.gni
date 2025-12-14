@@ -17,5 +17,5 @@ if (console_subsystem) {
 }
 
 declare_args() {
-  use_llvm = true
+  use_llvm = is_linux
 }

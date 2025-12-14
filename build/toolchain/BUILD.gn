@@ -180,7 +180,7 @@ toolchain("llvm-mingw") {
   }
 
   tool("rc") {
-    command = "$RC {{source}} {{defines}} {{include_dirs}} -o {{output}}"
+    command = "$RC {{source}} {{defines}} {{include_dirs}} -O coff {{output}}"
     depsformat = "msvc"
     outputs = [ "$object_path.res" ]
     description = "RC {{output}}"

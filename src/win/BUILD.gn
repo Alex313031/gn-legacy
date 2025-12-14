@@ -12,6 +12,7 @@ executable("hello_win32") {
   configs += [ "//build/config/win:windowed_subsystem" ]
   sources = [
     "hello_win32.cc",
+    "resource.rc",
   ]
 }
 

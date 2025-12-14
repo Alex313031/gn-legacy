@@ -1,0 +1,21 @@
+# Copyright 2025 Alex313031
+
+group("pepatcher") {
+  public_deps = [
+    ":patchpe",
+  ]
+}
+
+executable("patchpe") {
+  configs += [ ":patchpe_config", ]
+  sources = [
+    "patchpe.cc",
+    "patchpe.rc",
+  ]
+}
+
+config("patchpe_config") {
+  include_dirs = [
+    "./",
+  ]
+}

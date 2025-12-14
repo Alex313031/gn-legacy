@@ -1,0 +1,81 @@
+declare_args() {
+  # Target Windows version. Can be a name, like "2000", "Vista"
+  # or an NT number, like "5.1" for XP, or "6.1" for Win 7.
+  winver = "xp"
+
+  # Sets the WINVER and _WIN32_WINNT #define. Automatically set by the winver arg.
+  win32_winnt = ""
+
+  # Sets the _WIN64_WINNT #define. Automatically set by the winver arg.
+  win64_winnt = ""
+
+  # Sets the _WIN32_IE #define. Automatically set by the winver arg.
+  win32_ie = ""
+}
+
+is_win2k = (winver == "2000" || winver == "5.0" || winver == "2k" || winver == "2K")
+is_winxp = (winver == "xp" || winver == "5.1" || winver == "XP")
+is_win2003 = (winver == "xp64" || winver == "5.2" || winver == "2003")
+is_winvista = (winver == "vista" || winver == "5.1" || winver == "Vista")
+is_win7 = (winver == "7" || winver == "6.1" || winver == "seven")
+is_win8 = (winver == "8" || winver == "6.2" || winver == "eight")
+is_win81 = (winver == "8.1" || winver == "6.3" || winver == "blue")
+is_win10 = (winver == "10" || winver == "10.0" || winver == "threshold" || winver == "ten")
+is_win11 = (winver == "11" || winver == "10.1" || winver == "eleven")
+
+is_legacy_windows = is_win2k || is_winxp || is_win2003 || is_winvista
+
+if (is_win2k) {
+  win32_winnt = "0x0500"
+  win64_winnt = "0x0502"
+  win32_ie = "0x501"
+  subsystem = "5.00"
+} else if (is_winxp) {
+  win32_winnt = "0x0501"
+  win64_winnt = "0x0502"
+  win32_ie = "0x600"
+  subsystem = "5.01"
+} else if (is_win2003) {
+  win32_winnt = "0x0502"
+  win64_winnt = "0x0502"
+  win32_ie = "0x0602"
+  subsystem = "5.02"
+} else if (is_winvista) {
+  win32_winnt = "0x0600"
+  win64_winnt = "0x0600"
+  win32_ie = "0x0700"
+  subsystem = "6.00"
+} else if (is_win7) {
+  win32_winnt = "0x0601"
+  win64_winnt = "0x0601"
+  win32_ie = "0x800"
+  subsystem = "6.01"
+} else if (is_win8) {
+  win32_winnt = "0x0602"
+  win64_winnt = "0x0602"
+  win32_ie = "0x0A00"
+  subsystem = "6.02"
+} else if (is_win81) {
+  win32_winnt = "0x0603"
+  win64_winnt = "0x0603"
+  win32_ie = "0x0A00"
+  subsystem = "6.03"
+} else if (is_win10) {
+  win32_winnt = "0x0A00"
+  win64_winnt = "0x0A00"
+  win32_ie = "0x0A00"
+  subsystem = "10.0"
+} else if (is_win11) {
+  win32_winnt = "0x0A00"
+  win64_winnt = "0x0A00"
+  win32_ie = "0x0A00"
+  subsystem = "10.0"
+} else {
+  win32_winnt = "0x0501"
+  win64_winnt = "0x0502"
+  win32_ie = "0x601"
+}
+
+declare_args() {
+  use_common_controls = !is_win2k
+}

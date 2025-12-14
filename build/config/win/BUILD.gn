@@ -1,4 +1,7 @@
+# Copyright 2025 Alex313031.
+
 import("//build/config/args.gni")
+import("//build/config/win/target_ver.gni")
 
 config("windows_config") {
   defines = [ "_WIN32", ]
@@ -20,19 +23,15 @@ config("windows_config") {
     defines += [ "_WINDOWS", ]
   }
 
-  if (winver == "xp") {
+  defines += [
+    "WINVER=$win32_winnt",
+    "_WIN32_WINNT=$win32_winnt",
+    "_WIN64_WINNT=$win64_winnt",
+    "_WIN32_IE=$win32_ie",
+  ]
+  if (is_legacy_windows) {
     defines += [
-      "WINVER=0x0501",
-      "_WIN32_WINNT=0x0501",
-      "_WIN64_WINNT=0x0502",
-      "_WIN32_IE=0x600",
-    ]
-  } else {
-    defines += [
-      "WINVER=0x0601",
-      "_WIN32_WINNT=0x0601",
-      "_WIN64_WINNT=0x0601",
-      "_WIN32_IE=0x800",
+      "_CRT_SECURE_NO_WARNINGS"
     ]
   }
 
@@ -92,10 +91,10 @@ config("console_subsystem") {
   } else {
     ldflags += [ "-mconsole", ]
   }
-  if (winver == "xp") {
-    ldflags += [ "-Wl,--subsystem,console:5.01", ]
+  if (is_winxp) {
+    ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
   } else {
-    ldflags += [ "-Wl,--subsystem,console:6.01", ]
+    ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
   }
 }
 
@@ -106,9 +105,9 @@ config("windowed_subsystem") {
   } else {
     ldflags += [ "-mwindows", ]
   }
-  if (winver == "xp") {
-    ldflags += [ "-Wl,--subsystem,windows:5.01", ]
+  if (is_winxp) {
+    ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
   } else {
-    ldflags += [ "-Wl,--subsystem,windows:6.01", ]
+    ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
   }
 }

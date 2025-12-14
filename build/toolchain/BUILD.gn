@@ -100,11 +100,13 @@ toolchain("llvm-mingw") {
       CC = "i686-w64-mingw32-clang.exe"
       CXX = "i686-w64-mingw32-clang++.exe"
       LD = "i686-w64-mingw32-clang++.exe"
+      AR = "i686-w64-mingw32-llvm-ar.exe"
       RC = "i686-w64-mingw32-windres.exe"
     } else {
       CC = "i686-w64-mingw32-gcc.exe"
       CXX = "i686-w64-mingw32-g++.exe"
       LD = "i686-w64-mingw32-g++.exe"
+      AR = "i686-w64-mingw32-ar.exe"
       RC = "i686-w64-mingw32-windres.exe"
     }
   } else {
@@ -112,11 +114,13 @@ toolchain("llvm-mingw") {
       CC = "i686-w64-mingw32-clang"
       CXX = "i686-w64-mingw32-clang++"
       LD = "i686-w64-mingw32-clang++"
+      AR = "i686-w64-mingw32-llvm-ar"
       RC = "i686-w64-mingw32-windres"
     } else {
       CC = "i686-w64-mingw32-gcc"
       CXX = "i686-w64-mingw32-g++"
       LD = "i686-w64-mingw32-g++"
+      AR = "i686-w64-mingw32-ar"
       RC = "i686-w64-mingw32-windres"
     }
   }
@@ -140,7 +144,7 @@ toolchain("llvm-mingw") {
   }
 
   tool("alink") {
-    command = "i686-w64-mingw32-llvm-ar rcs {{output}} {{inputs}}"
+    command = "$AR rcs {{output}} {{inputs}}"
     description = "AR {{target_output_name}}{{output_extension}}"
 
     outputs =
@@ -152,18 +156,13 @@ toolchain("llvm-mingw") {
   tool("solink") {
     soname = "{{target_output_name}}{{output_extension}}"  # e.g. "libfoo.so".
     sofile = "{{output_dir}}/$soname"
-    rspfile = soname + ".rsp"
-    if (is_mac) {
-      os_specific_option = "-install_name @executable_path/$sofile"
-      rspfile_content = "{{inputs}} {{solibs}} {{libs}}"
-    } else {
-      os_specific_option = "-Wl,-soname=$soname"
-      rspfile_content = "-Wl,--whole-archive {{inputs}} {{solibs}} -Wl,--no-whole-archive {{libs}}"
-    }
+    libfile = "{{output_dir}}/lib$soname.a"
+    #rspfile = soname + ".rsp"
+    os_specific_option = "-Wl,-soname=$soname -Wl,--out-implib,$libfile"
 
-    command = "$CXX -shared {{ldflags}} -o $sofile $os_specific_option @$rspfile"
+    command = "$CXX -shared {{ldflags}} {{inputs}} -o $sofile {{solibs}} {{libs}} $os_specific_option"
 
-    description = "SOLINK $soname"
+    description = "DLL LINK $soname"
 
     # Use this for {{output_extension}} expansions unless a target manually
     # overrides it (in which case {{output_extension}} will be what the target
@@ -174,7 +173,7 @@ toolchain("llvm-mingw") {
     # it (in which case {{output_dir}} will be what the target specifies).
     default_output_dir = "{{root_out_dir}}"
 
-    outputs = [ sofile ]
+    outputs = [ sofile, libfile ]
     link_output = sofile
     depend_output = sofile
   }

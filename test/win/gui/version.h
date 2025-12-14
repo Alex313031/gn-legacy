@@ -1,5 +1,5 @@
-#ifndef CRYOCALC_VERSION_H_
-#define CRYOCALC_VERSION_H_
+#ifndef HELLOWIN32_VERSION_H_
+#define HELLOWIN32_VERSION_H_
 
 #ifdef __clang__
  #pragma code_page(65001) // UTF-8
@@ -54,10 +54,10 @@
 
 #ifndef VERSION_STRING
  #define VERSION_STRING _VERSION(MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION)
- #define ABOUT_TITLE L"About HelloWorld"
- #define ABOUT_CONTENT L"HelloWorld ver. " VERSION_STRING
+ #define ABOUT_TITLE L"About HelloWorld32"
+ #define ABOUT_CONTENT L"HelloWorld32 ver. " VERSION_STRING
  #define ABOUT_COPYRIGHT L"\251 2025 Alex313031" // \251 is the © symbol
  #define LEGAL_COPYRIGHT L"\251 2025 Alex313031"
 #endif // VERSION_STRING
 
-#endif // CRYOCALC_VERSION_H_
+#endif // HELLOWIN32_VERSION_H_

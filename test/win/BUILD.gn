@@ -11,13 +11,48 @@ executable("hello_win32") {
   configs -= [ "//build/config/win:console_subsystem" ]
   configs += [ "//build/config/win:windowed_subsystem" ]
   sources = [
-    "hello_win32.cc",
-    "resource.rc",
+    "gui/hello_win32.cc",
+    "gui/resource.h",
+    "gui/resource.rc",
+    "gui/version.h",
+  ]
+  include_dirs = [
+    "dll",
+    "static_lib",
+  ]
+  #libs = [ "libheller.dll", ]
+  deps = [
+    ":salute",
+    ":heller",
   ]
 }
 
 executable("hello_console") {
   sources = [
-    "hello_console.cc",
+    "console/hello_console.cc",
+  ]
+  include_dirs = [
+    "static_lib",
+  ]
+  deps = [
+    ":salute",
   ]
 }
+
+static_library("salute") {
+  sources = [
+    "static_lib/hello_static.cc",
+    "static_lib/hello_static.h",
+  ]
+}
+
+shared_library("heller") {
+  configs += [ "//build/config/win:windowed_subsystem" ]
+
+  sources = [
+    "dll/hello_shared.cc",
+    "dll/hello_shared.h",
+  ]
+}
+
+

@@ -84,8 +84,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   const unsigned long long testval = TestReturn69();
   const unsigned long long testval2 = TestReturn420();
   wostr << L"Hello World!" << L"\r\n" << L"This is hello_win32.exe ver. "
-        << GetVersionW() << L"\r\n" << std::endl;
-  wostr << L"The following lines check that the static and dynamic libraries were compiled/loaded correctly:" << L"\r\n" << std::endl;
+        << GetVersionW() << L"\r\n\r\n";
+  wostr << L"The following lines check that the static and dynamic libraries were compiled/loaded correctly:" << L"\r\n\r\n";
   wostr << L"salute.lib testval = " << std::hex << testval << L"\r\n"
         << L"heller.dll testval2 = " << testval2 << std::dec << std::endl;
   const std::wstring out = wostr.str();

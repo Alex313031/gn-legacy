@@ -3,5 +3,6 @@ import("//build/config/args.gni")
 group("all") {
   public_deps = [
     #":dummy_target", # This is where you put your targets and/or sources.
+    "cryocalc:cryocalc_all", # CryoCalc Win32!
   ]
 }

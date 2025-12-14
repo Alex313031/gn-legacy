@@ -21,7 +21,6 @@ executable("hello_win32") {
     "dll",
     "static_lib",
   ]
-  #libs = [ "libheller.dll", ]
   deps = [
     ":salute",
     ":heller",

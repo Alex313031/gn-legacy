@@ -20,6 +20,10 @@ static const LPCWSTR kHelloWin32Title = L"Hello World Win32";
 
 const LPCWSTR kHelloWin32Class = L"HelloWin32Class";
 
+void AppendTextToEditControl(HWND hWnd, const std::wstring line);
+
+void OutputText(HWND hWnd);
+
 ATOM RegisterWndClass(HINSTANCE hInstance);
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);

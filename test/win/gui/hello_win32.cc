@@ -20,14 +20,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   RegisterWndClass(hInstance);
 
-  std::wostringstream wostr;
-  const unsigned long long testval = TestReturn69();
-  const unsigned long long testval2 = TestReturn420();
-  wostr << L"salute.lib testval = " << std::hex << testval << std::dec << std::endl;
-  wostr << L"heller.dll testval2 = " << std::hex << testval2 << std::dec << std::endl;
-  const std::wstring out = wostr.str();
-  textout = out;
-
   if (!InitInstance(hInstance, nCmdShow)) {
     return 1;
   }
@@ -43,6 +35,20 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   }
 
   return static_cast<int>(msg.wParam);
+}
+
+void AppendTextToEditControl(HWND hWnd, const std::wstring line) {
+  const WCHAR* text = line.c_str();
+  int length = GetWindowTextLength(hWnd); // Get current text length
+  SendMessageW(hWnd, EM_SETSEL, (WPARAM)length, (LPARAM)length); // Set cursor at the end
+  SendMessageW(hWnd, EM_REPLACESEL, FALSE, (LPARAM)text); // Append the text
+}
+
+void OutputText(HWND hWnd) {
+  hTextOut = CreateWindowExW(0, L"EDIT", nullptr,
+      WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL,
+      6, 6, 300, 200, hWnd, (HMENU)IDC_TEXT1, gHinst, nullptr);
+  AppendTextToEditControl(hTextOut, textout);
 }
 
 ATOM RegisterWndClass(HINSTANCE hInstance) {
@@ -67,6 +73,13 @@ ATOM RegisterWndClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   bool success = false;
   gHinst = hInstance;
+  std::wostringstream wostr;
+  const unsigned long long testval = TestReturn69();
+  const unsigned long long testval2 = TestReturn420();
+  wostr << L"salute.lib testval = " << std::hex << testval << L"\r\n"
+        << L"heller.dll testval2 = " << testval2 << std::dec << std::endl;
+  const std::wstring out = wostr.str();
+  textout = out;
   HWND hWnd = CreateWindowExW(WS_EX_WINDOWEDGE,
                               kHelloWin32Class,
                               kHelloWin32Title,
@@ -108,15 +121,12 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
       }
     } break;
     case WM_CREATE: {
-      hTextOut = CreateWindowExW(0, L"EDIT", nullptr,
-          WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE,
-          6, 6, 300, 200, hWnd, (HMENU)IDC_TEXT1, gHinst, nullptr);
-      SetWindowTextW(hTextOut, textout.c_str());
+      OutputText(hWnd);
     } break;
     case WM_GETMINMAXINFO: {
       LPMINMAXINFO pMinMaxInfo = (LPMINMAXINFO)lParam;
-      pMinMaxInfo->ptMinTrackSize.x = 200;
-      pMinMaxInfo->ptMinTrackSize.y = 100;
+      pMinMaxInfo->ptMinTrackSize.x = 228;
+      pMinMaxInfo->ptMinTrackSize.y = 128;
     } break;
     case WM_SIZE: {
       int width = LOWORD(lParam);

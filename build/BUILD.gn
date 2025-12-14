@@ -1,0 +1,127 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/args.gni")
+
+config("compiler_defaults") {
+  configs = []
+  defines = []
+  include_dirs = []
+  cflags = []
+  cflags_c = []
+  cflags_cc = []
+  ldflags = []
+
+  if (is_debug) {
+    defines += [
+      "DEBUG",
+      "_DEBUG",
+    ]
+  } else {
+    defines += [
+      "NDEBUG",
+      "_NDEBUG",
+    ]
+  }
+  if (use_unicode) {
+    cflags += [
+      "-finput-charset=UTF-8",
+      "-fexec-charset=UTF-8",
+    ]
+  }
+  if (current_os == "win") {
+    cflags += [
+      "-Wall",
+      "-MMD",
+      "-MP",
+      "-static",
+      "-mfpmath=sse",
+      "-mfxsr",
+      "-msse",
+      "-msse2",
+    ]
+    cflags_c += [
+      "-static-libgcc",
+    ]
+    cflags_cc += [
+      "-std=c++17",
+    ]
+    if (!use_llvm) {
+      cflags_cc += [ "-static-libstdc++", ]
+    }
+    include_dirs += [
+      #"/home/alex/Downloads/gn-simple/llvm-mingw-20251202-ucrt-ubuntu-22.04-x86_64/i686-w64-mingw32/include/",
+    ]
+    ldflags += [
+      #"-L/home/alex/Downloads/gn-simple/llvm-mingw-20251202-ucrt-ubuntu-22.04-x86_64/i686-w64-mingw32/lib/",
+      #"-L/home/alex/Downloads/gn-simple/llvm-mingw-20251202-ucrt-ubuntu-22.04-x86_64/lib/clang/21/lib/windows/",
+      "-static",
+    ]
+    configs += [ "//build/config/win:windows_config", ]
+  } else if (current_os == "linux") {
+    cflags += [
+      "-fPIC",
+      "-pthread",
+    ]
+    libs = [
+      "-lm",
+    ]
+    ldflags += [
+      "-pic",
+    ]
+    configs += [ ":linux_config", ]
+  }
+}
+
+config("linux_config") {
+  defines = []
+  cflags = []
+  ldflags = []
+
+  if (use_unicode) {
+    defines += [
+      "UNICODE",
+      "_UNICODE",
+    ]
+  }
+
+  if (is_debug) {
+    cflags += [
+      "-Og",
+      "-g",
+    ]
+  } else {
+    if (is_official_build) {
+      cflags += [
+        "-O3",
+        "-g0",
+        "-s",
+      ]
+    } else {
+      cflags += [
+        "-O1",
+        "-g",
+      ]
+    }
+  }
+}
+
+config("executable_ldconfig") {
+  configs = []
+  ldflags = []
+  if (is_linux) {
+    ldflags += [
+      "-Wl,-rpath=\$ORIGIN/",
+      "-Wl,-rpath-link=",
+    ]
+  } else if (is_win) {
+    if (console_subsystem) {
+      #configs += [ "//build/config/win:console_subsystem", ]
+    } else {
+      #configs += [ "//build/config/win:windowed_subsystem", ]
+    }
+  } else if (is_mac) {
+    ldflags += []
+  }
+}

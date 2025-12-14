@@ -1,0 +1,114 @@
+import("//build/config/args.gni")
+
+config("windows_config") {
+  defines = [ "_WIN32", ]
+  cflags = []
+  libs = []
+  include_dirs = []
+  ldflags = []
+
+  if (use_unicode) {
+    defines += [
+      "UNICODE",
+      "_UNICODE",
+    ]
+  }
+
+  if (console_subsystem) {
+    defines += [ "_CONSOLE", ]
+  } else {
+    defines += [ "_WINDOWS", ]
+  }
+
+  if (winver == "xp") {
+    defines += [
+      "WINVER=0x0501",
+      "_WIN32_WINNT=0x0501",
+      "_WIN64_WINNT=0x0502",
+      "_WIN32_IE=0x600",
+    ]
+  } else {
+    defines += [
+      "WINVER=0x0601",
+      "_WIN32_WINNT=0x0601",
+      "_WIN64_WINNT=0x0601",
+      "_WIN32_IE=0x800",
+    ]
+  }
+
+  if (is_debug) {
+    cflags += [
+      "-Og",
+      "-g",
+    ]
+  } else {
+    if (is_official_build) {
+      cflags += [
+        "-O3",
+        "-g0",
+        "-s",
+      ]
+    } else {
+      cflags += [
+        "-O2",
+        "-g",
+      ]
+    }
+  }
+
+  if (console_subsystem) {
+    cflags += [ "-mconsole", ]
+  } else {
+    if (use_unicode) {
+      cflags += [ "-municode", ]
+    } else {
+      cflags += [ "-mwindows", ]
+    }
+  }
+  if (console_subsystem) {
+    libs += [
+      "kernel32",
+      "user32",
+    ]
+  } else {
+    libs += [
+      "kernel32",
+      "user32",
+      "shell32",
+      "comctl32",
+      "comdlg32",
+      "gdi32",
+      "advapi32",
+      "ole32",
+      "winmm",
+    ]
+  }
+}
+
+config("console_subsystem") {
+  ldflags = []
+  if (use_unicode) {
+    ldflags += [ "-mconsole", ]
+  } else {
+    ldflags += [ "-mconsole", ]
+  }
+  if (winver == "xp") {
+    ldflags += [ "-Wl,--subsystem,console:5.01", ]
+  } else {
+    ldflags += [ "-Wl,--subsystem,console:6.01", ]
+  }
+}
+
+config("windowed_subsystem") {
+  ldflags = []
+  if (use_unicode) {
+    ldflags += [ "-municode", ]
+  } else {
+    ldflags += [ "-mwindows", ]
+  }
+  if (winver == "xp") {
+    ldflags += [ "-Wl,--subsystem,windows:5.01", ]
+  } else {
+    ldflags += [ "-Wl,--subsystem,windows:6.01", ]
+  }
+}

@@ -1,0 +1,21 @@
+declare_args() {
+  is_debug = true
+  cpp_std = 17
+  winver = "xp"
+  use_unicode = true
+  console_subsystem = false
+}
+
+declare_args() {
+  is_official_build = !is_debug
+  use_common_controls = !(winver == "2000" || winver == "2k")
+  windowed_subsystem = !console_subsystem
+}
+
+if (console_subsystem) {
+  assert(!windowed_subsystem, "console_subsystem and windowed_subsystem cannot both be true!")
+}
+
+declare_args() {
+  use_llvm = true
+}

@@ -1,0 +1,8 @@
+# Copyright 2025 Alex313031
+
+group("hello_all") {
+  public_deps = [
+    "linux:hello_linux",
+    "win:hello_win",
+  ]
+}

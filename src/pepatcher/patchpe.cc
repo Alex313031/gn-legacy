@@ -5,10 +5,13 @@
 //
 // SPDX-License-Identifier: MIT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include <stdio.h>
 #include <windows.h>
+#include <tchar.h>
 
 struct PEHeader
 {
@@ -92,7 +95,7 @@ struct PEHeader
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-extern "C" int main(int argc, WCHAR *argv[])
+extern "C" int wmain(int argc, WCHAR *argv[], WCHAR *envp[])
 {
 	IMAGE_DOS_HEADER udtDOSHeader;
 	PEHeader udtPEHeader;
@@ -330,11 +333,15 @@ extern "C" int main(int argc, WCHAR *argv[])
 				}
 
 				//Find and read load config
+#ifndef __MINGW32__
 #				pragma warning(disable: 4456)
+#endif
 				WORD hasLoadConfig = udtPEHeaderLike.FileHeader.NumberOfSections;
 				IMAGE_DATA_DIRECTORY dSH = udtPEHeaderLike.Directory()[IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG];
 				IMAGE_SECTION_HEADER eSH;
+#ifndef __MINGW32__
 #				pragma warning(default: 4456)
+#endif
 				do if (fread(&eSH, 1, sizeof eSH, pLike) != sizeof eSH)
 				{
 					wprintf(L"Cannot read section header %s\n", r);
@@ -376,7 +383,7 @@ extern "C" int main(int argc, WCHAR *argv[])
 				WORD value = t ? static_cast<WORD>(wcstoul(t, &s, 0)) : udtPEHeaderLike.FileHeader.Characteristics;
 				if (s == t) value = 0xFFFF; //If no value is given, set the bits as per the given mask
 				WORD const mask = *s == L':' ? static_cast<WORD>(wcstoul(s + 1, &s, 0)) : 0xFFFF;
-				udtPEHeader.FileHeader.Characteristics = value & mask | ~mask & udtPEHeaderUnpatched.FileHeader.Characteristics;
+				udtPEHeader.FileHeader.Characteristics = (value & mask) | (~mask & udtPEHeaderUnpatched.FileHeader.Characteristics);
 			}
 			else if (_wcsicmp(s, L"/LinkerVersion") == 0)
 			{
@@ -393,7 +400,7 @@ extern "C" int main(int argc, WCHAR *argv[])
 				WORD value = t ? static_cast<WORD>(wcstoul(t, &s, 0)) : udtPEHeaderLike.DllCharacteristics();
 				if (s == t) value = 0xFFFF; //If no value is given, set the bits as per the given mask
 				WORD const mask = *s == L':' ? static_cast<WORD>(wcstoul(s + 1, &s, 0)) : 0xFFFF;
-				udtPEHeader.DllCharacteristics() = value & mask | ~mask & udtPEHeaderUnpatched.DllCharacteristics();
+				udtPEHeader.DllCharacteristics() = (value & mask) | (~mask & udtPEHeaderUnpatched.DllCharacteristics());
 			}
 			else if (_wcsicmp(s, L"/SectionAlignment") == 0)
 			{
@@ -450,7 +457,7 @@ extern "C" int main(int argc, WCHAR *argv[])
 				WORD value = t ? static_cast<WORD>(wcstoul(t, &s, 0)) : udtPEHeaderLike.DependentLoadFlags();
 				if (s == t) value = 0xFFFF; //If no value is given, set the bits as per the given mask
 				WORD const mask = *s == L':' ? static_cast<WORD>(wcstoul(s + 1, &s, 0)) : 0xFFFF;
-				udtPEHeader.DependentLoadFlags() = value & mask | ~mask & udtPEHeaderUnpatched.DependentLoadFlags();
+				udtPEHeader.DependentLoadFlags() = (value & mask) | (~mask & udtPEHeaderUnpatched.DependentLoadFlags());
 			}
 			else
 			{
@@ -598,6 +605,17 @@ extern "C" int main(int argc, WCHAR *argv[])
 		wprintf(L"\nNothing to patch!\n\n");
 	}
 
-	_fcloseall();	
-	return(0);
+	int retval = _fcloseall();	
+	return(retval);
 }
+
+#ifdef __MINGW32__
+extern int _CRT_glob;
+extern "C" void __wgetmainargs(int*,wchar_t***,wchar_t***,int,int*);
+extern "C" int main() {
+	wchar_t **enpv, **argv;
+	int argc, si = 0;
+	__wgetmainargs(&argc, &argv, &enpv, _CRT_glob, &si); // this also creates the global variable __wargv
+	return wmain(argc, argv, enpv);
+}
+#endif

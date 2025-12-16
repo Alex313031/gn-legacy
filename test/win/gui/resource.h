@@ -5,13 +5,14 @@
 // Icons
 #define IDI_HELLOWORLD              101
 #define IDI_SMALL                   102
+#define IDI_ABOUT                   104
 
 // Main application resource
 #define IDC_HELLOWORLD              103
 
 // Dialogs
-#define IDD_ABOUT_DIALOG            104
-#define IDD_ABOUTBOX                105
+#define IDD_ABOUT_DIALOG            105
+#define IDD_ABOUTBOX                106
 
 // Menu items
 #define IDM_ABOUT                   200

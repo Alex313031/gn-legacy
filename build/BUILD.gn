@@ -47,19 +47,19 @@ config("compiler_defaults") {
     ]
     cflags_c += [
       "-static-libgcc",
+      "-std=c$c_std",
     ]
-    cflags_cc += [
-      "-std=c++17",
-    ]
+    if (is_legacy_windows && cpp_std == "20") {
+      # Windows XP and older can't handle C++20
+      cflags_cc += [ "-std=c++17", ]
+    } else {
+      cflags_cc += [ "-std=c++$cpp_std", ]
+    }
     if (!use_llvm) {
       cflags_cc += [ "-static-libstdc++", ]
     }
-    include_dirs += [
-      #"/home/alex/Downloads/gn-simple/llvm-mingw-20251202-ucrt-ubuntu-22.04-x86_64/i686-w64-mingw32/include/",
-    ]
     ldflags += [
-      #"-L/home/alex/Downloads/gn-simple/llvm-mingw-20251202-ucrt-ubuntu-22.04-x86_64/i686-w64-mingw32/lib/",
-      #"-L/home/alex/Downloads/gn-simple/llvm-mingw-20251202-ucrt-ubuntu-22.04-x86_64/lib/clang/21/lib/windows/",
+      #"-Lsrc",
       "-static",
     ]
     configs += [ "//build/config/win:windows_config", ]

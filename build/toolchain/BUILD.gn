@@ -95,33 +95,41 @@ toolchain("llvm-mingw") {
   # have no spaces and will be unique in the directory.
   object_path = "{{target_out_dir}}/{{label_name}}/{{source_name_part}}"
 
+  if (target_cpu == "x86") {
+    mingw_prefix = "i686"
+  } else if (target_cpu == "x64") {
+    mingw_prefix = "x86_64"
+  } else {
+    print("MinGW toolchain can only target x86/x64 for now.")
+  }
+
   if (host_os == "win") {
     if (use_llvm) {
-      CC = "i686-w64-mingw32-clang.exe"
-      CXX = "i686-w64-mingw32-clang++.exe"
-      LD = "i686-w64-mingw32-clang++.exe"
-      AR = "i686-w64-mingw32-llvm-ar.exe"
-      RC = "i686-w64-mingw32-windres.exe"
+      CC = "$mingw_prefix-w64-mingw32-clang.exe"
+      CXX = "$mingw_prefix-w64-mingw32-clang++.exe"
+      LD = "$mingw_prefix-w64-mingw32-clang++.exe"
+      AR = "$mingw_prefix-w64-mingw32-llvm-ar.exe"
+      RC = "$mingw_prefix-w64-mingw32-windres.exe"
     } else {
-      CC = "i686-w64-mingw32-gcc.exe"
-      CXX = "i686-w64-mingw32-g++.exe"
-      LD = "i686-w64-mingw32-g++.exe"
-      AR = "i686-w64-mingw32-ar.exe"
-      RC = "i686-w64-mingw32-windres.exe"
+      CC = "$mingw_prefix-w64-mingw32-gcc.exe"
+      CXX = "$mingw_prefix-w64-mingw32-g++.exe"
+      LD = "$mingw_prefix-w64-mingw32-g++.exe"
+      AR = "$mingw_prefix-w64-mingw32-ar.exe"
+      RC = "$mingw_prefix-w64-mingw32-windres.exe"
     }
   } else {
     if (use_llvm) {
-      CC = "i686-w64-mingw32-clang"
-      CXX = "i686-w64-mingw32-clang++"
-      LD = "i686-w64-mingw32-clang++"
-      AR = "i686-w64-mingw32-llvm-ar"
-      RC = "i686-w64-mingw32-windres"
+      CC = "$mingw_prefix-w64-mingw32-clang"
+      CXX = "$mingw_prefix-w64-mingw32-clang++"
+      LD = "$mingw_prefix-w64-mingw32-clang++"
+      AR = "$mingw_prefix-w64-mingw32-llvm-ar"
+      RC = "$mingw_prefix-w64-mingw32-windres"
     } else {
-      CC = "i686-w64-mingw32-gcc"
-      CXX = "i686-w64-mingw32-g++"
-      LD = "i686-w64-mingw32-g++"
-      AR = "i686-w64-mingw32-ar"
-      RC = "i686-w64-mingw32-windres"
+      CC = "$mingw_prefix-w64-mingw32-gcc"
+      CXX = "$mingw_prefix-w64-mingw32-g++"
+      LD = "$mingw_prefix-w64-mingw32-g++"
+      AR = "$mingw_prefix-w64-mingw32-ar"
+      RC = "$mingw_prefix-w64-mingw32-windres"
     }
   }
 

@@ -36,4 +36,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
+HINSTANCE GetHinstanceFromHwnd(HWND hWnd);
+
 #endif // HELLOWIN32_MAIN_H_

@@ -9,17 +9,16 @@ group("hello_win") {
 
 executable("hello_win32") {
   configs -= [ "//build/config/win:console_subsystem" ]
-  configs += [ "//build/config/win:windowed_subsystem" ]
+  configs += [
+    "//build/config/win:windowed_subsystem",
+    ":hello_win_config",
+  ]
   sources = [
     "gui/hello_win32.cc",
     "gui/hello_win32.h",
     "gui/resource.h",
     "gui/resource.rc",
     "gui/version.h",
-  ]
-  include_dirs = [
-    "dll",
-    "static_lib",
   ]
   deps = [
     ":salute",
@@ -28,19 +27,19 @@ executable("hello_win32") {
 }
 
 executable("hello_console") {
+  configs +=[ ":hello_win_config", ]
   sources = [
     "console/hello_console.cc",
     "console/resource.rc",
   ]
-  include_dirs = [
-    "static_lib",
-  ]
   deps = [
     ":salute",
+    ":heller",
   ]
 }
 
 static_library("salute") {
+  include_dirs = [ "static_lib", ]
   sources = [
     "static_lib/hello_static.cc",
     "static_lib/hello_static.h",
@@ -50,6 +49,7 @@ static_library("salute") {
 shared_library("heller") {
   configs += [ "//build/config/win:windowed_subsystem" ]
 
+  include_dirs = [ "dll", ]
   sources = [
     "dll/hello_shared.cc",
     "dll/hello_shared.h",
@@ -57,4 +57,9 @@ shared_library("heller") {
   ]
 }
 
-
+config("hello_win_config") {
+  include_dirs = [
+    "dll",
+    "static_lib",
+  ]
+}

@@ -1,5 +1,9 @@
 # Copyright 2025 Alex313031
 
+group("gn_tests") {
+  public_deps = [ ":hello_all", ]
+}
+
 group("hello_all") {
   public_deps = []
   if (is_linux) {

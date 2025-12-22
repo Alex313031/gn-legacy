@@ -45,7 +45,7 @@ void AppendTextToEditControl(HWND hWnd, const std::wstring line) {
 }
 
 void OutputText(HWND hWnd) {
-  hTextOut = CreateWindowExW(0, L"EDIT", nullptr,
+  hTextOut = CreateWindowExW(0, WC_EDIT, nullptr,
       WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL,
       6, 6, 300, 200, hWnd, (HMENU)IDC_TEXT1, gHinst, nullptr);
   AppendTextToEditControl(hTextOut, textout);

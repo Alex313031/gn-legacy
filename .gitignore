@@ -25,5 +25,13 @@ Thumbs.db
 *.pdb
 *.res
 *.stamp
+
+# Output directories
 /out/
 /Release/
+
+# MinGW Toolchain Files
+/tools/mingw/linux/i686/
+/tools/mingw/linux/x64/
+/tools/mingw/win/i686/
+/tools/mingw/win/x64/

@@ -17,6 +17,6 @@ try() { "$@" || die "${RED}Failed $*"; }
 
 export HERE=${PWD} &&
 
-export MINGW_BINPATH=${HERE}/tools/mingw/bin &&
+export TOOLS_PATH=${HERE}/tools &&
 
-export PATH=${MINGW_BINPATH}:$PATH:${MINGW_BINPATH}
+export PATH=${TOOLS_PATH}:$PATH:${TOOLS_PATH}

@@ -97,8 +97,10 @@ toolchain("llvm-mingw") {
 
   if (target_cpu == "x86") {
     mingw_prefix = "i686"
+    bin_prefix = "i686"
   } else if (target_cpu == "x64") {
     mingw_prefix = "x86_64"
+    bin_prefix = "x64"
   } else {
     print("MinGW toolchain can only target x86/x64 for now.")
   }
@@ -111,11 +113,11 @@ toolchain("llvm-mingw") {
       AR = "$mingw_prefix-w64-mingw32-llvm-ar.exe"
       RC = "$mingw_prefix-w64-mingw32-windres.exe"
     } else {
-      CC = "../../tools/mingw/win/bin/$mingw_prefix-w64-mingw32-gcc.exe"
-      CXX = "../../tools/mingw/win/bin/$mingw_prefix-w64-mingw32-g++.exe"
-      LD = "../../tools/mingw/win/bin/$mingw_prefix-w64-mingw32-g++.exe"
-      AR = "../../tools/mingw/win/bin/$mingw_prefix-w64-mingw32-ar.exe"
-      RC = "../../tools/mingw/win/bin/$mingw_prefix-w64-mingw32-windres.exe"
+      CC = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-gcc.exe"
+      CXX = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++.exe"
+      LD = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++.exe"
+      AR = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar.exe"
+      RC = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-windres.exe"
     }
   } else {
     if (use_llvm) {
@@ -125,11 +127,11 @@ toolchain("llvm-mingw") {
       AR = "$mingw_prefix-w64-mingw32-llvm-ar"
       RC = "$mingw_prefix-w64-mingw32-windres"
     } else {
-      CC = "../../tools/mingw/linux/bin/$mingw_prefix-w64-mingw32-gcc"
-      CXX = "../../tools/mingw/linux/bin/$mingw_prefix-w64-mingw32-g++"
-      LD = "../../tools/mingw/linux/bin/$mingw_prefix-w64-mingw32-g++"
-      AR = "../../tools/mingw/linux/bin/$mingw_prefix-w64-mingw32-ar"
-      RC = "../../tools/mingw/linux/bin/$mingw_prefix-w64-mingw32-windres"
+      CC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-gcc"
+      CXX = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++"
+      LD = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++"
+      AR = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar"
+      RC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-windres"
     }
   }
 

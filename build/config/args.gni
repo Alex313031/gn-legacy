@@ -49,5 +49,6 @@ if (c_std == "default") {
 }
 
 declare_args() {
-  use_llvm = is_linux
+  # Whether to use LLVM compiler instead of GCC/MinGW
+  use_llvm = false
 }

@@ -10,9 +10,6 @@ declare_args() {
   # default is C11
   c_std = "default"
 
-  # Whether to compile with unicode CFLAGS and _UNICODE defined.
-  use_unicode = true
-
   # Whether this is a console app. Sets subsystem and defines _CONSOLE.
   # Cannot be true when windowed_subsystem = true
   console_subsystem = false

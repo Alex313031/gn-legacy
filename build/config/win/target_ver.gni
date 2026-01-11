@@ -13,6 +13,7 @@ declare_args() {
   win32_ie = ""
 }
 
+is_winnt = (winver == "NT" || winver == "4.0" || winver == "NT4" || winver == "nt4")
 is_win2k = (winver == "2000" || winver == "5.0" || winver == "2k" || winver == "2K")
 is_winxp = (winver == "xp" || winver == "5.1" || winver == "XP")
 is_win2003 = (winver == "xp64" || winver == "5.2" || winver == "2003")
@@ -23,9 +24,14 @@ is_win81 = (winver == "8.1" || winver == "6.3" || winver == "blue")
 is_win10 = (winver == "10" || winver == "10.0" || winver == "threshold" || winver == "ten")
 is_win11 = (winver == "11" || winver == "10.1" || winver == "eleven")
 
-is_legacy_windows = is_win2k || is_winxp || is_win2003 || is_winvista
+is_legacy_windows = is_winnt || is_win2k || is_winxp || is_win2003 || is_winvista
 
-if (is_win2k) {
+if (is_winnt) {
+  win32_winnt = "0x0400"
+  win64_winnt = "0x0502"
+  win32_ie = "0x501"
+  subsystem = "4.00"
+} else if (is_win2k) {
   win32_winnt = "0x0500"
   win64_winnt = "0x0502"
   win32_ie = "0x501"
@@ -77,5 +83,9 @@ if (is_win2k) {
 }
 
 declare_args() {
+  # Whether to specify to use modern common controls.
   use_common_controls = !is_win2k
+
+  # Whether to compile with unicode CFLAGS and _UNICODE defined.
+  use_unicode = !is_winnt
 }

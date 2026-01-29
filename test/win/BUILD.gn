@@ -27,7 +27,7 @@ executable("hello_win32") {
 }
 
 executable("hello_console") {
-  configs +=[ ":hello_win_config", ]
+  configs += [ ":hello_win_config", ]
   sources = [
     "console/hello_console.cc",
     "console/resource.rc",

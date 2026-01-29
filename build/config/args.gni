@@ -2,6 +2,9 @@ declare_args() {
   # Whether to compile in debug mode, with symbols and DEBUG defined.
   is_debug = true
 
+  # Whether to enable DCHECKs and extra assertions
+  dcheck_enabled = false
+
   # What C++ standard to use, valid values are 03, 11, 14, 17, and 20
   # default is C++17
   cpp_std = "default"

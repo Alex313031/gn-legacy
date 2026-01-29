@@ -25,6 +25,9 @@ config("compiler_defaults") {
       "_NDEBUG",
     ]
   }
+  if (dcheck_enabled) {
+    defines += [ "DCHECK=1" ]
+  }
   if (use_common_controls) {
     defines += [ "USE_COMMCTRLS", ]
   }

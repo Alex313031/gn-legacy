@@ -88,4 +88,8 @@ declare_args() {
 
   # Whether to compile with unicode CFLAGS and _UNICODE defined.
   use_unicode = !is_winnt
+
+  # Whether the app should be compiled as LARGE_ADDRESS_AWARE to
+  # allow 32 bit apps to access up to 4GB virtual address space.
+  large_address_aware = is_win8 || is_win81 || is_win10 || is_win11 || current_cpu == "x64"
 }

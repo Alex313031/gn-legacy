@@ -29,6 +29,11 @@ config("windows_config") {
     "_WIN64_WINNT=$win64_winnt",
     "_WIN32_IE=$win32_ie",
   ]
+
+  if (large_address_aware) {
+    ldflags += [ "-Wl,--large-address-aware" ]
+  }
+
   if (is_legacy_windows) {
     defines += [
       "_CRT_SECURE_NO_WARNINGS"

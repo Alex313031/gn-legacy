@@ -82,9 +82,6 @@ config("windows_config") {
       "comctl32",
       "comdlg32",
       "gdi32",
-      "advapi32",
-      "ole32",
-      "winmm",
     ]
   }
 }

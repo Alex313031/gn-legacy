@@ -31,13 +31,19 @@ config("windows_config") {
   ]
 
   if (large_address_aware) {
-    ldflags += [ "-Wl,--large-address-aware" ]
+    defines += [ "LARGE_ADDRESS_AWARE" ]
+    if (current_cpu == "x86") {
+      ldflags += [ "-Wl,--large-address-aware" ]
+    }
   }
 
   if (is_legacy_windows) {
     defines += [
-      "_CRT_SECURE_NO_WARNINGS"
+      "PSAPI_VERSION=1",
+      "_CRT_SECURE_NO_WARNINGS",
     ]
+  } else {
+    defines += [ "PSAPI_VERSION=2", ]
   }
 
   if (is_debug) {

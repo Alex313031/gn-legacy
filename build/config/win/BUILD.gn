@@ -41,9 +41,13 @@ config("windows_config") {
     defines += [
       "PSAPI_VERSION=1",
       "_CRT_SECURE_NO_WARNINGS",
+      "_CRT_NONSTDC_NO_WARNINGS",
     ]
   } else {
-    defines += [ "PSAPI_VERSION=2", ]
+    defines += [
+      "PSAPI_VERSION=2",
+      "_CRT_SECURE_NO_WARNINGS",
+    ]
   }
 
   if (is_debug) {
@@ -118,4 +122,8 @@ config("windowed_subsystem") {
   } else {
     ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
   }
+}
+
+config("nominmax") {
+  defines = [ "NOMINMAX", ]
 }

@@ -5,11 +5,11 @@ declare_args() {
   # Whether to enable DCHECKs and extra assertions
   dcheck_enabled = false
 
-  # What C++ standard to use, valid values are 03, 11, 14, 17, and 20
+  # What C++ standard to use, valid values are 03, 11, 14, 17, and 20, and 23
   # default is C++17
   cpp_std = "default"
 
-  # What C++ standard to use, valid values are 99, 11, 17
+  # What C++ standard to use, valid values are 99, 11, 17, and 23
   # default is C11
   c_std = "default"
 
@@ -35,11 +35,11 @@ if (is_official_build) {
   assert(!is_debug, "is_official_build cannot be true when is_debug = true")
 }
 
-if (cpp_std != "03" && cpp_std != "11" && cpp_std != "14" && cpp_std != "17" && cpp_std != "20") {
+if (cpp_std != "03" && cpp_std != "11" && cpp_std != "14" && cpp_std != "17" && cpp_std != "20" && cpp_std != "23") {
  assert(cpp_std == "default", "Invalid C++ standard!")
 }
 
-if (c_std != "99" && c_std != "11" && c_std != "17") {
+if (c_std != "99" && c_std != "11" && c_std != "17" && c_std != "23") {
  assert(c_std == "default", "Invalid C standard!")
 }
 

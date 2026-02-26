@@ -2,12 +2,12 @@
 
 @ECHO OFF
 
-ECHO NINJA 32 Bit
+ECHO NINJA 64 Bit
 
 SET CWD=%~dp0
 
 SET TOOLSDIR=%CWD%\tools
 
-SET PATH=%TOOLSDIR%\mingw\win\i686\bin;%PATH%
+SET PATH=%TOOLSDIR%\mingw\win\x64\bin;%PATH%
 
 %TOOLSDIR%\ninja.exe %*

@@ -23,15 +23,20 @@ export TMP_DOWN_PATH=${HERE}/TMP_ &&
 
 export PATH=${TOOLS_PATH}:$PATH
 
+# Edit below lines to update toolchains
+export LINUX_TOOLCHAIN_VER="20260221"
+export WIN32_TOOLCHAIN_VER="v2.5.1"
+
 # Linux toolchain
 DownloadLinux () {
-  printf "${GRE}Downloading 32 bit Linux Toolchain... ${c0}\n" &&
-  wget -P $TMP_DOWN_PATH https://github.com/Alex313031/mingw-linux-build/releases/download/20260221/i686.zip &&
+  mkdir -p ${TMP_DOWN_PATH} &&
+  printf "${GRE}Downloading 32 bit Linux Toolchain version ${LINUX_TOOLCHAIN_VER} ${c0}\n" &&
+  wget -P $TMP_DOWN_PATH https://github.com/Alex313031/mingw-linux-build/releases/download/${LINUX_TOOLCHAIN_VER}/i686.zip &&
   printf "${GRE}Unzipping Linux i686.zip... ${c0}\n" &&
   unzip $TMP_DOWN_PATH/i686.zip -d ${MINGW_LINUX_PATH} &&
 
-  printf "${GRE}Downloading 64 bit Linux Toolchain... ${c0}\n" &&
-  wget -P $TMP_DOWN_PATH https://github.com/Alex313031/mingw-linux-build/releases/download/20260221/x64.zip &&
+  printf "${GRE}Downloading 64 bit Linux Toolchain version ${LINUX_TOOLCHAIN_VER} ${c0}\n" &&
+  wget -P $TMP_DOWN_PATH https://github.com/Alex313031/mingw-linux-build/releases/download/${LINUX_TOOLCHAIN_VER}/x64.zip &&
   printf "${GRE}Unzipping Linux x64.zip... ${c0}\n" &&
   unzip $TMP_DOWN_PATH/x64.zip -d ${MINGW_LINUX_PATH} &&
 
@@ -40,13 +45,14 @@ DownloadLinux () {
 
 # Windows toolchain
 DownloadWindows () {
-  printf "${GRE}Downloading 32 bit Windows Toolchain... ${c0}\n" &&
-  wget.exe -P $TMP_DOWN_PATH https://github.com/Alex313031/win32-devkit/releases/download/v2.5.1/i686.zip &&
+  mkdir -p ${TMP_DOWN_PATH} &&
+  printf "${GRE}Downloading 32 bit Windows Toolchain version ${WIN32_TOOLCHAIN_VER} ${c0}\n" &&
+  wget.exe -P $TMP_DOWN_PATH https://github.com/Alex313031/win32-devkit/releases/download/${WIN32_TOOLCHAIN_VER}/i686.zip &&
   printf "${GRE}Unzipping Windows i686.zip... ${c0}\n" &&
   unzip $TMP_DOWN_PATH/i686.zip -d ${MINGW_WIN32_PATH} &&
 
-  printf "${GRE}Downloading 64 bit Windows Toolchain... ${c0}\n" &&
-  wget.exe -P $TMP_DOWN_PATH https://github.com/Alex313031/win32-devkit/releases/download/v2.5.1/x64.zip &&
+  printf "${GRE}Downloading 64 bit Windows Toolchain version ${WIN32_TOOLCHAIN_VER} ${c0}\n" &&
+  wget.exe -P $TMP_DOWN_PATH https://github.com/Alex313031/win32-devkit/releases/download/${WIN32_TOOLCHAIN_VER}/x64.zip &&
   printf "${GRE}Unzipping Windows x64.zip... ${c0}\n" &&
   unzip $TMP_DOWN_PATH/x64.zip -d ${MINGW_WIN32_PATH} &&
 
@@ -55,6 +61,7 @@ DownloadWindows () {
 
 # MacOS (none yet)
 DownloadMacOS () {
+  mkdir -p ${TMP_DOWN_PATH} &&
   printf "${RED}...not downloading for MacOS, no builds yet.${c0}\n"
 }
 

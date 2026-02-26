@@ -8,6 +8,8 @@ SET CWD=%~dp0
 
 SET TOOLSDIR=%CWD%\tools
 
-SET PATH=%TOOLSDIR%\mingw\win\i686\bin;%PATH%
+SET MINGW_PATH=%TOOLSDIR%\mingw\win\i686\bin
+
+SET PATH=%TOOLSDIR%;%PATH%
 
 %TOOLSDIR%\ninja.exe %*

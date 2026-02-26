@@ -158,7 +158,11 @@ toolchain("llvm-mingw") {
     libfile = "{{target_out_dir}}/$libname"
     outlibfile = "{{root_out_dir}}/$libname"
     description = "AR {{output}}"
-    command = "$AR rcs $libfile {{inputs}} && cp -af $libfile $outlibfile"
+    if (host_os == "win") {
+      command = "$AR rcs $libfile {{inputs}}"
+    } else {
+      command = "$AR rcs $libfile {{inputs}} && cp -af $libfile $outlibfile"
+    }
 
     default_output_extension = ".a"
     output_prefix = "lib"

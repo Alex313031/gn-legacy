@@ -24,7 +24,7 @@ export TMP_DOWN_PATH=${HERE}/TMP_ &&
 export PATH=${TOOLS_PATH}:$PATH
 
 # Edit below lines to update toolchains
-export LINUX_TOOLCHAIN_VER="20260221"
+export LINUX_TOOLCHAIN_VER="20260311"
 export WIN32_TOOLCHAIN_VER="v2.5.1"
 
 # Linux toolchain

@@ -18,7 +18,7 @@ try() { "$@" || die "${RED}Failed $*"; }
 export HERE=${PWD} &&
 
 export TOOLS_PATH=${HERE}/tools &&
-export MINGW_PATH=${HERE}/tools/mingw/linux/i686/bin &&
+export MINGW_PATH=${HERE}/tools/mingw/linux/x64/bin &&
 
 printf "\nAdding ${CYA}${TOOLS_PATH}${c0} and ${CYA}${MINGW_PATH}${c0} to PATH... \n" &&
 

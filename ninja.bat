@@ -2,7 +2,7 @@
 
 @ECHO OFF
 
-ECHO NINJA 32 Bit
+ECHO MinGW x86
 
 SET CWD=%~dp0
 

@@ -5,7 +5,7 @@
 export HERE=${PWD} &&
 
 export TOOLS_PATH=${HERE}/tools &&
-export MINGW_PATH=${HERE}/tools/mingw/linux/i686/bin &&
+export MINGW_PATH=${HERE}/tools/mingw/linux/x64/bin &&
 
 export PATH=${MINGW_PATH}:${TOOLS_PATH}:$PATH:${TOOLS_PATH}:${MINGW_PATH} &&
 

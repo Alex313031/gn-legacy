@@ -137,7 +137,7 @@ toolchain("llvm-mingw") {
 
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "$CC {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    command = "$CC -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CC {{output}}"
     outputs =
@@ -146,7 +146,7 @@ toolchain("llvm-mingw") {
 
   tool("cxx") {
     depfile = "{{output}}.d"
-    command = "$CXX {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    command = "$CXX -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CXX {{output}}"
     outputs =
@@ -173,10 +173,11 @@ toolchain("llvm-mingw") {
     soname = "{{target_output_name}}{{output_extension}}"  # e.g. "libfoo.dll".
     sofile = "{{output_dir}}/$soname"
     libfile = "{{output_dir}}/lib$soname.a"
-    #rspfile = soname + ".rsp"
+    rspfile = soname + ".rsp"
+    rspfile_content = "{{inputs}}"
     os_specific_option = "-Wl,-soname=$soname -Wl,--out-implib,$libfile"
 
-    command = "$CXX -shared {{ldflags}} {{inputs}} -o $sofile {{solibs}} {{libs}} $os_specific_option"
+    command = "$CXX -shared {{ldflags}} @$rspfile -o $sofile {{solibs}} {{libs}} $os_specific_option"
 
     description = "DLL LINK $soname"
 
@@ -196,19 +197,18 @@ toolchain("llvm-mingw") {
 
   tool("rc") {
     command = "$RC {{source}} {{defines}} {{include_dirs}} -O coff {{output}}"
-    depsformat = "msvc"
     outputs = [ "$object_path.res" ]
     description = "RC {{output}}"
   }
 
   tool("link") {
     outfile = "{{target_output_name}}{{output_extension}}"
-    #rspfile = "$outfile.rsp"
-    command = "$LD {{ldflags}} {{inputs}} -o $outfile {{solibs}} {{libs}}"
+    rspfile = "$outfile.rsp"
+    rspfile_content = "{{inputs}}"
+    command = "$LD {{ldflags}} @$rspfile -o $outfile {{solibs}} {{libs}}"
     description = "LINK $outfile"
     default_output_dir = "{{root_out_dir}}"
     default_output_extension = ".exe"
-    #rspfile_content = "{{inputs}}"
     outputs = [ outfile ]
   }
 

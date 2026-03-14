@@ -40,8 +40,6 @@ config("compiler_defaults") {
   if (current_os == "win") {
     cflags += [
       "-Wall",
-      "-MMD",
-      "-MP",
       "-static",
       "-mfpmath=sse",
       "-mfxsr",

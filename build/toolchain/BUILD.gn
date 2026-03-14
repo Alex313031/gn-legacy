@@ -113,11 +113,11 @@ toolchain("llvm-mingw") {
       AR = "$mingw_prefix-w64-mingw32-llvm-ar.exe"
       RC = "$mingw_prefix-w64-mingw32-windres.exe"
     } else {
-      CC = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-gcc.exe"
-      CXX = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++.exe"
-      LD = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++.exe"
-      AR = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar.exe"
-      RC = "../../tools/mingw/win/$bin_prefix/bin/$mingw_prefix-w64-mingw32-windres.exe"
+      CC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-gcc.exe"
+      CXX = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-g++.exe"
+      LD = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-g++.exe"
+      AR = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-ar.exe"
+      RC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-windres.exe"
     }
   } else {
     if (use_llvm) {
@@ -159,7 +159,7 @@ toolchain("llvm-mingw") {
     outlibfile = "{{root_out_dir}}/$libname"
     description = "AR {{output}}"
     if (host_os == "win") {
-      command = "cmd /c $AR rcs $libfile {{inputs}} && copy /Y $libfile $outlibfile"
+      command = "cmd /c $AR rcs $libfile {{inputs}}&&powershell -NoProfile -Command \"Copy-Item -LiteralPath '$libfile' -Destination '$outlibfile' -Force\""
     } else {
       command = "$AR rcs $libfile {{inputs}} && cp -af $libfile $outlibfile"
     }

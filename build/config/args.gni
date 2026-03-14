@@ -9,7 +9,7 @@ declare_args() {
   # default is C++17
   cpp_std = "default"
 
-  # What C++ standard to use, valid values are 99, 11, 17, and 23
+  # What C standard to use, valid values are 99, 11, 17, and 23
   # default is C11
   c_std = "default"
 

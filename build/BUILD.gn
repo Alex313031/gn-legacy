@@ -121,11 +121,7 @@ config("executable_ldconfig") {
       "-Wl,-rpath-link=",
     ]
   } else if (is_win) {
-    if (console_subsystem) {
-      #configs += [ "//build/config/win:console_subsystem", ]
-    } else {
-      #configs += [ "//build/config/win:windowed_subsystem", ]
-    }
+    ldflags += []
   } else if (is_mac) {
     ldflags += []
   }

@@ -71,15 +71,6 @@ config("windows_config") {
   }
 
   if (console_subsystem) {
-    cflags += [ "-mconsole", ]
-  } else {
-    if (use_unicode) {
-      cflags += [ "-municode", ]
-    } else {
-      cflags += [ "-mwindows", ]
-    }
-  }
-  if (console_subsystem) {
     libs += [
       "kernel32",
       "user32",
@@ -103,11 +94,7 @@ config("console_subsystem") {
   } else {
     ldflags += [ "-mconsole", ]
   }
-  if (is_winxp) {
-    ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
-  } else {
-    ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
-  }
+  ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
 }
 
 config("windowed_subsystem") {
@@ -117,11 +104,7 @@ config("windowed_subsystem") {
   } else {
     ldflags += [ "-mwindows", ]
   }
-  if (is_winxp) {
-    ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
-  } else {
-    ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
-  }
+  ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
 }
 
 config("nominmax") {

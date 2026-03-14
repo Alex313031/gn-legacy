@@ -17,7 +17,7 @@ is_winnt = (winver == "NT" || winver == "4.0" || winver == "NT4" || winver == "n
 is_win2k = (winver == "2000" || winver == "5.0" || winver == "2k" || winver == "2K")
 is_winxp = (winver == "xp" || winver == "5.1" || winver == "XP")
 is_win2003 = (winver == "xp64" || winver == "5.2" || winver == "2003")
-is_winvista = (winver == "vista" || winver == "5.1" || winver == "Vista")
+is_winvista = (winver == "vista" || winver == "6.0" || winver == "Vista")
 is_win7 = (winver == "7" || winver == "6.1" || winver == "seven")
 is_win8 = (winver == "8" || winver == "6.2" || winver == "eight")
 is_win81 = (winver == "8.1" || winver == "6.3" || winver == "blue")
@@ -80,6 +80,7 @@ if (is_winnt) {
   win32_winnt = "0x0501"
   win64_winnt = "0x0502"
   win32_ie = "0x601"
+  subsystem = "5.01"
 }
 
 declare_args() {

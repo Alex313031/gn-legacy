@@ -159,7 +159,7 @@ toolchain("llvm-mingw") {
     outlibfile = "{{root_out_dir}}/$libname"
     description = "AR {{output}}"
     if (host_os == "win") {
-      command = "$AR rcs $libfile {{inputs}} && copy /Y $libfile $outlibfile"
+      command = "cmd /c $AR rcs $libfile {{inputs}} && copy /Y $libfile $outlibfile"
     } else {
       command = "$AR rcs $libfile {{inputs}} && cp -af $libfile $outlibfile"
     }

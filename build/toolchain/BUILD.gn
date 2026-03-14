@@ -159,7 +159,7 @@ toolchain("llvm-mingw") {
     outlibfile = "{{root_out_dir}}/$libname"
     description = "AR {{output}}"
     if (host_os == "win") {
-      command = "$AR rcs $libfile {{inputs}}"
+      command = "$AR rcs $libfile {{inputs}} && copy /Y $libfile $outlibfile"
     } else {
       command = "$AR rcs $libfile {{inputs}} && cp -af $libfile $outlibfile"
     }
@@ -213,12 +213,20 @@ toolchain("llvm-mingw") {
   }
 
   tool("stamp") {
-    command = "touch {{output}}"
+    if (host_os == "win") {
+      command = "copy /b NUL {{output}}"
+    } else {
+      command = "touch {{output}}"
+    }
     description = "STAMP {{output}}"
   }
 
   tool("copy") {
-    command = "cp -af {{source}} {{output}}"
+    if (host_os == "win") {
+      command = "copy /Y {{source}} {{output}}"
+    } else {
+      command = "cp -af {{source}} {{output}}"
+    }
     description = "COPY {{source}} {{output}}"
   }
 }

@@ -31,15 +31,14 @@ config("compiler_defaults") {
   if (use_common_controls) {
     defines += [ "USE_COMMCTRLS", ]
   }
-  if (use_unicode) {
-    cflags += [
-      "-finput-charset=UTF-8",
-      "-fexec-charset=UTF-8",
-    ]
+  # Warn for everything
+  cflags += [ "-Wall", ]
+  if (dcheck_enabled) {
+    # Warnings are errors by default if DCHECK
+    cflags += [ "-Werror", ]
   }
   if (current_os == "win") {
     cflags += [
-      "-Wall",
       "-static",
       "-mfpmath=sse",
       "-mfxsr",
@@ -84,12 +83,16 @@ config("linux_config") {
   cflags = []
   ldflags = []
 
-  if (use_unicode) {
-    defines += [
-      "UNICODE",
-      "_UNICODE",
-    ]
-  }
+  # Assume Unicode on Linux
+  defines += [
+    "UNICODE",
+    "_UNICODE",
+  ]
+
+  cflags += [
+    "-finput-charset=UTF-8",
+    "-fexec-charset=UTF-8",
+  ]
 
   if (is_debug) {
     cflags += [

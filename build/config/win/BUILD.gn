@@ -6,22 +6,8 @@ import("//build/config/win/target_ver.gni")
 config("windows_config") {
   defines = [ "_WIN32", ]
   cflags = []
-  libs = []
   include_dirs = []
   ldflags = []
-
-  if (use_unicode) {
-    defines += [
-      "UNICODE",
-      "_UNICODE",
-    ]
-  }
-
-  if (console_subsystem) {
-    defines += [ "_CONSOLE", ]
-  } else {
-    defines += [ "_WINDOWS", ]
-  }
 
   defines += [
     "WINVER=$win32_winnt",
@@ -69,42 +55,55 @@ config("windows_config") {
       ]
     }
   }
-
-  if (console_subsystem) {
-    libs += [
-      "kernel32",
-      "user32",
-    ]
-  } else {
-    libs += [
-      "kernel32",
-      "user32",
-      "shell32",
-      "comctl32",
-      "comdlg32",
-      "gdi32",
-    ]
-  }
 }
 
 config("console_subsystem") {
   ldflags = []
-  if (use_unicode) {
-    ldflags += [ "-mconsole", ]
-  } else {
-    ldflags += [ "-mconsole", ]
-  }
+  libs = []
+  defines = [ "_CONSOLE", ]
+  ldflags += [ "-mconsole", ]
   ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
+  # Default libs
+  libs += [
+    "kernel32",
+    "user32",
+  ]
 }
 
 config("windowed_subsystem") {
   ldflags = []
-  if (use_unicode) {
-    ldflags += [ "-municode", ]
-  } else {
-    ldflags += [ "-mwindows", ]
-  }
+  libs = []
+  defines = [ "_WINDOWS", ]
   ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
+  # Default libs
+  libs += [
+    "kernel32",
+    "user32",
+    "shell32",
+    "comctl32",
+    "comdlg32",
+    "gdi32",
+  ]
+}
+
+config("unicode") {
+  defines = [
+    "UNICODE",
+    "_UNICODE",
+  ]
+  cflags = [
+    "-finput-charset=UTF-8",
+    "-fexec-charset=UTF-8",
+  ]
+  ldflags = [ "-municode", ]
+}
+
+config("ansi") {
+  defines = [
+    "ANSI",
+    "_ANSI",
+  ]
+  ldflags = [ "-mwindows", ]
 }
 
 config("nominmax") {

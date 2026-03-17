@@ -13,22 +13,13 @@ declare_args() {
   # default is C11
   c_std = "default"
 
-  # Whether this is a console app. Sets subsystem and defines _CONSOLE.
-  # Cannot be true when windowed_subsystem = true
-  console_subsystem = false
+  # Whether to use LLVM compiler instead of GCC/MinGW
+  use_llvm = false
 }
 
 declare_args() {
   # Whether this is an official release build for users. Adds additional compiler optimization.
   is_official_build = !is_debug
-
-  # Whether this is a console app. Sets subsystem and defines _WINDOWS.
-  # Cannot be true when console_subsystem = true
-  windowed_subsystem = !console_subsystem
-}
-
-if (console_subsystem) {
-  assert(!windowed_subsystem, "console_subsystem and windowed_subsystem cannot both be true!")
 }
 
 if (is_official_build) {
@@ -49,9 +40,4 @@ if (cpp_std == "default") {
 
 if (c_std == "default") {
   c_std = "11"
-}
-
-declare_args() {
-  # Whether to use LLVM compiler instead of GCC/MinGW
-  use_llvm = false
 }

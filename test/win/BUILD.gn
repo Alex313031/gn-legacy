@@ -1,4 +1,4 @@
-# Copyright 2025 Alex313031
+# Copyright 2026 Alex313031
 
 group("hello_win") {
   public_deps = [
@@ -8,11 +8,7 @@ group("hello_win") {
 }
 
 executable("hello_win32") {
-  configs -= [ "//build/config/win:console_subsystem" ]
-  configs += [
-    "//build/config/win:windowed_subsystem",
-    ":hello_win_config",
-  ]
+  configs += [ ":hello_win_config", ]
   sources = [
     "gui/hello_win32.cc",
     "gui/hello_win32.h",
@@ -27,7 +23,14 @@ executable("hello_win32") {
 }
 
 executable("hello_console") {
-  configs += [ ":hello_win_config", ]
+  configs -= [
+    "//build/config/win:windowed_subsystem",
+    "//build/config/win:unicode",
+  ]
+  configs += [
+    "//build/config/win:console_subsystem",
+    ":hello_win_config",
+  ]
   sources = [
     "console/hello_console.cc",
     "console/resource.rc",
@@ -47,8 +50,6 @@ static_library("salute") {
 }
 
 shared_library("heller") {
-  configs += [ "//build/config/win:windowed_subsystem" ]
-
   include_dirs = [ "dll", ]
   sources = [
     "dll/hello_shared.cc",

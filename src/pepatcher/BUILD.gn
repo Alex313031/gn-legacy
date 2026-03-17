@@ -7,7 +7,11 @@ group("pepatcher") {
 }
 
 executable("patchpe") {
-  configs += [ ":patchpe_config", ]
+  configs -= [ "//build/config/win:windowed_subsystem" ]
+  configs += [
+    "//build/config/win:console_subsystem",
+    ":patchpe_config",
+  ]
   sources = [
     "patchpe.cc",
     "patchpe.rc",

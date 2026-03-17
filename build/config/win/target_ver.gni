@@ -13,14 +13,14 @@ declare_args() {
   win32_ie = ""
 }
 
-is_winnt = (winver == "NT" || winver == "4.0" || winver == "NT4" || winver == "nt4")
-is_win2k = (winver == "2000" || winver == "5.0" || winver == "2k" || winver == "2K")
-is_winxp = (winver == "xp" || winver == "5.1" || winver == "XP")
-is_win2003 = (winver == "xp64" || winver == "5.2" || winver == "2003")
-is_winvista = (winver == "vista" || winver == "6.0" || winver == "Vista")
-is_win7 = (winver == "7" || winver == "6.1" || winver == "seven")
-is_win8 = (winver == "8" || winver == "6.2" || winver == "eight")
-is_win81 = (winver == "8.1" || winver == "6.3" || winver == "blue")
+is_winnt = (winver == "NT" || winver == "4.0" || winver == "NT4" || winver == "nt4" || winver == "cairo")
+is_win2k = (winver == "2000" || winver == "5.0" || winver == "2k" || winver == "2K" || winver == "neptune")
+is_winxp = (winver == "xp" || winver == "5.1" || winver == "XP" || winver == "whistler")
+is_win2003 = (winver == "xp64" || winver == "5.2" || winver == "2003" || winver == "XP64")
+is_winvista = (winver == "vista" || winver == "6.0" || winver == "Vista" || winver == "2008" || winver == "longhorn")
+is_win7 = (winver == "7" || winver == "6.1" || winver == "seven" || winver == "2008R2" || winver == "2011")
+is_win8 = (winver == "8" || winver == "6.2" || winver == "eight" || winver == "2012")
+is_win81 = (winver == "8.1" || winver == "6.3" || winver == "blue" || winver == "2012R2")
 is_win10 = (winver == "10" || winver == "10.0" || winver == "threshold" || winver == "ten")
 is_win11 = (winver == "11" || winver == "10.1" || winver == "eleven")
 
@@ -85,10 +85,7 @@ if (is_winnt) {
 
 declare_args() {
   # Whether to specify to use modern common controls.
-  use_common_controls = !is_win2k
-
-  # Whether to compile with unicode CFLAGS and _UNICODE defined.
-  use_unicode = !is_winnt
+  use_common_controls = !is_winnt
 
   # Whether the app should be compiled as LARGE_ADDRESS_AWARE to
   # allow 32 bit apps to access up to 4GB virtual address space.

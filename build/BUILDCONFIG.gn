@@ -25,8 +25,11 @@ is_win = host_os == "win" && current_os == "win" || target_os == "win"
 _shared_binary_target_configs = [ "//build:compiler_defaults" ]
 
 if (is_win) {
-   # For GUI Win32 App, remove this config and add "//build/config/win:windowed_subsystem"
-  _linker_configs = [ "//build/config/win:console_subsystem" ]
+  # For Console Win32 App, remove these config and add "//build/config/win:console_subsystem"
+  # also remove "//build/config/win:unicode" config
+  _linker_configs = [ "//build/config/win:windowed_subsystem" ]
+  # For Non-Unicode Win32 App, remove these config and add "//build/config/win:ansi"
+  _linker_configs += [ "//build/config/win:unicode" ]
 } else {
   _linker_configs = []
 }

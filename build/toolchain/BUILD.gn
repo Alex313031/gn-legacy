@@ -15,6 +15,7 @@ toolchain("gcc") {
   }
 
   tool("cxx") {
+    precompiled_header_type = "gcc"
     depfile = "{{output}}.d"
     command = "g++ -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
@@ -145,6 +146,7 @@ toolchain("llvm-mingw") {
   }
 
   tool("cxx") {
+    precompiled_header_type = "gcc"
     depfile = "{{output}}.d"
     command = "$CXX -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
     depsformat = "gcc"

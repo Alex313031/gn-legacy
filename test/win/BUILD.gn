@@ -29,6 +29,7 @@ executable("hello_console") {
   ]
   configs += [
     "//build/config/win:console_subsystem",
+    "//build/config/win:console_unicode",
     ":hello_win_config",
   ]
   sources = [

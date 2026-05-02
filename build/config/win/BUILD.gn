@@ -98,6 +98,18 @@ config("unicode") {
   ldflags = [ "-municode", ]
 }
 
+config("console_unicode") {
+  defines = [
+    "UNICODE",
+    "_UNICODE",
+  ]
+  cflags = [
+    "-finput-charset=UTF-8",
+    "-fexec-charset=UTF-8",
+  ]
+  ldflags = [ "-mconsole", ]
+}
+
 config("ansi") {
   defines = [
     "ANSI",

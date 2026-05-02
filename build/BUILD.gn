@@ -41,10 +41,6 @@ config("compiler_defaults") {
   if (current_os == "win") {
     cflags += [
       "-static",
-      "-mfpmath=sse",
-      "-mfxsr",
-      "-msse",
-      "-msse2",
     ]
     cflags_c += [
       "-static-libgcc",
@@ -76,6 +72,91 @@ config("compiler_defaults") {
       "-pic",
     ]
     configs += [ ":linux_config", ]
+  }
+  configs += [ ":simd_config", ]
+}
+
+config("simd_config") {
+  defines = []
+  cflags = []
+  ldflags = []
+  if (current_cpu == "x86" || current_cpu == "x64") {
+    if (current_cpu == "x86") {
+      cflags += [
+        "-mfpmath=sse",
+        "-mfxsr",
+        "-msse",
+      ]
+      if (use_sse2) {
+        cflags += [ "-msse2", ]
+      }
+    }
+    if (use_sse3) {
+      cflags += [ "-msse3", ]
+    }
+    if (use_sse41) {
+      cflags += [
+        "-mssse3",
+        "-msse4.1",
+      ]
+    }
+    if (use_sse42) {
+      cflags += [ "-msse4.2", ]
+      ldflags += [ "-march=x86-64-v2", ]
+    }
+    if (current_cpu == "x64") {
+      if (use_avx) {
+        cflags += [
+          "-mpclmul",
+          "-mavx",
+        ]
+      }
+      if (use_aes) {
+        cflags += [ "-maes", ]
+      }
+      if (use_avx2) {
+        cflags += [
+          "-mf16c",
+          "-mlzcnt",
+          "-mbmi",
+          "-mbmi2",
+          "-mavx2",
+        ]
+        ldflags += [ "-march=haswell", ]
+      }
+      if (use_avx512) {
+        cflags += [
+          "-mavx512f",
+          "-mavx512cd",
+          "-mavx512vl",
+          "-mavx512bw",
+          "-mavx512dq",
+        ]
+        ldflags += [ "-march=skylake-avx512", ]
+      }
+      if (use_fma) {
+        cflags += [
+          "-mfma",
+          "-ffp-contract=fast",
+        ]
+        ldflags += [ "-fp-contract=fast", ]
+      }
+    }
+  } else {
+    if (current_cpu == "arm") {
+      cflags += [
+        "-mfpu=vfpv3-d16",
+        "-mfloat-abi=hard",
+        "-march=armv7-a",
+      ]
+    }
+    if (current_cpu == "arm64") {
+      defines += [ "__ARM_NEON__=1" ]
+      cflags += [
+        "-mfpu=neon",
+        "-march=armv8-a+simd",
+      ]
+    }
   }
 }
 

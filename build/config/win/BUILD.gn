@@ -63,10 +63,9 @@ config("console_subsystem") {
   defines = [ "_CONSOLE", ]
   ldflags += [ "-mconsole", ]
   ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
-  # Default libs
+  # Default libs for console apps, everything needs kernel32.
   libs += [
     "kernel32",
-    "user32",
   ]
 }
 
@@ -75,47 +74,42 @@ config("windowed_subsystem") {
   libs = []
   defines = [ "_WINDOWS", ]
   ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
-  # Default libs
+  # Default common libs for GUI Win32 apps.
   libs += [
     "kernel32",
     "user32",
     "shell32",
     "comctl32",
-    "comdlg32",
-    "gdi32",
+  ]
+}
+
+config("unicode_base") {
+  defines = [
+    "UNICODE",
+    "_UNICODE",
+  ]
+  cflags = [
+    "-finput-charset=UTF-8",
+    "-fexec-charset=UTF-8",
   ]
 }
 
 config("unicode") {
-  defines = [
-    "UNICODE",
-    "_UNICODE",
-  ]
-  cflags = [
-    "-finput-charset=UTF-8",
-    "-fexec-charset=UTF-8",
-  ]
+  configs = [ ":unicode_base", ]
   ldflags = [ "-municode", ]
 }
 
+config("mwindows") {
+  ldflags = [ "-mwindows", ]
+}
+
 config("console_unicode") {
-  defines = [
-    "UNICODE",
-    "_UNICODE",
-  ]
-  cflags = [
-    "-finput-charset=UTF-8",
-    "-fexec-charset=UTF-8",
-  ]
+  configs = [ ":unicode_base", ]
   ldflags = [ "-mconsole", ]
 }
 
-config("ansi") {
-  defines = [
-    "ANSI",
-    "_ANSI",
-  ]
-  ldflags = [ "-mwindows", ]
+config("mconsole") {
+  ldflags = [ "-mconsole", ]
 }
 
 config("nominmax") {

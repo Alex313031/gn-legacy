@@ -1,0 +1,20 @@
+# Copyright 2026 Alex313031
+
+# Tests shared win32 .dll libraries (used by hello_win32)
+
+shared_library("heller_win32_shared") {
+  configs += [ ":heller_win32_shared_config", ]
+  sources = [
+    "hello_shared.cc",
+    "hello_shared.h",
+    "resource.rc",
+  ]
+  output_name = "heller"
+}
+
+config("heller_win32_shared_config") {
+  defines = [ "HELLO_SHARED_IMPLEMENTATION" ]
+  include_dirs = [
+    "./"
+  ]
+}

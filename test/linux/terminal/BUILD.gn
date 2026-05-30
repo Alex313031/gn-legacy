@@ -1,0 +1,27 @@
+# Copyright 2026 Alex313031
+
+# Tests that a standard Linux terminal app can be built correctly.
+
+executable("hello_linux") {
+  configs += [
+    ":hello_linux_config",
+  ]
+
+  sources = [ "hello_linux_console.cc" ]
+
+  deps = [
+    "../shared:hello_linux_shared",
+    "../static:hello_linux_static",
+  ]
+  output_name = "hello_linux"
+}
+
+config("hello_linux_config") {
+  include_dirs = [
+    "./",
+  ]
+  configs = [
+    "../shared:hello_linux_shared_config",
+    "../static:hello_linux_static_config",
+  ]
+}

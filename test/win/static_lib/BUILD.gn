@@ -1,0 +1,21 @@
+# Copyright 2026 Alex313031
+
+# Tests static win32 libraries (used by hello_console and hello_win32)
+
+static_library("heller_win32_static") {
+  configs += [ ":heller_win32_static_config", ]
+
+  sources = [
+    "hello_static.cc",
+    "hello_static.h",
+  ]
+
+  output_name = "salute"
+}
+
+config("heller_win32_static_config") {
+  defines = [ "HELLO_STATIC_IMPLEMENTATION" ]
+  include_dirs = [
+    "./"
+  ]
+}

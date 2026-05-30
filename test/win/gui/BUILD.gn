@@ -1,0 +1,28 @@
+# Copyright 2026 Alex313031
+
+# Tests Win32 GUI Apps
+
+executable("hello_win32") {
+  configs += [ ":hello_win32_config", ]
+  sources = [
+    "hello_win32.cc",
+    "hello_win32.h",
+    "resource.h",
+    "resource.rc",
+    "version.h",
+  ]
+  deps = [
+    "../dll:heller_win32_shared",
+    "../static_lib:heller_win32_static",
+  ]
+}
+
+config("hello_win32_config") {
+  include_dirs = [
+    "./",
+  ]
+  configs = [
+    "../dll:heller_win32_shared_config",
+    "../static_lib:heller_win32_static_config",
+  ]
+}

@@ -1,67 +1,12 @@
 # Copyright 2026 Alex313031
 
+# Tests that Windows libraries & binaries can be built properly.
+
 group("hello_win") {
   public_deps = [
-    ":hello_win32",
-    ":hello_console",
-  ]
-}
-
-executable("hello_win32") {
-  configs += [ ":hello_win_config", ]
-  sources = [
-    "gui/hello_win32.cc",
-    "gui/hello_win32.h",
-    "gui/resource.h",
-    "gui/resource.rc",
-    "gui/version.h",
-  ]
-  deps = [
-    ":salute",
-    ":heller",
-  ]
-}
-
-executable("hello_console") {
-  configs -= [
-    "//build/config/win:windowed_subsystem",
-    "//build/config/win:unicode",
-  ]
-  configs += [
-    "//build/config/win:console_subsystem",
-    "//build/config/win:console_unicode",
-    ":hello_win_config",
-  ]
-  sources = [
-    "console/hello_console.cc",
-    "console/resource.rc",
-  ]
-  deps = [
-    ":salute",
-    ":heller",
-  ]
-}
-
-static_library("salute") {
-  include_dirs = [ "static_lib", ]
-  sources = [
-    "static_lib/hello_static.cc",
-    "static_lib/hello_static.h",
-  ]
-}
-
-shared_library("heller") {
-  include_dirs = [ "dll", ]
-  sources = [
-    "dll/hello_shared.cc",
-    "dll/hello_shared.h",
-    "dll/resource.rc",
-  ]
-}
-
-config("hello_win_config") {
-  include_dirs = [
-    "dll",
-    "static_lib",
+    "console:hello_win32_console",
+    "dll:heller_win32_shared",
+    "gui:hello_win32",
+    "static_lib:heller_win32_static",
   ]
 }

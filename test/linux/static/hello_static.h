@@ -1,0 +1,6 @@
+#ifndef TEST_LINUX_STATIC_HELLO_STATIC_H_
+#define TEST_LINUX_STATIC_HELLO_STATIC_H_
+
+const char* GetStaticText();
+
+#endif  // TEST_LINUX_STATIC_HELLO_STATIC_H_

@@ -5,5 +5,5 @@
 #include "hello_shared.h"
 
 const char* GetSharedText() {
-  return "world";
+  return "ld from Linux!";
 }

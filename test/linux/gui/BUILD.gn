@@ -1,0 +1,27 @@
+# Copyright 2026 Alex313031
+
+# Tests that a Linux X11 program can be built correctly.
+
+executable("hello_linux_gui") {
+  configs += [
+    ":hello_linux_gui_config",
+  ]
+
+  sources = [ "hello_linux_gui.cc" ]
+
+  deps = [
+    "../shared:hello_linux_shared",
+    "../static:hello_linux_static",
+  ]
+  output_name = "hello_linux_gui"
+}
+
+config("hello_linux_gui_config") {
+  include_dirs = [
+    "./",
+  ]
+  configs = [
+    "../shared:hello_linux_shared_config",
+    "../static:hello_linux_static_config",
+  ]
+}

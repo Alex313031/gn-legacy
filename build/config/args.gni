@@ -1,4 +1,4 @@
-import("//build/config/simd.gni")
+import("//build/config/simd/simd.gni")
 
 declare_args() {
   # Whether to compile in debug mode, with symbols and DEBUG defined.

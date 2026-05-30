@@ -1,0 +1,57 @@
+# Copyright 2026 Alex313031.
+
+# Linux specific configs
+
+import("//build/config/args.gni")
+
+config("linux_config") {
+  defines = []
+  cflags = []
+  ldflags = []
+
+  # Assume Unicode on Linux
+  defines += [
+    "UNICODE",
+    "_UNICODE",
+  ]
+  cflags += [
+    "-finput-charset=UTF-8",
+    "-fexec-charset=UTF-8",
+  ]
+
+  if (is_debug) {
+    cflags += [
+      "-Og",
+      "-g",
+    ]
+  } else {
+    if (is_official_build) {
+      cflags += [
+        "-O3",
+        "-g0",
+        "-s",
+      ]
+    } else {
+      cflags += [
+        "-O1",
+        "-g",
+      ]
+    }
+  }
+
+  # PIC for PIE
+  cflags += [
+    "-fPIC",
+  ]
+  ldflags += [
+    "-fpic",
+  ]
+
+  # Default to using threads
+  cflags += [ "-pthread", ]
+
+  # Defalt linux system libraries
+  libs = [
+    "m",
+  ]
+}

@@ -1,4 +1,6 @@
-# Copyright 2025 Alex313031.
+# Copyright 2026 Alex313031.
+
+# Windows specific configs
 
 import("//build/config/args.gni")
 import("//build/config/win/target_ver.gni")

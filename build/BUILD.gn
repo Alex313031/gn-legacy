@@ -19,7 +19,6 @@ config("compiler_defaults") {
       "DEBUG",
       "_DEBUG",
     ]
-    cflags += [ "-fno-omit-frame-pointer", ]
   } else {
     defines += [
       "NDEBUG",
@@ -29,16 +28,16 @@ config("compiler_defaults") {
   if (dcheck_enabled) {
     defines += [ "DCHECK_ON=1" ]
   }
-  if (use_common_controls) {
-    defines += [ "USE_COMMCTRLS", ]
-  }
   # Warn for everything
   cflags += [ "-Wall", ]
   if (dcheck_enabled) {
     # Warnings are errors by default if DCHECK
     cflags += [ "-Werror", ]
   }
-  if (current_os == "win") {
+  if (is_win) {
+    if (use_common_controls) {
+      defines += [ "USE_COMMCTRLS", ]
+    }
     cflags += [
       "-static",
     ]
@@ -56,145 +55,21 @@ config("compiler_defaults") {
       cflags_cc += [ "-static-libstdc++", ]
     }
     ldflags += [
-      #"-Lsrc",
       "-static",
     ]
-    configs += [ "//build/config/win:windows_config", ]
-  } else if (current_os == "linux") {
-    cflags += [
-      "-fPIC",
-      "-pthread",
+    configs += [ "./config/win:windows_config", ]
+  } else if (is_linux) {
+    cflags_c += [
+      "-static-libgcc",
+      "-std=c$c_std",
     ]
-    libs = [
-      "-lm",
-    ]
-    ldflags += [
-      "-pic",
-    ]
-    configs += [ ":linux_config", ]
+    cflags_cc += [ "-std=c++$cpp_std", ]
+    if (!use_llvm) {
+      cflags_cc += [ "-static-libstdc++", ]
+    }
+    configs += [ "./config/linux:linux_config", ]
   }
-  configs += [ ":simd_config", ]
-}
-
-config("simd_config") {
-  defines = []
-  cflags = []
-  ldflags = []
-  if (current_cpu == "x86" || current_cpu == "x64") {
-    if (current_cpu == "x86") {
-      cflags += [
-        "-mfpmath=sse",
-        "-mfxsr",
-        "-msse",
-      ]
-      if (use_sse2) {
-        cflags += [ "-msse2", ]
-      }
-    }
-    if (use_sse3) {
-      cflags += [ "-msse3", ]
-    }
-    if (use_sse41) {
-      cflags += [
-        "-mssse3",
-        "-msse4.1",
-      ]
-    }
-    if (use_sse42) {
-      cflags += [ "-msse4.2", ]
-      ldflags += [ "-march=x86-64-v2", ]
-    }
-    if (current_cpu == "x64") {
-      if (use_avx) {
-        cflags += [
-          "-mpclmul",
-          "-mavx",
-        ]
-      }
-      if (use_aes) {
-        cflags += [ "-maes", ]
-      }
-      if (use_avx2) {
-        cflags += [
-          "-mf16c",
-          "-mlzcnt",
-          "-mbmi",
-          "-mbmi2",
-          "-mavx2",
-        ]
-        ldflags += [ "-march=haswell", ]
-      }
-      if (use_avx512) {
-        cflags += [
-          "-mavx512f",
-          "-mavx512cd",
-          "-mavx512vl",
-          "-mavx512bw",
-          "-mavx512dq",
-        ]
-        ldflags += [ "-march=skylake-avx512", ]
-      }
-      if (use_fma) {
-        cflags += [
-          "-mfma",
-          "-ffp-contract=fast",
-        ]
-        ldflags += [ "-fp-contract=fast", ]
-      }
-    }
-  } else {
-    if (current_cpu == "arm") {
-      cflags += [
-        "-mfpu=vfpv3-d16",
-        "-mfloat-abi=hard",
-        "-march=armv7-a",
-      ]
-    }
-    if (current_cpu == "arm64") {
-      defines += [ "__ARM_NEON__=1" ]
-      cflags += [
-        "-mfpu=neon",
-        "-march=armv8-a+simd",
-      ]
-    }
-  }
-}
-
-config("linux_config") {
-  defines = []
-  cflags = []
-  ldflags = []
-
-  # Assume Unicode on Linux
-  defines += [
-    "UNICODE",
-    "_UNICODE",
-  ]
-
-  cflags += [
-    "-finput-charset=UTF-8",
-    "-fexec-charset=UTF-8",
-  ]
-
-  if (is_debug) {
-    cflags += [
-      "-Og",
-      "-g",
-    ]
-  } else {
-    if (is_official_build) {
-      cflags += [
-        "-O3",
-        "-g0",
-        "-s",
-      ]
-    } else {
-      cflags += [
-        "-O1",
-        "-g",
-      ]
-    }
-  }
+  configs += [ "./config/simd:simd_config", ]
 }
 
 config("executable_ldconfig") {
@@ -202,6 +77,7 @@ config("executable_ldconfig") {
   ldflags = []
   if (is_linux) {
     ldflags += [
+      "-pie",
       "-Wl,-rpath=\$ORIGIN/",
       "-Wl,-rpath-link=",
     ]

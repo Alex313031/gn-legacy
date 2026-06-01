@@ -198,7 +198,17 @@ toolchain("llvm-mingw") {
   }
 
   tool("rc") {
-    command = "$RC {{source}} {{defines}} {{include_dirs}} -O coff {{output}}"
+    # Emit a depfile so that headers and nested .rc files pulled in via
+    # #include trigger a rebuild of the .res when they change. windres has no
+    # native depfile support, so forward -MMD/-MF to the C preprocessor it
+    # invokes (gcc -E for GNU windres, clang -E for llvm-windres). This tracks
+    # #include'd files only; binary resources referenced by statements such as
+    # ICON/BITMAP/CURSOR/RCDATA/MANIFEST are read by windres directly (not the
+    # preprocessor), so list those in the target's `inputs` to track them.
+    # --preprocessor-arg needs binutils >= 2.36 or llvm-mingw.
+    depfile = "{{output}}.d"
+    command = "$RC {{defines}} {{include_dirs}} --preprocessor-arg=-MMD --preprocessor-arg=-MF --preprocessor-arg={{output}}.d {{source}} -O coff {{output}}"
+    depsformat = "gcc"
     outputs = [ "$object_path.res" ]
     description = "RC {{output}}"
   }

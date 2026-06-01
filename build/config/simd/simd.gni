@@ -16,6 +16,9 @@ declare_args() {
   ## would want to turn on use_sse3, use_sse41, use_sse42 too. For AVX2
   ## you would add use_avx, etc.
 
+  # SSE The first iteration of SSE, introduced with Pentium 3/Athlon XP
+  use_sse = current_cpu == "x86"
+
   # SSE2
   # Normal x64 compiler baseline, present since Willamette (Original
   # 2001 Pentium 4) and AMD SledgeHammer (1st Gen. Opteron) and
@@ -88,11 +91,23 @@ declare_args() {
   # AES
   # Introduced with Westmere (2010), not all CPUs have it.
   use_aes = use_avx || use_avx2 || use_avx512
+
+  # MMX, introduced with the Pentium MMX, only used if use_sse = false
+  use_mmx = !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+}
+
+use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+
+if (use_x87) {
+  assert(target_cpu == "x86", "use_x87 can only be used with 32 bit x86 targets.")
+}
+if (use_mmx && current_cpu == "x64") {
+  print("WARNING: use_mmx = true should only be used with 32 bit x86 targets.")
 }
 
 # Make sure we are a x86 arch
 if (use_sse2 || use_sse3 || use_sse41 || use_sse42 || use_avx || use_avx2 || use_avx512) {
-  assert(target_cpu == "x86" || target_cpu == "x64", "x86 SIMD intrinsic optimizations cannot be used with non-x86 targets.")
+  assert(target_cpu == "x86" || target_cpu == "x64", "x86 SIMD intrinsic optimizations can only be used with x86 or x64 targets.")
 }
 
 # 32 Bit OSes cant use anything above SSE4.2, and 32 Bit Apps can't benefit

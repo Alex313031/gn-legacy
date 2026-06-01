@@ -15,13 +15,11 @@ yell() { echo "$0: $*" >&2; }
 die() { yell "$*"; exit 111; }
 try() { "$@" || die "${RED}Failed $*"; }
 
-export HERE=${PWD} &&
+export VARSROOT=$(cd "$(dirname "$0")" && pwd) &&
 
-export TOOLS_PATH=${HERE}/tools &&
-export MINGW_PATH=${HERE}/tools/mingw/linux/i686/bin &&
+export TOOLS_PATH=${VARSROOT}/tools &&
+export MINGW_PATH=${VARSROOT}/tools/mingw/linux/i686/bin &&
 
 printf "\nAdding ${CYA}${TOOLS_PATH}${c0} and ${CYA}${MINGW_PATH}${c0} to PATH... \n" &&
 
-export PATH=${MINGW_PATH}:${TOOLS_PATH}:$PATH:${TOOLS_PATH}:${MINGW_PATH} &&
-
-printf "\nNew PATH = ${GRE}${PATH}${c0} \n"
+export PATH=${MINGW_PATH}:${TOOLS_PATH}:$PATH:${TOOLS_PATH}:${MINGW_PATH}

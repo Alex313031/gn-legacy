@@ -2,6 +2,15 @@
 
 # Copyright (c) 2026 Alex313031
 
+# Source this file to add the 64-bit (x64) build tools to your PATH:
+#
+#     source /path/to/set_env_vars64
+#       or
+#     . /path/to/set_env_vars64
+#
+# It can be sourced from any directory; it locates the tools relative to
+# itself, not relative to your current working directory.
+
 YEL='\033[1;33m' # Yellow
 CYA='\033[1;96m' # Cyan
 RED='\033[1;31m' # Red
@@ -10,16 +19,40 @@ c0='\033[0m' # Reset Text
 bold='\033[1m' # Bold Text
 underline='\033[4m' # Underline Text
 
-# Error handling
-yell() { echo "$0: $*" >&2; }
-die() { yell "$*"; exit 111; }
-try() { "$@" || die "${RED}Failed $*"; }
+# Warn (but do not exit, so we never kill an interactive shell when sourced).
+yell() { printf "${RED}set_env_vars64: %s${c0}\n" "$*" >&2; }
 
-export VARSROOT=$(cd "$(dirname "$0")" && pwd) &&
+# Detect whether we were sourced (required) or executed directly (no effect).
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    yell "This script must be sourced, not executed, to affect your PATH."
+    yell "Run:  source $0"
+    exit 1
+fi
 
-export TOOLS_PATH=${VARSROOT}/tools &&
-export MINGW_PATH=${VARSROOT}/tools/mingw/linux/x64/bin &&
+# Resolve this script's real location, following symlinks, so it works no
+# matter where it is called from or symlinked to.
+__src="${BASH_SOURCE[0]}"
+while [ -h "$__src" ]; do
+    __dir="$(cd -P "$(dirname "$__src")" >/dev/null 2>&1 && pwd)"
+    __src="$(readlink "$__src")"
+    [ "${__src#/}" = "$__src" ] && __src="$__dir/$__src"
+done
+export VARSROOT="$(cd -P "$(dirname "$__src")" >/dev/null 2>&1 && pwd)"
+unset __src __dir
 
-printf "\nAdding ${CYA}${TOOLS_PATH}${c0} and ${CYA}${MINGW_PATH}${c0} to PATH... \n" &&
+export TOOLS_PATH="${VARSROOT}/tools"
+export MINGW_PATH="${TOOLS_PATH}/mingw/linux/x64/bin"
 
-export PATH=${MINGW_PATH}:${TOOLS_PATH}:$PATH:${TOOLS_PATH}:${MINGW_PATH}
+if [ ! -d "$MINGW_PATH" ]; then
+    yell "MinGW tools not found at $MINGW_PATH"
+    return 1
+fi
+
+# Prepend to PATH, but only if not already present (idempotent re-sourcing).
+case ":$PATH:" in
+    *":$MINGW_PATH:"*) ;;
+    *) printf "\nAdding ${CYA}%s${c0} and ${CYA}%s${c0} to PATH... \n" "$TOOLS_PATH" "$MINGW_PATH"
+       export PATH="${MINGW_PATH}:${TOOLS_PATH}:$PATH" ;;
+esac
+
+printf "${CYA} New path: $PATH ${c0}\n"

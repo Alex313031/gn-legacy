@@ -40,3 +40,6 @@ Thumbs.db
 /tools/mingw/win/i686/
 /tools/mingw/win/x64/
 /TMP_/
+
+# Personal script I use
+/buildall.sh

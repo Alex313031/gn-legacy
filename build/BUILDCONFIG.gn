@@ -2,8 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/args.gni")
-
+# Resolve the cpu/os defaults BEFORE importing args.gni. args.gni pulls in
+# simd.gni and target_ver.gni, whose declare_args() defaults read current_cpu
+# (e.g. "use_sse3 = current_cpu == \"x64\""). If these fallbacks ran after the
+# import, current_cpu would still be "" at that point, so use_mmx would wrongly
+# default to true and trigger the "use_mmx should only be used with 32 bit x86"
+# warning on x64 hosts.
 if (target_os == "") {
   target_os = host_os
 }
@@ -16,6 +20,8 @@ if (current_cpu == "") {
 if (current_os == "") {
   current_os = target_os
 }
+
+import("//build/config/args.gni")
 
 is_linux = host_os == "linux" && current_os == "linux" && target_os == "linux"
 is_mac = host_os == "mac" && current_os == "mac" && target_os == "mac"

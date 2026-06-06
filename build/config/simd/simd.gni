@@ -30,7 +30,7 @@ declare_args() {
   # the Athlon 64. Big step from MMX, x87, and SSE (i.e. SSE1)
   # Baseline requirement to run Windows since update KB4103718
   # for Windows 7 SP1/Server 2008 R2 SP1/Home Server 2011.
-  use_sse2 = current_cpu == "x86" && !is_winnt && !is_win2k
+  use_sse2 = current_cpu == "x64" || (current_cpu == "x86" && !is_winnt && !is_win2k)
 
   # SSE3
   # Normal Chromium baseline, present since Prescott (2004 Pentium 4)

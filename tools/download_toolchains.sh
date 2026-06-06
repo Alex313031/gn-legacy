@@ -15,8 +15,14 @@ yell() { echo -e "$0: $*" >&2; }
 die()  { yell "${RED}$* ${c0}"; exit 1; }
 try() { "$@" || die "${RED}Failed $*"; }
 
+# Download $1 into directory $2, keeping the URL's basename as the filename.
+# curl ships with both Linux and Git Bash on Windows, so one helper covers both.
+Fetch() {
+  try curl -fSL --retry 3 -o "${2}/$(basename "$1")" "$1"
+}
+
 SCRIPTNAME=$(basename "$0")
-SCRIPTVER="1.0.2"
+SCRIPTVER="1.0.3"
 
 export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -38,28 +44,28 @@ MINGW_VER="20260606"
 
 DownloadGNLinux() {
   printf "${GRE}Downloading GN Linux Binary Version ${GN_VER} ${c0}\n"
-  try wget -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/gn/releases/download/${GN_VER}/gn_linux_amd64.zip"
+  Fetch "https://github.com/Alex313031/gn/releases/download/${GN_VER}/gn_linux_amd64.zip" "$TMP_DOWN_PATH"
   printf "${GRE}Unzipping Linux gn.zip... ${c0}\n"
   try unzip -o "$TMP_DOWN_PATH/gn_linux_amd64.zip" -d "${TOOLS_PATH}"
 }
 
 DownloadGNWindows() {
   printf "${GRE}Downloading GN Windows Binary Version ${GN_VER} ${c0}\n"
-  try wget.exe -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/gn/releases/download/${GN_VER}/gn_win_amd64.zip"
+  Fetch "https://github.com/Alex313031/gn/releases/download/${GN_VER}/gn_win_amd64.zip" "$TMP_DOWN_PATH"
   printf "${GRE}Unzipping Windows gn.zip... ${c0}\n"
   try unzip -o "$TMP_DOWN_PATH/gn_win_amd64.zip" -d "${TOOLS_PATH}"
 }
 
 DownloadNinjaLinux() {
   printf "${GRE}Downloading Ninja Linux Binary Version ${NINJA_VER} ${c0}\n"
-  try wget -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/ninja_linux.zip"
+  Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/ninja_linux.zip" "$TMP_DOWN_PATH"
   printf "${GRE}Unzipping Linux ninja.zip... ${c0}\n"
   try unzip -o "$TMP_DOWN_PATH/ninja_linux.zip" -d "${TOOLS_PATH}"
 }
 
 DownloadNinjaWindows() {
   printf "${GRE}Downloading Ninja Windows Binary Version ${NINJA_VER} ${c0}\n"
-  try wget.exe -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/ninja_win.zip"
+  Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/ninja_win.zip" "$TMP_DOWN_PATH"
   printf "${GRE}Unzipping Windows ninja.zip... ${c0}\n"
   try unzip -o "$TMP_DOWN_PATH/ninja_win.zip" -d "${TOOLS_PATH}"
 }
@@ -67,37 +73,41 @@ DownloadNinjaWindows() {
 # Linux MinGW toolchains
 DownloadMinGWLinux () {
   printf "${GRE}Downloading i586 Linux Toolchain version ${MINGW_VER} ${c0}\n"
-  try wget -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/i586_linux.zip"
-  printf "${GRE}Unzipping Linux i586.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/i586_linux.zip" -d "${MINGW_LINUX_PATH}"
-
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/mingw_linux_i586.zip" "$TMP_DOWN_PATH"
+  
   printf "${GRE}Downloading i686 Linux Toolchain version ${MINGW_VER} ${c0}\n"
-  try wget -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/i686_linux.zip"
-  printf "${GRE}Unzipping Linux i686.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/i686_linux.zip" -d "${MINGW_LINUX_PATH}"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/mingw_linux_i686.zip" "$TMP_DOWN_PATH"
 
   printf "${GRE}Downloading x86_64 Linux Toolchain version ${MINGW_VER} ${c0}\n"
-  try wget -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/x64_linux.zip"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/mingw_linux_x64.zip" "$TMP_DOWN_PATH"
+
+  # Unpack
+  printf "${GRE}Unzipping Linux i586.zip... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/mingw_linux_i586.zip" -d "${MINGW_LINUX_PATH}"
+  printf "${GRE}Unzipping Linux i686.zip... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/mingw_linux_i686.zip" -d "${MINGW_LINUX_PATH}"
   printf "${GRE}Unzipping Linux x64.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/x64_linux.zip" -d "${MINGW_LINUX_PATH}"
+  try unzip -o "$TMP_DOWN_PATH/mingw_linux_x64.zip" -d "${MINGW_LINUX_PATH}"
 }
 
 # Windows MinGW toolchains
 DownloadMinGWWindows () {
   printf "${GRE}Downloading i586 Windows Toolchain version ${MINGW_VER} ${c0}\n"
-  try wget.exe -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/i586_win.zip"
-  printf "${GRE}Unzipping Windows i586.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/i586_win.zip" -d "${MINGW_WIN32_PATH}"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/mingw_win_i586.zip" "$TMP_DOWN_PATH"
 
   printf "${GRE}Downloading i686 Windows Toolchain version ${MINGW_VER} ${c0}\n"
-  try wget.exe -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/i686_win.zip"
-  printf "${GRE}Unzipping Windows i686.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/i686_win.zip" -d "${MINGW_WIN32_PATH}"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/mingw_win_i686.zip" "$TMP_DOWN_PATH"
 
   printf "${GRE}Downloading x86_64 Windows Toolchain version ${MINGW_VER} ${c0}\n"
-  try wget.exe -P "$TMP_DOWN_PATH" "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/x64_win.zip"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/mingw_win_x64.zip" "$TMP_DOWN_PATH"
+
+  # Unpack
+  printf "${GRE}Unzipping Windows i586.zip... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/mingw_win_i586.zip" -d "${MINGW_WIN32_PATH}"
+  printf "${GRE}Unzipping Windows i686.zip... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/mingw_win_i686.zip" -d "${MINGW_WIN32_PATH}"
   printf "${GRE}Unzipping Windows x64.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/x64_win.zip" -d "${MINGW_WIN32_PATH}"
+  try unzip -o "$TMP_DOWN_PATH/mingw_win_x64.zip" -d "${MINGW_WIN32_PATH}"
 }
 
 show_help() {
@@ -125,6 +135,7 @@ show_version() {
 
 # Verify required tools are present before doing anything.
 CheckDeps() {
+  command -v curl >/dev/null 2>&1 || die "curl is required but not installed."
   command -v unzip >/dev/null 2>&1 || die "unzip is required but not installed."
 }
 

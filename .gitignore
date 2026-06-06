@@ -32,7 +32,6 @@ Thumbs.db
 
 # Toolchain files
 /tools/**/*.zip
-/tools/clang-*
 /tools/src/*
 /tools/mingw/linux/i586/
 /tools/mingw/linux/i686/
@@ -40,6 +39,18 @@ Thumbs.db
 /tools/mingw/win/i586/
 /tools/mingw/win/i686/
 /tools/mingw/win/x64/
+# Binaries
+/tools/clang-format
+/tools/clang-format.exe
+/tools/clang-tidy
+/tools/clang-tidy.exe
+/tools/gn
+/tools/gn.exe
+/tools/gn_xp.exe
+/tools/ninja
+/tools/ninja.exe
+/tools/ninja_xp.exe
+# Temp download directory
 /TMP_/
 
 # Personal script I use

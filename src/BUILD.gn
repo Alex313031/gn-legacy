@@ -1,19 +1,8 @@
 import("//build/config/args.gni")
 
 group("all") {
-  public_deps = [
-    # This is where you put your targets, each target will have its own sources and be in it's own subdir.
-    "cryocalc:cryocalc_all", # CryoCalc Win32!
-    "pepatcher:pepatcher", # Portable Executable patcher
-    "degen_art:degen_art", # Generative Art program
-    "format32:format32", # Floppy disk formatter
-    "life:game_of_life", # Game of life win32
-    "neko-ng:neko-ng", # Neko98 Reborn
-    "reversi-ng:reversi32", # Win32 Reversi
-    "sfhasher:sfhasher", # Hashing test program
-    "snake-win32:snake", # Centipede clone
-    "taskmgr:taskmgr", # Win2003 taskmgr
-    #"USBView:usbview_all", # USBView from WDK 7.1
-    "xp_activate32:xp_activate32", # WinXP activator
-  ]
+  # This is where you put your targets, each target will have its own sources and be in it's own subdir.
+  public_deps = []
+  # Example target, GMP git submodule
+  # public_deps += [ "gmp-ninja:gmp_all" ]
 }

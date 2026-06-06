@@ -30,7 +30,7 @@ declare_args() {
   # the Athlon 64. Big step from MMX, x87, and SSE (i.e. SSE1)
   # Baseline requirement to run Windows since update KB4103718
   # for Windows 7 SP1/Server 2008 R2 SP1/Home Server 2011.
-  use_sse2 = current_cpu == "x86" && !is_winnt
+  use_sse2 = current_cpu == "x86" && !is_winnt && !is_win2k
 
   # SSE3
   # Normal Chromium baseline, present since Prescott (2004 Pentium 4)
@@ -101,7 +101,13 @@ declare_args() {
   use_mmx = !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
 }
 
-if (use_mmx && current_cpu == "x64") {
+use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+
+if (use_x87) {
+  assert(current_cpu == "x86", "use_x87 true when current_cpu != x86")
+}
+
+if (use_mmx && current_cpu != "x86") {
   print("WARNING: use_mmx = true should only be used with 32 bit x86 targets.")
 }
 

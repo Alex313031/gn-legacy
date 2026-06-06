@@ -25,7 +25,7 @@ if (cpu_march == "") {
     } else if (use_sse42) {
       march = "nehalem"
     } else {
-      march = "generic"
+      march = "i686"
     }
   } else if (current_cpu == "x64") {
     if (use_sse2 && !use_sse3) {
@@ -43,7 +43,7 @@ if (cpu_march == "") {
     } else if (use_avx512) {
       march = "x86-64-v4"
     } else {
-      march = "generic"
+      march = "x86-64"
     }
   } else if (current_cpu == "arm") {
     # ARMv7 baseline with hard-float

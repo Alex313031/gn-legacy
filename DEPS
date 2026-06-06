@@ -30,7 +30,7 @@ vars = {
   'clang-format_version': '',
 
   # Whether to download sources used to build MinGW/GN/Ninja itself to tools/src
-  'download_toolchain_sources': 'True',
+  'download_toolchain_sources': 'False',
 
   # Whether to download custom sources to src/
   'download_sources': 'False',

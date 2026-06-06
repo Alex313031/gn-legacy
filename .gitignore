@@ -30,9 +30,13 @@ Thumbs.db
 /out/
 /Release/
 
-# MinGW Toolchain Files
+# Toolchain files
+/tools/**/*.zip
+/tools/clang-*
+/tools/mingw/linux/i586/
 /tools/mingw/linux/i686/
 /tools/mingw/linux/x64/
+/tools/mingw/win/i586/
 /tools/mingw/win/i686/
 /tools/mingw/win/x64/
 /TMP_/

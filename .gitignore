@@ -33,6 +33,7 @@ Thumbs.db
 # Toolchain files
 /tools/**/*.zip
 /tools/clang-*
+/tools/src/*
 /tools/mingw/linux/i586/
 /tools/mingw/linux/i686/
 /tools/mingw/linux/x64/

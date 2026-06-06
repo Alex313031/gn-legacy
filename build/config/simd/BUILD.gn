@@ -2,43 +2,116 @@
 
 import("simd.gni")
 
+use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+
+if (use_x87) {
+  assert(target_cpu == "x86", "use_x87 can only be used with 32 bit x86 targets.")
+}
+
+if (cpu_march == "") {
+  if (current_cpu == "x86") {
+    if (is_winnt || use_x87) {
+      march = "i586"
+    } else if (use_mmx && !use_sse && !use_sse2) {
+      march = "pentium-mmx"
+    } else if (use_sse && !use_sse2) {
+      march = "pentium3"
+    } else if (use_sse2 && !use_sse3) {
+      march = "pentium4"
+    } else if (use_sse3 && !use_sse41) {
+      march = "prescott"
+    } else if (use_sse41 && !use_sse42) {
+      march = "core2"
+    } else if (use_sse42) {
+      march = "nehalem"
+    } else {
+      march = "generic"
+    }
+  } else if (current_cpu == "x64") {
+    if (use_sse2 && !use_sse3) {
+      march = "x86-64"
+    } else if (use_sse3 && !use_sse41) {
+      march = "nocona"
+    } else if (use_sse41 && !use_sse42) {
+      march = "core2"
+    } else if (use_sse42 && !use_avx) {
+      march = "x86-64-v2"
+    } else if (use_avx && !use_avx2) {
+      march = "sandybridge"
+    } else if (use_avx2 && !use_avx512) {
+      march = "x86-64-v3"
+    } else if (use_avx512) {
+      march = "x86-64-v4"
+    } else {
+      march = "generic"
+    }
+  } else if (current_cpu == "arm") {
+    # ARMv7 baseline with hard-float
+    march = "armv7-a"
+  } else if (current_cpu == "arm64") {
+    # ARMv8 baseline with NEON SIMD
+    march = "armv8-a+simd"
+  }
+} else {
+  march = cpu_march
+}
+
+assert(march != "", "march cannot be empty!")
+
 config("simd_config") {
   defines = []
   cflags = []
   ldflags = []
-  if (current_cpu == "x86" || current_cpu == "x64") {
-    if (current_cpu == "x86") {
-      if (use_x87) {
-        cflags += [
-          "-mfpmath=387",
-          "-march=i586",
-          "-mno-mmx",
-          "-mno-fxsr",
-          "-mno-sse",
-          "-mno-sse2",
-        ]
-      } else {
-        if (use_mmx || use_sse) {
-          cflags += [ "-mmmx", ]
-        }
-        if (use_sse || use_sse2) {
+  if (current_cpu == "x86") {
+    if (use_x87) {
+      cflags += [
+        "-mfpmath=387",
+        "-mno-mmx",
+        "-mno-fxsr",
+        "-mno-sse",
+        "-mno-sse2",
+      ]
+    } else {
+      if (use_mmx) {
+        cflags += [ "-mmmx", ]
+        if (!use_sse) {
           cflags += [
-            "-mfpmath=sse",
-            "-mfxsr",
-            "-msse",
+            "-mfpmath=387",
+            "-mno-fxsr",
+            "-mno-sse",
           ]
         }
-        if (use_sse2) {
-          cflags += [ "-msse2", ]
+        if (!use_sse2) {
+          cflags += [ "-mno-sse2", ]
         }
       }
+      if (use_sse || use_sse2 || use_sse3 || use_sse41 || use_sse42) {
+        cflags += [ "-mfpmath=sse", ]
+      }
+      if (use_sse) {
+        cflags += [ "-mfxsr", "-msse", ]
+      }
+      if (use_sse2) {
+        cflags += [ "-msse2", ]
+      }
+      if (use_sse3) {
+        cflags += [ "-msse3", ]
+      }
+      if (use_sse41) {
+        cflags += [
+          "-mssse3",
+          "-msse4.1",
+        ]
+      }
+      if (use_sse42) {
+        cflags += [ "-msse4.2", ]
+      }
     }
-    if (current_cpu == "x64") {
-      cflags += [
-        "-mfpmath=sse",
-        "-msse2",
-      ]
-    }
+  } else if (current_cpu == "x64") {
+    cflags += [
+      "-mfpmath=sse",
+      "-msse2",
+    ]
     if (use_sse3) {
       cflags += [ "-msse3", ]
     }
@@ -50,60 +123,54 @@ config("simd_config") {
     }
     if (use_sse42) {
       cflags += [ "-msse4.2", ]
-      ldflags += [ "-march=x86-64-v2", ]
     }
-    if (current_cpu == "x64") {
-      if (use_avx) {
-        cflags += [
-          "-mpclmul",
-          "-mavx",
-        ]
-      }
-      if (use_aes) {
-        cflags += [ "-maes", ]
-      }
-      if (use_avx2) {
-        cflags += [
-          "-mf16c",
-          "-mlzcnt",
-          "-mbmi",
-          "-mbmi2",
-          "-mavx2",
-        ]
-        ldflags += [ "-march=haswell", ]
-      }
-      if (use_avx512) {
-        cflags += [
-          "-mavx512f",
-          "-mavx512cd",
-          "-mavx512vl",
-          "-mavx512bw",
-          "-mavx512dq",
-        ]
-        ldflags += [ "-march=skylake-avx512", ]
-      }
-      if (use_fma) {
-        cflags += [
-          "-mfma",
-          "-ffp-contract=fast",
-        ]
-        ldflags += [ "-ffp-contract=fast", ]
-      }
-    }
-  } else {
-    if (current_cpu == "arm") {
+    if (use_avx) {
       cflags += [
-        "-mfpu=vfpv3-d16",
-        "-mfloat-abi=hard",
-        "-march=armv7-a",
+        "-mpclmul",
+        "-mavx",
       ]
     }
-    if (current_cpu == "arm64") {
-      defines += [ "__ARM_NEON__=1" ]
+    if (use_aes) {
+      cflags += [ "-maes", ]
+    }
+    if (use_avx2) {
       cflags += [
-        "-mfpu=neon",
-        "-march=armv8-a+simd",
+        "-mf16c",
+        "-mrdrnd",
+        "-mlzcnt",
+        "-mbmi",
+        "-mbmi2",
+        "-mavx2",
       ]
     }
+    if (use_avx512) {
+      cflags += [
+        "-mavx512f",
+        "-mavx512cd",
+        "-mavx512vl",
+        "-mavx512bw",
+        "-mavx512dq",
+      ]
+    }
+    if (use_fma) {
+      cflags += [
+        "-mfma",
+        "-ffp-contract=fast",
+      ]
+      ldflags += [ "-ffp-contract=fast", ]
+    }
+  } else if (current_cpu == "arm") {
+    cflags += [
+      "-mfpu=vfpv3-d16",
+      "-mfloat-abi=hard",
+    ]
+  } else if (current_cpu == "arm64") {
+    defines += [ "__ARM_NEON__=1" ]
+    cflags += [
+      "-mfpu=neon",
+    ]
   }
+  cflags += [
+    "-march=$march",
+  ]
 }

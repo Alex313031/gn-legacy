@@ -97,8 +97,13 @@ toolchain("llvm-mingw") {
   object_path = "{{target_out_dir}}/{{label_name}}/{{source_name_part}}"
 
   if (target_cpu == "x86") {
-    mingw_prefix = "i686"
-    bin_prefix = "i686"
+    if (is_winnt || !use_sse || !use_sse2) {
+      mingw_prefix = "i586"
+      bin_prefix = "i586"
+    } else {
+      mingw_prefix = "i686"
+      bin_prefix = "i686"
+    }
   } else if (target_cpu == "x64") {
     mingw_prefix = "x86_64"
     bin_prefix = "x64"

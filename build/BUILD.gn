@@ -14,6 +14,7 @@ config("compiler_defaults") {
   cflags_cc = []
   ldflags = []
 
+  # Debug defines/flags
   if (is_debug) {
     defines += [
       "DEBUG",
@@ -28,52 +29,41 @@ config("compiler_defaults") {
   if (dcheck_enabled) {
     defines += [ "DCHECK_ON=1" ]
   }
-  # Warn for everything
-  cflags += [ "-Wall", ]
+  cflags += [ "-Wall" ]
   if (dcheck_enabled) {
     # Warnings are errors by default if DCHECK
-    cflags += [ "-Werror", ]
+    cflags += [ "-Werror" ]
   }
-  if (is_win) {
-    if (use_common_controls) {
-      defines += [ "USE_COMMCTRLS", ]
-    }
-    cflags += [
-      "-static",
-    ]
-    cflags_c += [
-      "-static-libgcc",
-      "-std=c$c_std",
-    ]
-    if (is_legacy_windows && cpp_std == "20") {
-      # Windows XP and older can't handle C++20
-      cflags_cc += [ "-std=c++17", ]
-    } else {
-      cflags_cc += [ "-std=c++$cpp_std", ]
-    }
-    if (!use_llvm) {
-      cflags_cc += [ "-static-libstdc++", ]
-    }
+
+  # Set C/C++ standards
+  cflags_c += [ "-std=c$c_std" ]
+  cflags_cc += [ "-std=c++$cpp_std" ]
+
+  # Static CRT. These are link-time flags, so they go in ldflags (the link
+  # tools only consume {{ldflags}}, not cflags). Clang/LLVM has no
+  # libgcc/libstdc++; it gets standalone binaries from the unconditional
+  # -static in the platform configs instead.
+  if (!use_llvm) {
     ldflags += [
-      "-static",
-    ]
-    configs += [ "./config/win:windows_config", ]
-  } else if (is_linux) {
-    cflags_c += [
       "-static-libgcc",
-      "-std=c$c_std",
+      "-static-libstdc++",
     ]
-    cflags_cc += [ "-std=c++$cpp_std", ]
-    if (!use_llvm) {
-      cflags_cc += [ "-static-libstdc++", ]
-    }
-    configs += [ "./config/linux:linux_config", ]
   }
-  configs += [ "./config/simd:simd_config", ]
+
+  # Platform configs
+  if (is_win) {
+    configs += [ "./config/win:windows_config" ]
+  } else if (is_linux) {
+    configs += [ "./config/linux:linux_config" ]
+  }
+
+  # SIMD flags
+  configs += [ "./config/simd:simd_config" ]
 }
 
 config("executable_ldconfig") {
   configs = []
+  cflags = []
   ldflags = []
   if (is_linux) {
     ldflags += [
@@ -85,5 +75,19 @@ config("executable_ldconfig") {
     ldflags += []
   } else if (is_mac) {
     ldflags += []
+  }
+  if (use_lto) {
+    if (use_llvm) {
+      # Clang spelling; -flto=auto / -flto-partition are GCC-only.
+      cflags += [ "-flto=full" ]
+      ldflags += [ "-flto=full" ]
+    } else {
+      cflags += [ "-flto=auto" ]
+      ldflags += [ "-flto" ]
+      if (dcheck_enabled) {
+        # For checking code ordering issues
+        ldflags += [ "-flto-partition=1to1" ]
+      }
+    }
   }
 }

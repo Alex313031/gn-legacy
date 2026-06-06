@@ -19,7 +19,7 @@ if (current_os == "") {
 
 is_linux = host_os == "linux" && current_os == "linux" && target_os == "linux"
 is_mac = host_os == "mac" && current_os == "mac" && target_os == "mac"
-is_win = host_os == "win" && current_os == "win" || target_os == "win"
+is_win = (host_os == "win" && current_os == "win") || target_os == "win"
 
 # All binary targets will get this list of configs by default.
 _shared_binary_target_configs = [ "//build:compiler_defaults" ]
@@ -28,6 +28,7 @@ if (is_win) {
   # For Console Win32 App, remove these config and add "//build/config/win:console_subsystem"
   # also remove "//build/config/win:unicode" config
   _linker_configs = [ "//build/config/win:windowed_subsystem" ]
+
   # For Non-Unicode Win32 App, remove these config and add "//build/config/win:ansi"
   _linker_configs += [ "//build/config/win:unicode" ]
 } else {

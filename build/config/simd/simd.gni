@@ -8,6 +8,11 @@
 import("//build/config/win/target_ver.gni")
 
 declare_args() {
+  # What -march to use, see https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
+  cpu_march = ""
+}
+
+declare_args() {
   ## SIMD compiler optimization flags
   ## Propagated to //build/config/* to allow controlling
   ## x86_64 SIMD optimization levels. This was done to refactor
@@ -17,7 +22,7 @@ declare_args() {
   ## you would add use_avx, etc.
 
   # SSE The first iteration of SSE, introduced with Pentium 3/Athlon XP
-  use_sse = current_cpu == "x86"
+  use_sse = current_cpu == "x86" && !is_winnt
 
   # SSE2
   # Normal x64 compiler baseline, present since Willamette (Original
@@ -25,7 +30,7 @@ declare_args() {
   # the Athlon 64. Big step from MMX, x87, and SSE (i.e. SSE1)
   # Baseline requirement to run Windows since update KB4103718
   # for Windows 7 SP1/Server 2008 R2 SP1/Home Server 2011.
-  use_sse2 = current_cpu == "x86"
+  use_sse2 = current_cpu == "x86" && !is_winnt
 
   # SSE3
   # Normal Chromium baseline, present since Prescott (2004 Pentium 4)
@@ -89,18 +94,13 @@ declare_args() {
   use_fma = use_avx2 || use_avx512
 
   # AES
-  # Introduced with Westmere (2010), not all CPUs have it.
+  # Introduced with Westmere (2010), not all 1st gen Intel CPUs have it.
   use_aes = use_avx || use_avx2 || use_avx512
 
   # MMX, introduced with the Pentium MMX, only used if use_sse = false
   use_mmx = !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
 }
 
-use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
-
-if (use_x87) {
-  assert(target_cpu == "x86", "use_x87 can only be used with 32 bit x86 targets.")
-}
 if (use_mmx && current_cpu == "x64") {
   print("WARNING: use_mmx = true should only be used with 32 bit x86 targets.")
 }

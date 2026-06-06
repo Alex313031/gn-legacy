@@ -25,6 +25,14 @@ config("windows_config") {
     }
   }
 
+  if (use_common_controls) {
+    defines += [ "USE_COMMCTRLS", ]
+  }
+
+  # Default to statically linked binaries
+  cflags += [ "-static", ]
+  ldflags += [ "-static", ]
+
   if (is_legacy_windows) {
     defines += [
       "PSAPI_VERSION=1",
@@ -41,19 +49,24 @@ config("windows_config") {
   if (is_debug) {
     cflags += [
       "-Og",
-      "-g",
+      "-g2",
     ]
+    if (use_dwarf) {
+      cflags += [ "-gdwarf-2" ]
+    }
   } else {
     if (is_official_build) {
       cflags += [
         "-O3",
         "-g0",
-        "-s",
       ]
+      # Strip binaries
+      cflags += [ "-s", ]
+      ldflags += [ "-s", ]
     } else {
       cflags += [
         "-O2",
-        "-g",
+        "-g1",
       ]
     }
   }

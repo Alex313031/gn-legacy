@@ -22,19 +22,24 @@ config("linux_config") {
   if (is_debug) {
     cflags += [
       "-Og",
-      "-g",
+      "-g2",
     ]
+    if (use_dwarf) {
+      cflags += [ "-gdwarf-2" ]
+    }
   } else {
     if (is_official_build) {
       cflags += [
         "-O3",
         "-g0",
-        "-s",
       ]
+      # Strip binaries
+      cflags += [ "-s", ]
+      ldflags += [ "-s", ]
     } else {
       cflags += [
         "-O1",
-        "-g",
+        "-g1",
       ]
     }
   }

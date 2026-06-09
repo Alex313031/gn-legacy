@@ -17,7 +17,7 @@ It is based on the example simple GN build structure in the GN repo [Here](https
 It is deliberately simplistic so the structure is more clear, and doesn't support everything on
 every platform. It has minimal support for targeting Linux, but almost all support is for Windows.  
 
-<img src="./assets/Windows_NT_4.0_Workstation_logo.svg" height="64"> <img src="./assets/Windows_2000_logo.svg" height="64">
+<img src="./assets/WinNT4Workstation_Logo.svg" height="64"> <img src="./assets/Win2000Pro_Logo.svg" height="64"> <img src="./assets/WinXPPro_Logo.svg" height="64"> <img src="./assets/WinVista_Orb.svg" height="64">
 
 ## Getting Started
 

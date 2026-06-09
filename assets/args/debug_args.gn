@@ -7,7 +7,7 @@ winver = "2000"
 
 # Debug/Release Flags
 is_debug = true
-dcheck_enabled = false
+dcheck_enabled = true
 is_official_build = false
 
 # C++ Standard to use

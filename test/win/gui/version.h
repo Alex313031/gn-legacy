@@ -38,24 +38,28 @@
 #if !defined(_STRINGIZER) && !defined(STRINGIZE)
  #define _STRINGIZER(in) #in
  #define STRINGIZE(in) _STRINGIZER(in)
+ // Wide-string variant: L ## "x" -> L"x". Two levels so the argument expands
+ // before the L## paste widens the resulting narrow literal.
+ #define _WIDEN(in) L ## in
+ #define WIDEN(in) _WIDEN(in)
 #endif // !defined(_STRINGIZER) && !defined(STRINGIZE)
 
 // Main version constant
 #ifndef _VERSION
  // Run stringizer above
- #define _VERSION(major,minor,build) STRINGIZE(major) "." STRINGIZE(minor) "." STRINGIZE(build)
+ #define _VERSION(major,minor,build) WIDEN(STRINGIZE(major.minor.build))
 #endif // _VERSION
 
 // These next few lines are where we control version number and copyright year
 // Adhere to semver > semver.org
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 0
-#define BUILD_VERSION 3
+#define BUILD_VERSION 4
 
 #ifndef VERSION_STRING
  #define VERSION_STRING _VERSION(MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION)
  #define ABOUT_TITLE L"About HelloWorld32"
- #define ABOUT_CONTENT L"HelloWorld32 ver. " VERSION_STRING
+ #define ABOUT_CONTENT WIDEN(STRINGIZE(HelloWorld32 ver. MAJOR_VERSION.MINOR_VERSION.BUILD_VERSION))
  #define ABOUT_COPYRIGHT L"\251 2025 Alex313031" // \251 is the © symbol
  #define LEGAL_COPYRIGHT L"\251 2025 Alex313031"
 #endif // VERSION_STRING

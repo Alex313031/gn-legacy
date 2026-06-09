@@ -9,7 +9,7 @@
 
 #include <hello_static.h>
 
-int main() {
+int _tmain(int argc, _TCHAR* argv[]) {
   std::wcout << L"Hello, World! from Win32 Console" << std::endl;
   const unsigned long long testval = TestReturn69();
   std::wcout << L"testval = " << std::hex << testval << std::endl;

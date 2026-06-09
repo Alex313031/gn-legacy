@@ -5,11 +5,9 @@
 executable("hello_win32_console") {
   configs -= [
     "//build/config/win:windowed_subsystem",
-    "//build/config/win:unicode",
   ]
   configs += [
     "//build/config/win:console_subsystem",
-    "//build/config/win:console_unicode",
     ":hello_win32_console_config",
   ]
   sources = [

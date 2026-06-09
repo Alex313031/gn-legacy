@@ -17,12 +17,17 @@ try() { "$@" || die "${RED}Failed $*"; }
 
 # Download $1 into directory $2, keeping the URL's basename as the filename.
 # curl ships with both Linux and Git Bash on Windows, so one helper covers both.
+# CURL_INSECURE is "-k" when --insecure is passed: old curl (e.g. Git Bash on XP)
+# has a stale CA bundle and rejects GitHub's modern certs ("curl: (60) ... unable
+# to get local issuer certificate"); -k skips TLS verification. OFF by default so
+# modern hosts (and the gclient hook) stay verified.
+CURL_INSECURE=""
 Fetch() {
-  try curl -fSL --retry 3 -o "${2}/$(basename "$1")" "$1"
+  try curl -fSL ${CURL_INSECURE} --retry 3 -o "${2}/$(basename "$1")" "$1"
 }
 
 SCRIPTNAME=$(basename "$0")
-SCRIPTVER="1.0.5"
+SCRIPTVER="1.0.6"
 
 export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -220,6 +225,7 @@ Options:
   -h, --help Show this help.
   --version  Show script version.
   --i386     Download 32 Bit binaries instead of 64 Bit (XP compatible!)
+  --insecure Skip TLS cert verification (for old curl)
   --gn       Download GN binaries
   --ninja    Download Ninja binaries
   --mingw    Download MinGW Toolchains
@@ -303,6 +309,9 @@ while :; do
         ;;
     --i386)
         DOWNLOAD_I386=1
+        ;;
+    --insecure)
+        CURL_INSECURE="-k"
         ;;
     --ninja)
         DOWNLOAD_NINJA=1

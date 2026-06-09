@@ -41,7 +41,7 @@ export VARSROOT="$(cd -P "$(dirname "$__src")" >/dev/null 2>&1 && pwd)"
 unset __src __dir
 
 export TOOLS_PATH="${VARSROOT}/tools"
-export MINGW_PATH="${TOOLS_PATH}/mingw/linux/i686/bin"
+export MINGW_PATH="${TOOLS_PATH}/mingw/linux/i586/bin"
 
 if [ ! -d "$MINGW_PATH" ]; then
     yell "MinGW tools not found at $MINGW_PATH"

@@ -18,13 +18,13 @@ use_relative_paths = True
 # DEPS Flags, can be overridden in .gclient "custom_vars"
 vars = {
   # GN source repo version
-  'gn_version': '2901253287f4320efbbf77a7e58a47e4bc6c9980',
+  'gn_version': '41f93e4face33b6ac65585bf32fa112b7c85ea3d',
 
   # Ninja source repo version
-  'ninja_version': '84c43cde2abbd77d3d6b66856addc994755b3ed5',
+  'ninja_version': '2ba359574568e08ace86f4c9184d6d06f6dadcfa',
 
   # MinGW source repo version
-  'mingw_version': 'c1a015fc5e8878e9933d02158c2ed7947dd078ca',
+  'mingw_version': '701e138422d179d8c6d5eb8daade4d7e51c35bf4',
 
   # clang-format Release to download
   'clang-format_version': '',

@@ -3,6 +3,8 @@ import("//build/config/args.gni")
 group("all") {
   # This is where you put your targets, each target will have its own sources and be in it's own subdir.
   public_deps = []
-  # Example target, GMP git submodule
-  # public_deps += [ "gmp-ninja:gmp_all" ]
+  # Example target, PE Patcher
+  public_deps += [
+    "pepatcher:pepatcher"
+  ]
 }

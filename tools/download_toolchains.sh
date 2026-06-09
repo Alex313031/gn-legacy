@@ -22,7 +22,7 @@ Fetch() {
 }
 
 SCRIPTNAME=$(basename "$0")
-SCRIPTVER="1.0.3"
+SCRIPTVER="1.0.4"
 
 export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -42,72 +42,125 @@ GN_VER="2026.06"
 NINJA_VER="v1.13.2"
 MINGW_VER="20260606"
 
+# Artifact names to download/unpack
+LINUX_GCC_I586="mingw_gcc_linux_i586.zip"
+LINUX_GCC_I686="mingw_gcc_linux_i686.zip"
+LINUX_GCC_X64="mingw_gcc_linux_x64.zip"
+WIN_GCC_I586="mingw_gcc_win_i586.zip"
+WIN_GCC_I686="mingw_gcc_win_i686.zip"
+WIN_GCC_X64="mingw_gcc_win_x64.zip"
+# LLVM
+LINUX_LLVM_I586="mingw_llvm_linux_i586.zip"
+LINUX_LLVM_I686="mingw_llvm_linux_i686.zip"
+LINUX_LLVM_X64="mingw_llvm_linux_x64.zip"
+WIN_LLVM_I586="mingw_llvm_win_i586.zip"
+WIN_LLVM_I686="mingw_llvm_win_i686.zip"
+WIN_LLVM_X64="mingw_llvm_win_x64.zip"
+# GN / Ninja
+GN_LINUX_X64="gn_linux_amd64.zip"
+GN_WIN_X64="gn_win_amd64.zip"
+NINJA_LINUX_X64="ninja_linux.zip"
+NINJA_WIN_X64="ninja_win.zip"
+
 DownloadGNLinux() {
   printf "${GRE}Downloading GN Linux Binary Version ${GN_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/gn/releases/download/${GN_VER}/gn_linux_amd64.zip" "$TMP_DOWN_PATH"
-  printf "${GRE}Unzipping Linux gn.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/gn_linux_amd64.zip" -d "${TOOLS_PATH}"
+  Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_LINUX_X64}" "$TMP_DOWN_PATH"
+  printf "${GRE}Unzipping ${GN_LINUX_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${GN_LINUX_X64}" -d "${TOOLS_PATH}"
 }
 
 DownloadGNWindows() {
   printf "${GRE}Downloading GN Windows Binary Version ${GN_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/gn/releases/download/${GN_VER}/gn_win_amd64.zip" "$TMP_DOWN_PATH"
-  printf "${GRE}Unzipping Windows gn.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/gn_win_amd64.zip" -d "${TOOLS_PATH}"
+  Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_WIN_X64}" "$TMP_DOWN_PATH"
+  printf "${GRE}Unzipping ${GN_WIN_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${GN_WIN_X64}" -d "${TOOLS_PATH}"
 }
 
 DownloadNinjaLinux() {
   printf "${GRE}Downloading Ninja Linux Binary Version ${NINJA_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/ninja_linux.zip" "$TMP_DOWN_PATH"
-  printf "${GRE}Unzipping Linux ninja.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/ninja_linux.zip" -d "${TOOLS_PATH}"
+  Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_LINUX_X64}" "$TMP_DOWN_PATH"
+  printf "${GRE}Unzipping ${NINJA_LINUX_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${NINJA_LINUX_X64}" -d "${TOOLS_PATH}"
 }
 
 DownloadNinjaWindows() {
   printf "${GRE}Downloading Ninja Windows Binary Version ${NINJA_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/ninja_win.zip" "$TMP_DOWN_PATH"
-  printf "${GRE}Unzipping Windows ninja.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/ninja_win.zip" -d "${TOOLS_PATH}"
+  Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_WIN_X64}" "$TMP_DOWN_PATH"
+  printf "${GRE}Unzipping ${NINJA_WIN_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${NINJA_WIN_X64}" -d "${TOOLS_PATH}"
 }
 
 # Linux MinGW toolchains
 DownloadMinGWLinux () {
-  printf "${GRE}Downloading i586 Linux Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/mingw_linux_i586.zip" "$TMP_DOWN_PATH"
+  # First MinGW/GCC Toolchains
+  printf "${GRE}Downloading i586 Linux GCC Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_GCC_I586}" "$TMP_DOWN_PATH"
   
-  printf "${GRE}Downloading i686 Linux Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/mingw_linux_i686.zip" "$TMP_DOWN_PATH"
+  printf "${GRE}Downloading i686 Linux GCC Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_GCC_I686}" "$TMP_DOWN_PATH"
 
-  printf "${GRE}Downloading x86_64 Linux Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/mingw_linux_x64.zip" "$TMP_DOWN_PATH"
+  printf "${GRE}Downloading x64 Linux GCC Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_GCC_X64}" "$TMP_DOWN_PATH"
+  # Then MinGW/LLVM toolchains
+  printf "${GRE}Downloading i586 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_I586}" "$TMP_DOWN_PATH"
+  
+  printf "${GRE}Downloading i686 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_I686}" "$TMP_DOWN_PATH"
 
-  # Unpack
-  printf "${GRE}Unzipping Linux i586.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/mingw_linux_i586.zip" -d "${MINGW_LINUX_PATH}"
-  printf "${GRE}Unzipping Linux i686.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/mingw_linux_i686.zip" -d "${MINGW_LINUX_PATH}"
-  printf "${GRE}Unzipping Linux x64.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/mingw_linux_x64.zip" -d "${MINGW_LINUX_PATH}"
+  printf "${GRE}Downloading x64 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_X64}" "$TMP_DOWN_PATH"
+
+  # Unpack zips
+  printf "${GRE}Unzipping ${LINUX_GCC_I586}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${LINUX_GCC_I586}" -d "${MINGW_LINUX_PATH}"
+  printf "${GRE}Unzipping ${LINUX_GCC_I686}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${LINUX_GCC_I686}" -d "${MINGW_LINUX_PATH}"
+  printf "${GRE}Unzipping ${LINUX_GCC_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${LINUX_GCC_X64}" -d "${MINGW_LINUX_PATH}"
+  # LLVM zips
+  printf "${GRE}Unzipping ${LINUX_LLVM_I586}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_I586}" -d "${MINGW_LINUX_PATH}"
+  printf "${GRE}Unzipping ${LINUX_LLVM_I686}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_I686}" -d "${MINGW_LINUX_PATH}"
+  printf "${GRE}Unzipping ${LINUX_LLVM_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_X64}" -d "${MINGW_LINUX_PATH}"
 }
 
 # Windows MinGW toolchains
 DownloadMinGWWindows () {
-  printf "${GRE}Downloading i586 Windows Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/mingw_win_i586.zip" "$TMP_DOWN_PATH"
+  printf "${GRE}Downloading i586 Windows GCC Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_GCC_I586}" "$TMP_DOWN_PATH"
 
-  printf "${GRE}Downloading i686 Windows Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/mingw_win_i686.zip" "$TMP_DOWN_PATH"
+  printf "${GRE}Downloading i686 Windows GCC Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_GCC_I686}" "$TMP_DOWN_PATH"
 
-  printf "${GRE}Downloading x86_64 Windows Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/mingw_win_x64.zip" "$TMP_DOWN_PATH"
+  printf "${GRE}Downloading x64 Windows GCC Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_GCC_X64}" "$TMP_DOWN_PATH"
+  # Then MinGW/LLVM toolchains
+  printf "${GRE}Downloading i586 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_LLVM_I586}" "$TMP_DOWN_PATH"
 
-  # Unpack
-  printf "${GRE}Unzipping Windows i586.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/mingw_win_i586.zip" -d "${MINGW_WIN32_PATH}"
-  printf "${GRE}Unzipping Windows i686.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/mingw_win_i686.zip" -d "${MINGW_WIN32_PATH}"
-  printf "${GRE}Unzipping Windows x64.zip... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/mingw_win_x64.zip" -d "${MINGW_WIN32_PATH}"
+  printf "${GRE}Downloading i686 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_LLVM_I686}" "$TMP_DOWN_PATH"
+
+  printf "${GRE}Downloading x64 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_LLVM_X64}" "$TMP_DOWN_PATH"
+
+  # Unpack zips
+  printf "${GRE}Unzipping ${WIN_GCC_I586}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${WIN_GCC_I586}" -d "${MINGW_WIN32_PATH}"
+  printf "${GRE}Unzipping ${WIN_GCC_I686}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${WIN_GCC_I686}" -d "${MINGW_WIN32_PATH}"
+  printf "${GRE}Unzipping ${WIN_GCC_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${WIN_GCC_X64}" -d "${MINGW_WIN32_PATH}"
+  # LLVM zips
+  printf "${GRE}Unzipping ${WIN_LLVM_I586}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_I586}" -d "${MINGW_WIN32_PATH}"
+  printf "${GRE}Unzipping ${WIN_LLVM_I686}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_I686}" -d "${MINGW_WIN32_PATH}"
+  printf "${GRE}Unzipping ${WIN_LLVM_X64}... ${c0}\n"
+  try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_X64}" -d "${MINGW_WIN32_PATH}"
 }
 
 show_help() {

@@ -57,23 +57,32 @@ WIN_LLVM_I586="mingw_llvm_win_i586.zip"
 WIN_LLVM_I686="mingw_llvm_win_i686.zip"
 WIN_LLVM_X64="mingw_llvm_win_x64.zip"
 # GN / Ninja
-GN_LINUX_X64="gn_linux_amd64.zip"
-GN_WIN_X64="gn_win_amd64.zip"
+GN_LINUX_X64="gn_linux.zip"
+GN_WIN_X86="gn_win32.zip"
+GN_WIN_X64="gn_win64.zip"
 NINJA_LINUX_X64="ninja_linux.zip"
-NINJA_WIN_X64="ninja_win.zip"
+NINJA_WIN_X86="ninja_win32.zip"
+NINJA_WIN_X64="ninja_win64.zip"
 
 DownloadGNLinux() {
-  printf "${GRE}Downloading GN Linux Binary Version ${GN_VER} ${c0}\n"
+  printf "${GRE}Downloading GN Linux x64 Binary Version ${GN_VER} ${c0}\n"
   Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_LINUX_X64}" "$TMP_DOWN_PATH"
   printf "${GRE}Unzipping ${GN_LINUX_X64}... ${c0}\n"
   try unzip -o "$TMP_DOWN_PATH/${GN_LINUX_X64}" -d "${TOOLS_PATH}"
 }
 
 DownloadGNWindows() {
-  printf "${GRE}Downloading GN Windows Binary Version ${GN_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_WIN_X64}" "$TMP_DOWN_PATH"
-  printf "${GRE}Unzipping ${GN_WIN_X64}... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/${GN_WIN_X64}" -d "${TOOLS_PATH}"
+  if [ "$DOWNLOAD_XP" == "1" ]; then
+    printf "${GRE}Downloading GN Windows x86 Binary Version ${GN_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_WIN_X86}" "$TMP_DOWN_PATH"
+    printf "${GRE}Unzipping ${GN_WIN_X86}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${GN_WIN_X86}" -d "${TOOLS_PATH}"
+  else
+    printf "${GRE}Downloading GN Windows x64 Binary Version ${GN_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_WIN_X64}" "$TMP_DOWN_PATH"
+    printf "${GRE}Unzipping ${GN_WIN_X64}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${GN_WIN_X64}" -d "${TOOLS_PATH}"
+  fi
 }
 
 DownloadNinjaLinux() {
@@ -84,10 +93,17 @@ DownloadNinjaLinux() {
 }
 
 DownloadNinjaWindows() {
-  printf "${GRE}Downloading Ninja Windows Binary Version ${NINJA_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_WIN_X64}" "$TMP_DOWN_PATH"
-  printf "${GRE}Unzipping ${NINJA_WIN_X64}... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/${NINJA_WIN_X64}" -d "${TOOLS_PATH}"
+  if [ "$DOWNLOAD_XP" == "1" ]; then
+    printf "${GRE}Downloading Ninja Windows x86 Binary Version ${NINJA_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_WIN_X86}" "$TMP_DOWN_PATH"
+    printf "${GRE}Unzipping ${NINJA_WIN_X86}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${NINJA_WIN_X86}" -d "${TOOLS_PATH}"
+  else
+    printf "${GRE}Downloading Ninja Windows x64 Binary Version ${NINJA_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_WIN_X64}" "$TMP_DOWN_PATH"
+    printf "${GRE}Unzipping ${NINJA_WIN_X64}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${NINJA_WIN_X64}" -d "${TOOLS_PATH}"
+  fi
 }
 
 # Linux MinGW toolchains
@@ -171,6 +187,7 @@ Usage:
 Options:
   -h, --help Show this help.
   --version  Show script version.
+  --xp       Download 32 Bit Windows XP compatible binaries
   --gn       Download GN binaries
   --ninja    Download Ninja binaries
   --mingw    Download MinGW Toolchains
@@ -251,6 +268,9 @@ while :; do
         ;;
     --gn)
         DOWNLOAD_GN=1
+        ;;
+    --xp)
+        DOWNLOAD_XP=1
         ;;
     --ninja)
         DOWNLOAD_NINJA=1

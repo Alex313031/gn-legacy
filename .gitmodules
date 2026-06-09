@@ -1,4 +1,0 @@
-[submodule "src/cryocalc"]
-	path = src/cryocalc
-	url = https://github.com/Alex313031/cryocalc.git
-	branch = main

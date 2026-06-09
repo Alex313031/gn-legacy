@@ -136,8 +136,8 @@ toolchain("llvm-mingw") {
       CC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-gcc.exe"
       CXX = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-g++.exe"
       LD = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-g++.exe"
-      AR = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-ar.exe"
-      RC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-windres.exe"
+      AR = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-gcc-ar.exe"
+      RC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\windres.exe"
     }
   } else {
     if (use_llvm) {

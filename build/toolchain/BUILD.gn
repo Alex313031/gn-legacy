@@ -101,25 +101,37 @@ toolchain("llvm-mingw") {
   if (target_cpu == "x86") {
     if (is_winnt || use_x87 || use_mmx || !use_sse) {
       mingw_prefix = "i586"
-      bin_prefix = "i586"
+      if (use_llvm) {
+        bin_prefix = "i586_llvm"
+      } else {
+        bin_prefix = "i586"
+      }
     } else {
       mingw_prefix = "i686"
-      bin_prefix = "i686"
+      if (use_llvm) {
+        bin_prefix = "i686_llvm"
+      } else {
+        bin_prefix = "i686"
+      }
     }
   } else if (target_cpu == "x64") {
     mingw_prefix = "x86_64"
-    bin_prefix = "x64"
+    if (use_llvm) {
+      bin_prefix = "x64_llvm"
+    } else {
+      bin_prefix = "x64"
+    }
   } else {
-    print("MinGW toolchain can only target x86/x64 for now.")
+    print("GN-Legacy can only target x86/x64 for now.")
   }
 
   if (host_os == "win") {
     if (use_llvm) {
-      CC = "$mingw_prefix-w64-mingw32-clang.exe"
-      CXX = "$mingw_prefix-w64-mingw32-clang++.exe"
-      LD = "$mingw_prefix-w64-mingw32-clang++.exe"
-      AR = "$mingw_prefix-w64-mingw32-llvm-ar.exe"
-      RC = "$mingw_prefix-w64-mingw32-windres.exe"
+      CC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang.exe"
+      CXX = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang++.exe"
+      LD = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang++.exe"
+      AR = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-ar.exe"
+      RC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-windres.exe"
     } else {
       CC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-gcc.exe"
       CXX = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-g++.exe"
@@ -129,11 +141,11 @@ toolchain("llvm-mingw") {
     }
   } else {
     if (use_llvm) {
-      CC = "$mingw_prefix-w64-mingw32-clang"
-      CXX = "$mingw_prefix-w64-mingw32-clang++"
-      LD = "$mingw_prefix-w64-mingw32-clang++"
-      AR = "$mingw_prefix-w64-mingw32-llvm-ar"
-      RC = "$mingw_prefix-w64-mingw32-windres"
+      CC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang"
+      CXX = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang++"
+      LD = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang++"
+      AR = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar"
+      RC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-windres"
     } else {
       CC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-gcc"
       CXX = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++"
@@ -184,7 +196,15 @@ toolchain("llvm-mingw") {
     libfile = "{{output_dir}}/lib$soname.a"
     rspfile = soname + ".rsp"
     rspfile_content = "{{inputs}}"
-    os_specific_option = "-Wl,-soname=$soname -Wl,--out-implib,$libfile"
+
+    # -soname is an ELF concept and is meaningless for PE/COFF DLLs. GNU ld's
+    # MinGW driver silently ignores it, but LLVM's lld rejects it outright
+    # ("unknown argument: -soname"), so only emit it for the GNU toolchain.
+    if (use_llvm) {
+      os_specific_option = "-Wl,--out-implib,$libfile"
+    } else {
+      os_specific_option = "-Wl,-soname=$soname -Wl,--out-implib,$libfile"
+    }
 
     command = "$CXX -shared {{ldflags}} @$rspfile -o $sofile {{solibs}} {{libs}} $os_specific_option"
 

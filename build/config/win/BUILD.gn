@@ -10,6 +10,18 @@ config("windows_config") {
   cflags = []
   include_dirs = []
   ldflags = []
+  libs = []
+
+  # LLVM's libc++/libunwind reference the pthread API (thread-safe statics,
+  # std::call_once) and EnumProcessModules (in the unwinder), so C++ binaries
+  # need winpthread + psapi at link. GCC's libstdc++ pulls these itself, so
+  # this is only required for the clang/lld toolchain.
+  if (use_llvm) {
+    libs += [
+      "winpthread",
+      "psapi",
+    ]
+  }
 
   defines += [
     "WINVER=$win32_winnt",
@@ -72,11 +84,21 @@ config("windows_config") {
   }
 }
 
+config("unicode_base") {
+  defines = [
+    "UNICODE",
+    "_UNICODE",
+  ]
+  cflags = [
+    "-finput-charset=UTF-8",
+    "-fexec-charset=UTF-8",
+  ]
+}
+
 config("console_subsystem") {
   ldflags = []
   libs = []
   defines = [ "_CONSOLE", ]
-  ldflags += [ "-mconsole", ]
   ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
   # Default libs for console apps, everything needs kernel32.
   libs += [
@@ -98,29 +120,25 @@ config("windowed_subsystem") {
   ]
 }
 
-config("unicode_base") {
-  defines = [
-    "UNICODE",
-    "_UNICODE",
-  ]
-  cflags = [
-    "-finput-charset=UTF-8",
-    "-fexec-charset=UTF-8",
-  ]
-}
-
 config("unicode") {
   configs = [ ":unicode_base", ]
   ldflags = [ "-municode", ]
 }
 
-config("mwindows") {
-  ldflags = [ "-mwindows", ]
+# Non-Unicode (ANSI/MBCS) counterpart to :unicode. Add this (and remove
+# :unicode) on targets that use the narrow Win32 APIs and a narrow entry point
+# (main/WinMain). Without -municode the CRT selects the narrow startup, and the
+# linker still infers the right entry from the subsystem, so no extra link flag
+# is needed. -finput-charset keeps UTF-8 source files readable; the exec charset
+# is intentionally left at the default so narrow literals use the runtime code
+# page rather than being forced to UTF-8.
+config("ansi") {
+  defines = [ "_MBCS", ]
+  cflags = [ "-finput-charset=UTF-8", ]
 }
 
-config("console_unicode") {
-  configs = [ ":unicode_base", ]
-  ldflags = [ "-mconsole", ]
+config("mwindows") {
+  ldflags = [ "-mwindows", ]
 }
 
 config("mconsole") {

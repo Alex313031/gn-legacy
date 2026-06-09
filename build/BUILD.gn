@@ -26,12 +26,12 @@ config("compiler_defaults") {
       "_NDEBUG",
     ]
   }
-  if (dcheck_enabled) {
-    defines += [ "DCHECK_ON=1" ]
-  }
+
+  # Log all compiler warnings
   cflags += [ "-Wall" ]
   if (dcheck_enabled) {
-    # Warnings are errors by default if DCHECK
+    defines += [ "DCHECK_ON=1" ]
+    # Warnings are errors by default if DCHECK is on.
     cflags += [ "-Werror" ]
   }
 
@@ -57,6 +57,11 @@ config("compiler_defaults") {
     configs += [ "./config/linux:linux_config" ]
   }
 
+  # Win32 tends to have pragmas clang doesn't recognize
+  if (use_llvm && target_os == "win") {
+    cflags += [ "-Wno-unknown-pragmas", ]
+  }
+
   # SIMD flags
   configs += [ "./config/simd:simd_config" ]
 }
@@ -76,6 +81,10 @@ config("executable_ldconfig") {
   } else if (is_mac) {
     ldflags += []
   }
+  if (is_official_build && use_llvm) {
+    # LLVM has explicit linker optimization flags
+    ldflags += [ "-Wl,-O3", ]
+  }
   if (use_lto) {
     if (use_llvm) {
       # Clang spelling; -flto=auto / -flto-partition are GCC-only.
@@ -91,3 +100,25 @@ config("executable_ldconfig") {
     }
   }
 }
+
+config("shared_lib_config") {
+  cflags_cc = []
+  # The DLL link flag (-shared) is hardcoded in the solink tool command in
+  # //build/toolchain:llvm-mingw, so nothing is added here for the link itself.
+  # Do NOT add -mdll: solink already passes -shared, and GCC rejects the
+  # combination outright ("shared and mdll are not compatible") -- only clang
+  # tolerates it. (-shared/-mdll in cflags is also wrong: at the compile step
+  # they are "argument unused during compilation" and never reach the linker.)
+  if (is_win && use_llvm) {
+    # clang-only: C++ functions whose return type has C linkage (extern "C"
+    # structs, common in Win32/COM DLL exports) trigger a cosmetic warning
+    # that GCC does not emit. Silence it for parity.
+    cflags_cc += [ "-Wno-return-type-c-linkage", ]
+  }
+}
+
+config("static_lib_config") {
+  # Self-contained static archives (no libgcc/CRT dependency leakage).
+  cflags = [ "-static", ]
+}
+

@@ -18,19 +18,19 @@ use_relative_paths = True
 # DEPS Flags, can be overridden in .gclient "custom_vars"
 vars = {
   # GN source repo version
-  'gn_version': 'c6767f465fd9c9d68c631ff6a8f11679f7531d55',
+  'gn_version': 'b1eed84f732a4e9839a20328a639256ab989f633',
 
   # Ninja source repo version
-  'ninja_version': '07bdc4a143ff515b1a19e4965380b9d8b54f170b',
+  'ninja_version': '71f269846b4996fd7a0a521447d4a74747238b57',
 
   # MinGW source repo version
-  'mingw_version': 'ff39317baa5c8674a8127e6df645781769664eb4',
+  'mingw_version': 'fed5df52aa2f9bb2bb3de75713feb3bc9ef8d10f',
 
   # clang-format Release to download
   'clang-format_version': '',
 
   # Whether to download sources used to build MinGW/GN/Ninja itself to tools/src
-  'download_toolchain_sources': 'False',
+  'download_toolchain_sources': 'True',
 
   # Whether to download custom sources to src/
   'download_sources': 'False',
@@ -47,7 +47,7 @@ deps = {
   # Only download toolchain sources if download_toolchain_sources == True
   'tools/src/gn': {
     # Source code to gn (bare minimum to use this repo)
-    'url': 'https://github.com/Alex313031/gn.git' + '@' + Var('gn_version'),
+    'url': 'https://github.com/Alex313031/gn-xp.git' + '@' + Var('gn_version'),
     'condition': 'download_toolchain_sources',
   },
   'tools/src/ninja': {

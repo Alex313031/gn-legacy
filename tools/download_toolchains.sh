@@ -42,10 +42,10 @@ TMP_DOWN_PATH="${HERE}/TMP_"
 
 export PATH="${TOOLS_PATH}:$PATH"
 
-# Edit below lines to update toolchains
+# Edit below 3 lines to update toolchains
 GN_VER="2026.06xp"
-NINJA_VER="v1.13.2xp"
-MINGW_VER="20260606"
+NINJA_VER="v1.13.2xp2"
+MINGW_VER="20260609"
 
 # Artifact names to download/unpack
 LINUX_GCC_I586="mingw_gcc_linux_i586.zip"

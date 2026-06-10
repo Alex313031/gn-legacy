@@ -37,7 +37,7 @@ BEGIN
             VALUE "FileDescription", "Hello World Console Test"
             VALUE "FileVersion", "0.0.1.0"
             VALUE "InternalName", "hello_console"
-            VALUE "LegalCopyright", L"\251 2025 Alex313031"
+            VALUE "LegalCopyright", L"\251 2026 Alex313031"
             VALUE "LegalTrademarks", "BSD-3"
             VALUE "OriginalFilename", "hello_console.exe"
             VALUE "ProductName", "Hello World"

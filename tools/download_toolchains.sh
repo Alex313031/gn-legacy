@@ -27,7 +27,7 @@ Fetch() {
 }
 
 SCRIPTNAME=$(basename "$0")
-SCRIPTVER="1.0.6"
+SCRIPTVER="1.0.7"
 
 export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -141,15 +141,17 @@ DownloadMinGWLinux () {
     Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_GCC_X64}" "$TMP_DOWN_PATH"
   fi
   # Then MinGW/LLVM toolchains
-  printf "${GRE}Downloading i586 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_I586}" "$TMP_DOWN_PATH"
-  
-  printf "${GRE}Downloading i686 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_I686}" "$TMP_DOWN_PATH"
+  if [ ! "$SKIP_LLVM" ]; then
+    printf "${GRE}Downloading i586 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_I586}" "$TMP_DOWN_PATH"
 
-  if [ ! "$DOWNLOAD_I386" ]; then
-    printf "${GRE}Downloading x64 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
-    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_X64}" "$TMP_DOWN_PATH"
+    printf "${GRE}Downloading i686 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_I686}" "$TMP_DOWN_PATH"
+
+    if [ ! "$DOWNLOAD_I386" ]; then
+      printf "${GRE}Downloading x64 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+      Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_X64}" "$TMP_DOWN_PATH"
+    fi
   fi
 
   # Unpack zips
@@ -162,38 +164,42 @@ DownloadMinGWLinux () {
     try unzip -o "$TMP_DOWN_PATH/${LINUX_GCC_X64}" -d "${MINGW_LINUX_PATH}"
   fi
   # LLVM zips
-  printf "${GRE}Unzipping ${LINUX_LLVM_I586}... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_I586}" -d "${MINGW_LINUX_PATH}"
-  printf "${GRE}Unzipping ${LINUX_LLVM_I686}... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_I686}" -d "${MINGW_LINUX_PATH}"
-  if [ ! "$DOWNLOAD_I386" ]; then
-    printf "${GRE}Unzipping ${LINUX_LLVM_X64}... ${c0}\n"
-    try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_X64}" -d "${MINGW_LINUX_PATH}"
+  if [ ! "$SKIP_LLVM" ]; then
+    printf "${GRE}Unzipping ${LINUX_LLVM_I586}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_I586}" -d "${MINGW_LINUX_PATH}"
+    printf "${GRE}Unzipping ${LINUX_LLVM_I686}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_I686}" -d "${MINGW_LINUX_PATH}"
+    if [ ! "$DOWNLOAD_I386" ]; then
+      printf "${GRE}Unzipping ${LINUX_LLVM_X64}... ${c0}\n"
+      try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_X64}" -d "${MINGW_LINUX_PATH}"
+    fi
   fi
 }
 
 # Windows MinGW toolchains
 DownloadMinGWWindows () {
   printf "${GRE}Downloading i586 Windows GCC Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_GCC_I586}" "$TMP_DOWN_PATH"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_GCC_I586}" "$TMP_DOWN_PATH"
 
   printf "${GRE}Downloading i686 Windows GCC Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_GCC_I686}" "$TMP_DOWN_PATH"
+  Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_GCC_I686}" "$TMP_DOWN_PATH"
 
   if [ ! "$DOWNLOAD_I386" ]; then
     printf "${GRE}Downloading x64 Windows GCC Toolchain version ${MINGW_VER} ${c0}\n"
-    Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_GCC_X64}" "$TMP_DOWN_PATH"
+    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_GCC_X64}" "$TMP_DOWN_PATH"
   fi
   # Then MinGW/LLVM toolchains
-  printf "${GRE}Downloading i586 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_LLVM_I586}" "$TMP_DOWN_PATH"
+  if [ ! "$SKIP_LLVM" ]; then
+    printf "${GRE}Downloading i586 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_LLVM_I586}" "$TMP_DOWN_PATH"
 
-  printf "${GRE}Downloading i686 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
-  Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_LLVM_I686}" "$TMP_DOWN_PATH"
+    printf "${GRE}Downloading i686 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_LLVM_I686}" "$TMP_DOWN_PATH"
 
-  if [ ! "$DOWNLOAD_I386" ]; then
-    printf "${GRE}Downloading x64 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
-    Fetch "https://github.com/Alex313031/win32-devkit/releases/download/${MINGW_VER}/${WIN_LLVM_X64}" "$TMP_DOWN_PATH"
+    if [ ! "$DOWNLOAD_I386" ]; then
+      printf "${GRE}Downloading x64 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+      Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_LLVM_X64}" "$TMP_DOWN_PATH"
+    fi
   fi
 
   # Unpack zips
@@ -206,13 +212,15 @@ DownloadMinGWWindows () {
     try unzip -o "$TMP_DOWN_PATH/${WIN_GCC_X64}" -d "${MINGW_WIN32_PATH}"
   fi
   # LLVM zips
-  printf "${GRE}Unzipping ${WIN_LLVM_I586}... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_I586}" -d "${MINGW_WIN32_PATH}"
-  printf "${GRE}Unzipping ${WIN_LLVM_I686}... ${c0}\n"
-  try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_I686}" -d "${MINGW_WIN32_PATH}"
-  if [ ! "$DOWNLOAD_I386" ]; then
-    printf "${GRE}Unzipping ${WIN_LLVM_X64}... ${c0}\n"
-    try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_X64}" -d "${MINGW_WIN32_PATH}"
+  if [ ! "$SKIP_LLVM" ]; then
+    printf "${GRE}Unzipping ${WIN_LLVM_I586}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_I586}" -d "${MINGW_WIN32_PATH}"
+    printf "${GRE}Unzipping ${WIN_LLVM_I686}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_I686}" -d "${MINGW_WIN32_PATH}"
+    if [ ! "$DOWNLOAD_I386" ]; then
+      printf "${GRE}Unzipping ${WIN_LLVM_X64}... ${c0}\n"
+      try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_X64}" -d "${MINGW_WIN32_PATH}"
+    fi
   fi
 }
 
@@ -224,12 +232,13 @@ Usage:
 Options:
   -h, --help Show this help.
   --version  Show script version.
-  --i386     Download 32 Bit binaries instead of 64 Bit (XP compatible!)
-  --insecure Skip TLS cert verification (for old curl)
-  --gn       Download GN binaries
-  --ninja    Download Ninja binaries
-  --mingw    Download MinGW Toolchains
-  -a, --all  Download everything
+  --i386     Download 32 Bit binaries instead of 64 Bit (XP compatible!).
+  --insecure Skip TLS cert verification (for old curl).
+  --gn       Download GN binaries.
+  --ninja    Download Ninja binaries.
+  --mingw    Download MinGW Toolchains.
+  --no-llvm  Skip LLVM MinGW toolchains and only download GCC ones.
+  -a, --all  Download everything (respects --no-llvm and --i386).
 
 EOF
 
@@ -318,6 +327,9 @@ while :; do
         ;;
     --mingw)
         DOWNLOAD_MINGW=1
+        ;;
+    --no-llvm)
+        SKIP_LLVM=1
         ;;
     -a|--all)
         DOWNLOAD_GN=1

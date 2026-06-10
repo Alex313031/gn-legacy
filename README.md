@@ -135,3 +135,5 @@ Ninja Manual: https://github.com/Alex313031/ninja-xp/blob/release/doc/manual.asc
 [Christopher Wellons](https://github.com/skeeto) for showing me how to compile MinGW targeting old Windows.
 
 [Chromium Team](https://source.chromium.org/chromium/chromium/src/+/main:AUTHORS) for these projects in the first place.
+
+[w64devkit](https://github.com/skeeto/w64devkit) for helping show me how to make legacy compatible toolchains.

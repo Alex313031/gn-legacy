@@ -21,13 +21,12 @@ vars = {
   'gn_version': '41f93e4face33b6ac65585bf32fa112b7c85ea3d',
 
   # Ninja source repo version
-  'ninja_version': '2ba359574568e08ace86f4c9184d6d06f6dadcfa',
+  'ninja_version': 'e916529cc93775d6a15c9d749be6ea1ded7ea9ac',
 
   # MinGW source repo version
-  'mingw_version': '701e138422d179d8c6d5eb8daade4d7e51c35bf4',
+  'mingw_version': '7d3dd889114214997ace0e9dbf2e650a3324bef5',
 
-  # clang-format Release to download
-  'clang-format_version': '',
+  #'clang-format_version': '',
 
   # Whether to download sources used to build MinGW/GN/Ninja itself to tools/src
   'download_toolchain_sources': 'True',

@@ -21,7 +21,7 @@ vars = {
   'gn_version': '41f93e4face33b6ac65585bf32fa112b7c85ea3d',
 
   # Ninja source repo version
-  'ninja_version': 'e916529cc93775d6a15c9d749be6ea1ded7ea9ac',
+  'ninja_version': 'f7c2d2b63c9672691ef44d6ebf16c48ee3902222',
 
   # MinGW source repo version
   'mingw_version': '7d3dd889114214997ace0e9dbf2e650a3324bef5',

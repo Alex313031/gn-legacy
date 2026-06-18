@@ -69,6 +69,7 @@ config("compiler_defaults") {
 config("executable_ldconfig") {
   configs = []
   cflags = []
+  cflags_cc = []
   ldflags = []
   if (is_linux) {
     ldflags += [
@@ -81,10 +82,31 @@ config("executable_ldconfig") {
   } else if (is_mac) {
     ldflags += []
   }
-  if (is_official_build && use_llvm) {
-    # LLVM has explicit linker optimization flags
-    ldflags += [ "-Wl,-O3", ]
+
+  # LLVM has explicit linker optimization flags
+  if (use_llvm) {
+    if (is_debug) {
+      ldflags += [ "-Wl,-O0", ]
+    } else {
+      if (is_official_build) {
+        ldflags += [ "-Wl,-O3", ]
+      } else {
+        if (dcheck_enabled) {
+          ldflags += [ "-Wl,-O1", ]
+        } else {
+          ldflags += [ "-Wl,-O2", ]
+        }
+      }
+    }
   }
+
+  if (is_win && use_llvm) {
+    # clang-only: C++ functions whose return type has C linkage (extern "C")
+    # trigger a cosmetic warning. Silence it for parity with GCC and trust the programmer.
+    cflags_cc += [ "-Wno-return-type-c-linkage", ]
+  }
+
+  # Full LTO/ThinLTO config
   if (use_lto) {
     if (use_llvm) {
       # Clang spelling; -flto=auto / -flto-partition are GCC-only.
@@ -110,9 +132,6 @@ config("shared_lib_config") {
   # tolerates it. (-shared/-mdll in cflags is also wrong: at the compile step
   # they are "argument unused during compilation" and never reach the linker.)
   if (is_win && use_llvm) {
-    # clang-only: C++ functions whose return type has C linkage (extern "C"
-    # structs, common in Win32/COM DLL exports) trigger a cosmetic warning
-    # that GCC does not emit. Silence it for parity.
     cflags_cc += [ "-Wno-return-type-c-linkage", ]
   }
 }
@@ -120,5 +139,9 @@ config("shared_lib_config") {
 config("static_lib_config") {
   # Self-contained static archives (no libgcc/CRT dependency leakage).
   cflags = [ "-static", ]
+  cflags_cc = []
+  if (is_win && use_llvm) {
+    cflags_cc += [ "-Wno-return-type-c-linkage", ]
+  }
 }
 

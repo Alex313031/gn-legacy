@@ -13,17 +13,17 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0, 0, 1
- PRODUCTVERSION 0, 0, 1
- FILEFLAGSMASK 0x3fL
+ FILEVERSION 0, 0, 2
+ PRODUCTVERSION 0, 0, 2
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
 #ifdef _DEBUG
- FILEFLAGS VS_FF_DEBUG // 0x00000010L
+ FILEFLAGS VS_FF_DEBUG // 0x00000001L // Debug build
 #else // Release mode
- FILEFLAGS 0x00000000L // Normal?
+ FILEFLAGS 0x00000000L // Release build
 #endif  // _DEBUG
  // Windows NT
  FILEOS VOS_NT_WINDOWS32 // 0x00040004L
- FILETYPE VFT_APP // 0x00000001L
+ FILETYPE VFT_DLL // 0x00000002L // .DLL type
  FILESUBTYPE VFT2_UNKNOWN // 0x00000000L
 BEGIN
     BLOCK "StringFileInfo"
@@ -33,13 +33,13 @@ BEGIN
             VALUE "Comments", "https://github.com/Alex313031/gn-legacy"
             VALUE "CompanyName", "Alex313031"
             VALUE "FileDescription", "Hello World Test DLL"
-            VALUE "FileVersion", "0.0.1.0"
+            VALUE "FileVersion", "0.0.2.0"
             VALUE "InternalName", "heller"
             VALUE "LegalCopyright", L"\251 2026 Alex313031"
             VALUE "LegalTrademarks", "BSD-3"
             VALUE "OriginalFilename", "heller.dll"
-            VALUE "ProductName", "Hello DLL"
-            VALUE "ProductVersion", "0.0.1"
+            VALUE "ProductName", "Heller DLL"
+            VALUE "ProductVersion", "0.0.2"
         END
     END
     BLOCK "VarFileInfo"

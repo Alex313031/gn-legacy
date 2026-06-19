@@ -111,10 +111,25 @@ config("unicode_base") {
   ]
 }
 
+# Link-time only: stamp the PE OS/subsystem version fields so the binary
+# targets the configured legacy Windows release. The clang return-type-c-linkage
+# warning suppression lives in //build:compiler_defaults so it reaches every
+# target type (including source_set), not just those that link.
+config("subsystem_base") {
+  ldflags = []
+  if (is_win) {
+    ldflags += [
+      "-Wl,--major-os-version=$winver_major,--minor-os-version=$winver_minor",
+      "-Wl,--major-subsystem-version=$winver_major,--minor-subsystem-version=$winver_minor",
+    ]
+  }
+}
+
 config("console_subsystem") {
   ldflags = []
   libs = []
   defines = [ "_CONSOLE", ]
+  configs = [ ":subsystem_base", ]
   ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
   # Default libs for console apps, everything needs kernel32.
   libs += [
@@ -126,6 +141,7 @@ config("windowed_subsystem") {
   ldflags = []
   libs = []
   defines = [ "_WINDOWS", ]
+  configs = [ ":subsystem_base", ]
   ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
   # Default common libs for GUI Win32 apps.
   libs += [

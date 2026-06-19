@@ -13,6 +13,7 @@ config("compiler_defaults") {
   cflags_c = []
   cflags_cc = []
   ldflags = []
+  arflags = [ "rcs", ]
 
   # Debug defines/flags
   if (is_debug) {
@@ -52,18 +53,21 @@ config("compiler_defaults") {
 
   # Platform configs
   if (is_win) {
-    configs += [ "./config/win:windows_config" ]
+    configs += [ "config/win:windows_config" ]
   } else if (is_linux) {
-    configs += [ "./config/linux:linux_config" ]
+    configs += [ "config/linux:linux_config" ]
   }
 
-  # Win32 tends to have pragmas clang doesn't recognize
+  # Win32 tends to have pragmas clang doesn't recognize. -Wno-return-type-c-linkage
+  # silences a cosmetic clang-only warning for C++ functions whose return type has
+  # C linkage (extern "C") -- for parity with GCC; trust the programmer.
   if (use_llvm && target_os == "win") {
     cflags += [ "-Wno-unknown-pragmas", ]
+    cflags_cc += [ "-Wno-return-type-c-linkage", ]
   }
 
   # SIMD flags
-  configs += [ "./config/simd:simd_config" ]
+  configs += [ "config/simd:simd_config" ]
 }
 
 config("executable_ldconfig") {
@@ -100,12 +104,6 @@ config("executable_ldconfig") {
     }
   }
 
-  if (is_win && use_llvm) {
-    # clang-only: C++ functions whose return type has C linkage (extern "C")
-    # trigger a cosmetic warning. Silence it for parity with GCC and trust the programmer.
-    cflags_cc += [ "-Wno-return-type-c-linkage", ]
-  }
-
   # Full LTO/ThinLTO config
   if (use_lto) {
     if (use_llvm) {
@@ -124,24 +122,25 @@ config("executable_ldconfig") {
 }
 
 config("shared_lib_config") {
-  cflags_cc = []
+  configs = [ "config/win:subsystem_base", ]
+
   # The DLL link flag (-shared) is hardcoded in the solink tool command in
   # //build/toolchain:llvm-mingw, so nothing is added here for the link itself.
   # Do NOT add -mdll: solink already passes -shared, and GCC rejects the
   # combination outright ("shared and mdll are not compatible") -- only clang
   # tolerates it. (-shared/-mdll in cflags is also wrong: at the compile step
   # they are "argument unused during compilation" and never reach the linker.)
-  if (is_win && use_llvm) {
-    cflags_cc += [ "-Wno-return-type-c-linkage", ]
-  }
 }
 
 config("static_lib_config") {
+  configs = [ "config/win:subsystem_base", ]
+  cflags = []
+  ldflags = []
+
   # Self-contained static archives (no libgcc/CRT dependency leakage).
-  cflags = [ "-static", ]
-  cflags_cc = []
-  if (is_win && use_llvm) {
-    cflags_cc += [ "-Wno-return-type-c-linkage", ]
+  cflags += [ "-static", ]
+  if (is_linux) {
+    ldflags += [ "-static", ]
   }
 }
 

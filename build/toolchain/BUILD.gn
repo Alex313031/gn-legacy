@@ -7,9 +7,17 @@ import("//build/config/args.gni")
 use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
 
 toolchain("gcc") {
+  # Link through the g++ driver on every host: invoking `ld` directly skips
+  # CRT startup objects and the default system libraries, which breaks C++
+  # executables. The driver handles those for us.
+  CC = "gcc"
+  CXX = "g++"
+  LD = "g++"
+  AR = "ar"
+
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "gcc -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    command = "$CC -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CC {{output}}"
     outputs =
@@ -19,7 +27,7 @@ toolchain("gcc") {
   tool("cxx") {
     precompiled_header_type = "gcc"
     depfile = "{{output}}.d"
-    command = "g++ -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    command = "$CXX -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CXX {{output}}"
     outputs =
@@ -27,11 +35,12 @@ toolchain("gcc") {
   }
 
   tool("alink") {
-    command = "ar rcs {{output}} {{inputs}}"
+    libname = "{{target_output_name}}{{output_extension}}"
+    libfile = "{{target_out_dir}}/$libname"
+    command = "$AR {{arflags}} {{output}} {{inputs}}"
     description = "AR {{target_output_name}}{{output_extension}}"
 
-    outputs =
-        [ "{{target_out_dir}}/{{target_output_name}}{{output_extension}}" ]
+    outputs = [ libfile ]
     default_output_extension = ".a"
     output_prefix = "lib"
   }
@@ -41,21 +50,25 @@ toolchain("gcc") {
     sofile = "{{output_dir}}/$soname"
     rspfile = soname + ".rsp"
     if (is_mac) {
+      description = "DYNLIB $soname"
       os_specific_option = "-install_name @executable_path/$sofile"
       rspfile_content = "{{inputs}} {{solibs}} {{libs}}"
     } else {
+      description = "SOLINK $soname"
       os_specific_option = "-Wl,-soname=$soname"
       rspfile_content = "-Wl,--whole-archive {{inputs}} {{solibs}} -Wl,--no-whole-archive {{libs}}"
     }
 
-    command = "g++ -shared {{ldflags}} -o $sofile $os_specific_option @$rspfile"
-
-    description = "SOLINK $soname"
+    command = "$LD -shared {{ldflags}} -o $sofile $os_specific_option @$rspfile"
 
     # Use this for {{output_extension}} expansions unless a target manually
     # overrides it (in which case {{output_extension}} will be what the target
     # specifies).
-    default_output_extension = ".so"
+    if (is_mac) {
+      default_output_extension = ".dylib"
+    } else {
+      default_output_extension = ".so"
+    }
 
     # Use this for {{output_dir}} expansions unless a target manually overrides
     # it (in which case {{output_dir}} will be what the target specifies).
@@ -71,9 +84,9 @@ toolchain("gcc") {
     outfile = "{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
     if (is_mac) {
-      command = "g++ {{ldflags}} -o $outfile @$rspfile {{solibs}} {{libs}}"
+      command = "$LD {{ldflags}} -o $outfile @$rspfile {{solibs}} {{libs}}"
     } else {
-      command = "g++ {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
+      command = "$LD {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
     }
     description = "LINK $outfile"
     default_output_dir = "{{root_out_dir}}"
@@ -180,9 +193,9 @@ toolchain("llvm-mingw") {
     outlibfile = "{{root_out_dir}}/$libname"
     description = "AR {{output}}"
     if (host_os == "win") {
-      command = "cmd /c $AR rcs $libfile {{inputs}}&&powershell -NoProfile -Command \"Copy-Item -LiteralPath '$libfile' -Destination '$outlibfile' -Force\""
+      command = "cmd /c $AR {{arflags}} $libfile {{inputs}}&&powershell -NoProfile -Command \"Copy-Item -LiteralPath '$libfile' -Destination '$outlibfile' -Force\""
     } else {
-      command = "$AR rcs $libfile {{inputs}} && cp -af $libfile $outlibfile"
+      command = "$AR {{arflags}} $libfile {{inputs}} && cp -af $libfile $outlibfile"
     }
 
     default_output_extension = ".a"
@@ -206,7 +219,7 @@ toolchain("llvm-mingw") {
       os_specific_option = "-Wl,-soname=$soname -Wl,--out-implib,$libfile"
     }
 
-    command = "$CXX -shared {{ldflags}} @$rspfile -o $sofile {{solibs}} {{libs}} $os_specific_option"
+    command = "$LD -shared {{ldflags}} @$rspfile -o $sofile {{solibs}} {{libs}} $os_specific_option"
 
     description = "DLL LINK $soname"
 

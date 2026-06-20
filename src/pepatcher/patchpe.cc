@@ -95,7 +95,7 @@ struct PEHeader
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-extern "C" int wmain(int argc, WCHAR *argv[], WCHAR *envp[])
+int wmain(int argc, WCHAR *argv[], WCHAR *envp[])
 {
 	IMAGE_DOS_HEADER udtDOSHeader;
 	PEHeader udtPEHeader;
@@ -608,14 +608,3 @@ extern "C" int wmain(int argc, WCHAR *argv[], WCHAR *envp[])
 	int retval = _fcloseall();	
 	return(retval);
 }
-
-#ifdef __MINGW32__
-extern int _CRT_glob;
-extern "C" void __wgetmainargs(int*,wchar_t***,wchar_t***,int,int*);
-extern "C" int main() {
-	wchar_t **enpv, **argv;
-	int argc, si = 0;
-	__wgetmainargs(&argc, &argv, &enpv, _CRT_glob, &si); // this also creates the global variable __wargv
-	return wmain(argc, argv, enpv);
-}
-#endif

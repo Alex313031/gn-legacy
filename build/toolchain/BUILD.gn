@@ -193,7 +193,13 @@ toolchain("llvm-mingw") {
     outlibfile = "{{root_out_dir}}/$libname"
     description = "AR {{output}}"
     if (host_os == "win") {
-      command = "cmd /c $AR {{arflags}} $libfile {{inputs}}&&powershell -NoProfile -Command \"Copy-Item -LiteralPath '$libfile' -Destination '$outlibfile' -Force\""
+      # Build the archive in target_out_dir, then copy it to root_out_dir.
+      # Use cmd's builtin `copy` (XP-compatible) rather than PowerShell's
+      # Copy-Item, which isn't usable on legacy Windows even with the PS 2.0
+      # add-on. Quote both paths: GN/ninja emit forward-slash paths and cmd's
+      # `copy` would otherwise treat a leading-slash token as a switch (the
+      # CopyFile API itself accepts `/` as a separator just fine).
+      command = "cmd /c $AR {{arflags}} $libfile {{inputs}}&&copy /Y \"$libfile\" \"$outlibfile\""
     } else {
       command = "$AR {{arflags}} $libfile {{inputs}} && cp -af $libfile $outlibfile"
     }
@@ -266,7 +272,9 @@ toolchain("llvm-mingw") {
 
   tool("stamp") {
     if (host_os == "win") {
-      command = "copy /b NUL {{output}}"
+      # Quote the path so cmd doesn't parse a leading-slash path token as a
+      # switch (GN/ninja emit forward-slash paths).
+      command = "copy /b NUL \"{{output}}\""
     } else {
       command = "touch {{output}}"
     }
@@ -275,7 +283,9 @@ toolchain("llvm-mingw") {
 
   tool("copy") {
     if (host_os == "win") {
-      command = "copy /Y {{source}} {{output}}"
+      # Quote both paths so cmd doesn't parse a leading-slash path token as a
+      # switch (GN/ninja emit forward-slash paths).
+      command = "copy /Y \"{{source}}\" \"{{output}}\""
     } else {
       command = "cp -af {{source}} {{output}}"
     }

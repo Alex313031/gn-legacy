@@ -1,0 +1,65 @@
+# Copyright (c) 2026 Alex313031
+
+# macOS specific configs. This is incomplete; frameworks and codesigning are
+# expected to grow as macOS support matures.
+
+import("//build/config/args.gni")
+
+declare_args() {
+  # Minimum macOS version to target. Passed to -mmacosx-version-min for both
+  # the compiler and linker.
+  mac_deployment_target = "10.15"
+}
+
+config("mac_config") {
+  defines = []
+  cflags = []
+  ldflags = []
+
+  # Assume Unicode on macOS
+  defines += [
+    "UNICODE",
+    "_UNICODE",
+  ]
+  cflags += [
+    "-finput-charset=UTF-8",
+    "-fexec-charset=UTF-8",
+  ]
+
+  # Target the configured minimum OS version at both compile and link time so
+  # the load command (LC_BUILD_VERSION) and availability checks agree.
+  cflags += [ "-mmacosx-version-min=$mac_deployment_target" ]
+  ldflags += [ "-mmacosx-version-min=$mac_deployment_target" ]
+
+  if (is_debug) {
+    cflags += [
+      "-Og",
+      "-g2",
+    ]
+    if (use_dwarf) {
+      cflags += [ "-gdwarf-2" ]
+    }
+  } else {
+    if (is_official_build) {
+      cflags += [
+        "-O3",
+        "-g0",
+      ]
+    } else {
+      cflags += [
+        "-O2",
+        "-g1",
+      ]
+    }
+  }
+
+  # macOS binaries are position-independent (PIE) by default; -fPIC keeps
+  # parity with the other platforms. There is no ELF-style `-s` strip flag for
+  # the mach-o linker (it is obsolete) -- strip with the `strip` tool, or
+  # generate a separate .dSYM with dsymutil, post-link if desired.
+  cflags += [ "-fPIC" ]
+
+  # libSystem provides libm and libpthread, so no default system libs or
+  # -pthread are needed. Link Apple frameworks per-target via the GN
+  # `frameworks` variable (e.g. frameworks = [ "CoreFoundation.framework" ]).
+}

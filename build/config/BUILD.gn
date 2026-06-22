@@ -38,10 +38,11 @@ config("compiler_defaults") {
   cflags_cc += [ "-std=c++$cpp_std" ]
 
   # Static CRT. These are link-time flags, so they go in ldflags (the link
-  # tools only consume {{ldflags}}, not cflags). Clang/LLVM has no
-  # libgcc/libstdc++; it gets standalone binaries from the unconditional
-  # -static in the platform configs instead.
-  if (!use_llvm) {
+  # tools only consume {{ldflags}}, not cflags). They are GCC driver flags:
+  # Clang/LLVM has no libgcc/libstdc++ (it gets standalone binaries from the
+  # unconditional -static in the platform configs instead), and macOS clang
+  # links against libSystem and doesn't support them either.
+  if (!use_llvm && !is_mac) {
     ldflags += [
       "-static-libgcc",
       "-static-libstdc++",
@@ -53,6 +54,8 @@ config("compiler_defaults") {
     configs += [ "win:windows_config" ]
   } else if (is_linux) {
     configs += [ "linux:linux_config" ]
+  } else if (is_mac) {
+    configs += [ "mac:mac_config" ]
   }
 
   # Win32 tends to have pragmas clang doesn't recognize. -Wno-return-type-c-linkage

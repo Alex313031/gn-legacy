@@ -33,27 +33,24 @@ config("linux_config") {
         "-O3",
         "-g0",
       ]
-      # Strip binaries
-      cflags += [ "-s", ]
-      ldflags += [ "-s", ]
     } else {
       cflags += [
-        "-O1",
+        "-O2",
         "-g1",
       ]
     }
   }
 
-  # PIC for PIE
+  # PIC for PIE. -fPIC is compile-time only; the -pie link flag lives in
+  # //build:executable_config.
   cflags += [
     "-fPIC",
   ]
-  ldflags += [
-    "-fpic",
-  ]
 
-  # Default to using threads
+  # Default to using threads. -pthread is needed at compile time (defines the
+  # threading feature macros) and at link time (pulls in libpthread).
   cflags += [ "-pthread", ]
+  ldflags += [ "-pthread", ]
 
   # Default linux system libraries
   libs = [

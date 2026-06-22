@@ -48,7 +48,10 @@ config("executable_config") {
 }
 
 config("shared_lib_config") {
-  configs = [ "config/win:subsystem_base", ]
+  configs = []
+  if (is_win) {
+    configs += [ "config/win:subsystem_base", ]
+  }
 
   # The DLL link flag (-shared) is hardcoded in the solink tool command in
   # //build/toolchain/win:mingw, so nothing is added here for the link itself.
@@ -59,12 +62,19 @@ config("shared_lib_config") {
 }
 
 config("static_lib_config") {
-  configs = [ "config/win:subsystem_base", ]
+  configs = []
   cflags = []
   ldflags = []
 
-  # Self-contained static archives (no libgcc/CRT dependency leakage).
-  cflags += [ "-static", ]
+  if (is_win) {
+    configs += [ "config/win:subsystem_base", ]
+  }
+
+  # Self-contained static archives (no libgcc/CRT dependency leakage). macOS
+  # clang links against libSystem and doesn't support -static.
+  if (!is_mac) {
+    cflags += [ "-static", ]
+  }
   if (is_linux) {
     ldflags += [ "-static", ]
   }

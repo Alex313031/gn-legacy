@@ -1,6 +1,5 @@
-# Copyright 2025 The Chromium Authors and Alex313031.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+# Copyright (c) 2014-2025 The Chromium Authors
+# Copyright (c) 2025-2026 Alex313031
 
 import("//build/config/args.gni")
 import("//build/config/win/target_ver.gni")

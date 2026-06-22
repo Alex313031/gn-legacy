@@ -1,3 +1,5 @@
+# Copyright (c) 2025-2026 Alex313031
+
 import("//build/config/simd/simd.gni")
 
 declare_args() {

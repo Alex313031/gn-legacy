@@ -1,5 +1,6 @@
 BSD 3-Clause License
 
+Copyright (c) 2014-2025, The Chromium Authors
 Copyright (c) 2025-2026, Alexander Frick <alex313031@gmail.com>
 
 Redistribution and use in source and binary forms, with or without

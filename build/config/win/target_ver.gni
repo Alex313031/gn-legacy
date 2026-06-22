@@ -1,3 +1,5 @@
+# Copyright (c) 2025-2026 Alex313031
+
 declare_args() {
   # Target Windows version. Can be a name, like "2000", "Vista"
   # or an NT number, like "5.1" for XP, or "6.1" for Win 7.

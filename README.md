@@ -53,13 +53,13 @@ git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 ```
 and add it to your `$PATH`. See [Here](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up) for more info.  
 
-Then, from the directory *one level above* your `gn-legacy` checkout, generate a `.gclient` file with this one-liner:
+Then, from the directory *one level above* your `gn-legacy` checkout (or where you want it to be), and generate a `.gclient` file with this one-liner:
 
 ```bash
 gclient config --spec 'solutions=[{"name":"gn-legacy","url":"https://github.com/Alex313031/gn-legacy.git","managed":False,"custom_deps":{},"custom_vars":{"download_toolchain_sources":True,"download_sources":True}}]'
 ```
 
-Lastly, run `gclient sync`. This is more robust than just `download_toolchains.sh` - in addition to running that script, it will also download the sources
+Lastly, cd back to where `gn-legacy` is, and run `gclient sync`. This is more robust than just `download_toolchains.sh` - in addition to running that script, it will also download the sources
 for the [GN Fork](https://github.com/Alex313031/gn-xp#readme), the [Ninja Fork](https://github.com/Alex313031/ninja-xp#readme), and the [MinGW GCC + MinGW LLVM Toolchains](https://github.com/Alex313031/mingw-build#readme) that this repo uses.  
 All of these have been modified to run on Win XP+. (So that gn-legacy can be used on XP+, and target NT 4.0+).
 
@@ -133,6 +133,8 @@ It also uses forks of GN and Ninja, that support running on Windows XP+. See htt
 
 ### Resources
 
+This repo was created from the ground up based on the sample GN config [in the GN repo itself](https://gn.googlesource.com/gn/+/refs/heads/main/examples/simple_build/).
+
 GN Quick Start Guide: https://github.com/Alex313031/gn-xp/blob/master/docs/quick_start.md (Has Chromium-specific stuff in there, but still helpful)
 
 GN Reference: https://github.com/Alex313031/gn-xp/blob/master/docs/reference.md (How to use/write BUILD.gn files)
@@ -141,10 +143,13 @@ Ninja Manual: https://github.com/Alex313031/ninja-xp/blob/release/doc/manual.asc
 
 ### Acknowledgments
 
-[Tim Niederhausen](https://github.com/timniederhausen) for his forks of GN and Ninja, which mine are based on.
+[Tim Niederhausen](https://github.com/timniederhausen) for his forks GN ([Here](https://github.com/timniederhausen/gn)), and Ninja ([Here](https://github.com/timniederhausen/ninja)), which mine are based on.
+I also initially based this repo on his [gn-build repo](https://github.com/timniederhausen/gn-build), but found it too like Chromium's and too tied to Visual Studio.
 
-[Christopher Wellons](https://github.com/skeeto) for showing me how to compile MinGW targeting old Windows.
+[Christopher Wellons](https://github.com/skeeto) for showing me how to compile MinGW targeting old Windows. His [w64devkit](https://github.com/skeeto/w64devkit) is a good alternative to this toolchain,
+it provides a bash shell with Make, Ninja, MinGW, busybox, and [NSIS](https://nsis.sourceforge.io/Main_Page), that supports Windows XP.
 
-[Chromium Team](https://source.chromium.org/chromium/chromium/src/+/main:AUTHORS) for these projects in the first place.
+[Will](https://github.com/mon/llvm-mingw-xp/tree/master/patches) and [iProgramInCpp](https://github.com/DiscordMessenger/dm/tree/master/doc/pentium-toolchain) for additional patches
+that I found useful in making the compiler toolchains for this repo.
 
-[w64devkit](https://github.com/skeeto/w64devkit) for helping show me how to make legacy compatible toolchains.
+[Chromium Team](https://source.chromium.org/chromium/chromium/src/+/main:AUTHORS) for these projects in the first place. (Fun fact, I'm in that file)

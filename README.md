@@ -46,15 +46,20 @@ This command also downloads the `gn` and `ninja` binaries this repo needs.
 ```
 
 #### With gclient
-Since this repo uses GN/Ninja just like Chromium, one can also use the sample [`gclient`](./gclient) file. It will need to be renamed to `.gclient` (with a dot), and moved *one directory up*
-from this repo. Then, you can clone `depot_tools` with:
+Since this repo uses GN/Ninja just like Chromium, you can also manage it with `gclient`. First, clone `depot_tools`:
 
 ```bash
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 ```
-And then add it to your `$PATH`. See [Here](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up) for more info.  
+and add it to your `$PATH`. See [Here](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up) for more info.  
 
-Lastly, you can `cd` to this repo, and run `gclient sync`. This is more robust than just `download_toolchains.sh` - in addition to running that script, it will also download the sources
+Then, from the directory *one level above* your `gn-legacy` checkout, generate a `.gclient` file with this one-liner:
+
+```bash
+gclient config --spec 'solutions=[{"name":"gn-legacy","url":"https://github.com/Alex313031/gn-legacy.git","managed":False,"custom_deps":{},"custom_vars":{"download_toolchain_sources":True,"download_sources":True}}]'
+```
+
+Lastly, run `gclient sync`. This is more robust than just `download_toolchains.sh` - in addition to running that script, it will also download the sources
 for the [GN Fork](https://github.com/Alex313031/gn-xp#readme), the [Ninja Fork](https://github.com/Alex313031/ninja-xp#readme), and the [MinGW GCC + MinGW LLVM Toolchains](https://github.com/Alex313031/mingw-build#readme) that this repo uses.  
 All of these have been modified to run on Win XP+. (So that gn-legacy can be used on XP+, and target NT 4.0+).
 

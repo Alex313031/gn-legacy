@@ -20,6 +20,7 @@ if (current_os == "") {
   current_os = target_os
 }
 
+# Keep this here
 import("//build/config/args.gni")
 
 is_linux = host_os == "linux" && current_os == "linux" && target_os == "linux"
@@ -37,10 +38,10 @@ if (is_win) {
 }
 
 # All binary targets will get this list of configs by default.
-_binary_target_configs = [ "//build:compiler_defaults" ]
+_binary_target_configs = [ "//build/config:compiler_defaults" ]
 
-# Executables get additional linker configuration (ldconfig + subsystem/unicode).
-_executable_target_configs = _binary_target_configs + [ "//build:executable_ldconfig" ] + _linker_configs
+# Executables get additional linker configuration (linker config + subsystem/unicode).
+_executable_target_configs = _binary_target_configs + [ "//build:executable_config" ] + _linker_configs
 
 # Static libs get -static.
 _static_lib_target_configs = _binary_target_configs + [ "//build:static_lib_config" ]

@@ -2,8 +2,6 @@
 
 import("simd.gni")
 
-use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
-
 if (use_x87) {
   assert(target_cpu == "x86", "use_x87 can only be used with 32 bit x86 targets.")
 }

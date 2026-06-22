@@ -1,0 +1,69 @@
+# Copyright (c) 2025-2026 Alex313031
+
+import("//build/config/args.gni")
+import("//build/config/win/target_ver.gni")
+
+config("compiler_defaults") {
+  configs = []
+  defines = []
+  include_dirs = []
+  cflags = []
+  cflags_c = []
+  cflags_cc = []
+  ldflags = []
+  arflags = [ "rcs", ]
+
+  # Debug defines/flags
+  if (is_debug) {
+    defines += [
+      "DEBUG",
+      "_DEBUG",
+    ]
+  } else {
+    defines += [
+      "NDEBUG",
+      "_NDEBUG",
+    ]
+  }
+
+  # Log all compiler warnings
+  cflags += [ "-Wall" ]
+  if (dcheck_enabled) {
+    defines += [ "DCHECK_ON=1" ]
+    # Warnings are errors by default if DCHECK is on.
+    cflags += [ "-Werror" ]
+  }
+
+  # Set C/C++ standards
+  cflags_c += [ "-std=c$c_std" ]
+  cflags_cc += [ "-std=c++$cpp_std" ]
+
+  # Static CRT. These are link-time flags, so they go in ldflags (the link
+  # tools only consume {{ldflags}}, not cflags). Clang/LLVM has no
+  # libgcc/libstdc++; it gets standalone binaries from the unconditional
+  # -static in the platform configs instead.
+  if (!use_llvm) {
+    ldflags += [
+      "-static-libgcc",
+      "-static-libstdc++",
+    ]
+  }
+
+  # Platform configs
+  if (is_win) {
+    configs += [ "win:windows_config" ]
+  } else if (is_linux) {
+    configs += [ "linux:linux_config" ]
+  }
+
+  # Win32 tends to have pragmas clang doesn't recognize. -Wno-return-type-c-linkage
+  # silences a cosmetic clang-only warning for C++ functions whose return type has
+  # C linkage (extern "C") -- for parity with GCC; trust the programmer.
+  if (use_llvm && target_os == "win") {
+    cflags += [ "-Wno-unknown-pragmas", ]
+    cflags_cc += [ "-Wno-return-type-c-linkage", ]
+  }
+
+  # SIMD flags
+  configs += [ "simd:simd_config" ]
+}

@@ -3,8 +3,6 @@
 
 import("//build/config/args.gni")
 
-use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
-
 toolchain("gcc") {
   # Link through the g++ driver on every host: invoking `ld` directly skips
   # CRT startup objects and the default system libraries, which breaks C++

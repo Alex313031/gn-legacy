@@ -4,14 +4,12 @@
 import("//build/config/args.gni")
 
 config("executable_config") {
-  configs = []
   cflags = []
   ldflags = []
   if (is_linux) {
     ldflags += [
       "-pie",
       "-Wl,-rpath=\$ORIGIN/",
-      "-Wl,-rpath-link=",
     ]
   }
 

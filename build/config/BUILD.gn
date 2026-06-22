@@ -6,7 +6,6 @@ import("//build/config/win/target_ver.gni")
 config("compiler_defaults") {
   configs = []
   defines = []
-  include_dirs = []
   cflags = []
   cflags_c = []
   cflags_cc = []

@@ -55,7 +55,7 @@ config("linux_config") {
   # Default to using threads
   cflags += [ "-pthread", ]
 
-  # Defalt linux system libraries
+  # Default linux system libraries
   libs = [
     "m",
   ]

@@ -8,7 +8,6 @@ import("//build/config/win/target_ver.gni")
 config("windows_config") {
   defines = [ "_WIN32", ]
   cflags = []
-  include_dirs = []
   ldflags = []
   libs = []
 
@@ -61,16 +60,15 @@ config("windows_config") {
   cflags += [ "-static", ]
   ldflags += [ "-static", ]
 
+  defines += [ "_CRT_SECURE_NO_WARNINGS", ]
   if (is_legacy_windows) {
     defines += [
       "PSAPI_VERSION=1",
-      "_CRT_SECURE_NO_WARNINGS",
       "_CRT_NONSTDC_NO_WARNINGS",
     ]
   } else {
     defines += [
       "PSAPI_VERSION=2",
-      "_CRT_SECURE_NO_WARNINGS",
     ]
   }
 

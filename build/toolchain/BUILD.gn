@@ -14,7 +14,7 @@ toolchain("gcc") {
 
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "$CC -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    command = "$CC -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CC {{output}}"
     outputs =
@@ -24,7 +24,7 @@ toolchain("gcc") {
   tool("cxx") {
     precompiled_header_type = "gcc"
     depfile = "{{output}}.d"
-    command = "$CXX -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    command = "$CXX -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CXX {{output}}"
     outputs =

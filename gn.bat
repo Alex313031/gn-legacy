@@ -1,11 +1,18 @@
 :: Copyright (c) 2025 Alex313031
 
+:: Windows gn wrapper for GN-Legacy
+
+:: Don't spam console
 @ECHO OFF
 
-ECHO GN
-
+:: Current dir
 SET CWD=%~dp0
 
-SET TOOLSDIR=%CWD%\tools
+:: Pick up gn.exe
+SET TOOLSDIR=%CWD%tools
 
-%TOOLSDIR%\gn.exe %*
+:: Log what we are
+ECHO GN
+
+:: Run gn.exe
+"%TOOLSDIR%\gn.exe" %*

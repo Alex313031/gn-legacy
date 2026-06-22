@@ -2,6 +2,16 @@
 
 # Copyright (c) 2025 Alex313031.
 
-export HERE=${PWD}
+# Linux gn wrapper for GN-Legacy
 
-$HERE/tools/gn $@
+# Current dir (where this script lives, not where it was invoked)
+export HERE=$(cd "$(dirname "$0")" && pwd) &&
+
+# Pick up gn
+export TOOLS_PATH=${HERE}/tools &&
+
+# Log what we are
+printf "GN\n" &&
+
+# Run gn
+${TOOLS_PATH}/gn "$@"

@@ -2,11 +2,26 @@
 
 # Copyright (c) 2026 Alex313031.
 
-export HERE=${PWD} &&
+# Linux Ninja wrapper for GN-Legacy
 
+# Current dir (where this script lives, not where it was invoked)
+export HERE=$(cd "$(dirname "$0")" && pwd) &&
+
+# Pick up ninja and clang-format
 export TOOLS_PATH=${HERE}/tools &&
-export MINGW_PATH=${HERE}/tools/mingw/linux/i686/bin &&
 
-export PATH=${MINGW_PATH}:${TOOLS_PATH}:$PATH:${TOOLS_PATH}:${MINGW_PATH} &&
+# Pickup extra tools like gendef, this isn't for gn-legacy itself
+# export MINGW_PATH=${HERE}/tools/mingw/linux/i686/bin &&
 
-${TOOLS_PATH}/ninja $@
+# Add tools to path (and MinGW only when MINGW_PATH is set)
+if [ -n "${MINGW_PATH}" ]; then
+  export PATH=${TOOLS_PATH}:${MINGW_PATH}:$PATH
+else
+  export PATH=${TOOLS_PATH}:$PATH
+fi &&
+
+# Log what we are
+printf "Ninja\n" &&
+
+# Run ninja
+${TOOLS_PATH}/ninja "$@"

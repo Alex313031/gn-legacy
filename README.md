@@ -17,7 +17,14 @@ than Windows 7 (Modern MSVC for example), or they are incomplete/hard to use. Th
 a small learning curve getting used to how GN works and how to write BUILD.gn files, but once you learn it, I feel almost
 every C/C++ dev can appreciate what the build system has to offer.
 
-<img src="./assets/WinNT4Workstation_Logo.svg" height="64"> <img src="./assets/Win2000Pro_Logo.svg" height="64"> <img src="./assets/WinXPPro_Logo.svg" height="64"> <img src="./assets/WinVista_Orb.svg" height="64">
+<table>
+  <tr>
+    <td align="center" valign="middle"><img src="./assets/WinNT4Workstation_Logo.svg" height="64"></td>
+    <td align="center" valign="middle"><img src="./assets/Win2000Pro_Logo.svg" height="64"></td>
+    <td align="center" valign="middle"><img src="./assets/WinXPPro_Logo.svg" height="64"></td>
+    <td align="center" valign="middle"><img src="./assets/WinVista_Orb.svg" height="64"></td>
+  </tr>
+</table>
 
 ## Getting Started
 

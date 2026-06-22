@@ -73,12 +73,12 @@ set_defaults("source_set") {
 }
 
 if (is_linux) {
-  set_default_toolchain("//build/toolchain:gcc")
+  set_default_toolchain("//build/toolchain/linux:gcc")
 } else if (is_win) {
-  set_default_toolchain("//build/toolchain:llvm-mingw")
+  set_default_toolchain("//build/toolchain/win:mingw")
 } else if (is_mac) {
   print("MacOS support is incomplete.")
-  set_default_toolchain("//build/toolchain:gcc")
+  set_default_toolchain("//build/toolchain/mac:clang")
 } else {
   print("OS not handled! GN-Legacy only supports Linux and Windows for now.")
 }

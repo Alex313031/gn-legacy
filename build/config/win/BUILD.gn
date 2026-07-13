@@ -6,6 +6,7 @@ import("//build/config/args.gni")
 import("//build/config/win/target_ver.gni")
 
 config("windows_config") {
+  # All Windows apps should have this defined.
   defines = [ "_WIN32", ]
   cflags = []
   ldflags = []
@@ -25,6 +26,9 @@ config("windows_config") {
   }
   if (current_cpu == "arm64") {
     defines += [ "_M_ARM64", ]
+  }
+  if (current_cpu == "x64" || current_cpu == "arm64") {
+    defines += [ "_WIN64", ]
   }
 
   # LLVM's libc++/libunwind reference the pthread API (thread-safe statics,

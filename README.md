@@ -20,8 +20,8 @@ every C/C++ dev can appreciate what the build system has to offer.
 <table>
   <tr>
     <td align="center" valign="middle"><img src="./assets/WinNT4Workstation_Logo.svg" height="64"></td>
-    <td align="center" valign="middle"><img src="./assets/Win2000Pro_Logo.svg" height="64"></td>
-    <td align="center" valign="middle"><img src="./assets/WinXPPro_Logo.svg" height="64"></td>
+    <td align="center" valign="middle"><img src="./assets/Win2000_Logo.svg" height="64"></td>
+    <td align="center" valign="middle"><img src="./assets/WinXP_Logo.svg" height="64"></td>
     <td align="center" valign="middle"><img src="./assets/WinVista_Orb.svg" height="64"></td>
   </tr>
 </table>
@@ -29,9 +29,9 @@ every C/C++ dev can appreciate what the build system has to offer.
 ## Getting Started
 
 #### Prerequisites:
-  This toolchain requires `git`, `zip`, `unzip`, and `curl`.
-  For Debian based distros: `sudo apt install --needed git zip unzip curl`.
-  On Windows, just install [Git for Windows](https://git-scm.com/install/windows); it has zip/unzip and curl preinstalled)
+  This toolchain requires `git`, `zip`, `unzip`, and `curl`.  
+  For Debian based distros: `sudo apt install --needed git zip unzip curl`.  
+  On Windows, just install [Git for Windows](https://git-scm.com/install/windows) (it has zip/unzip and curl preinstalled).
 
 #### Initial Setup
 

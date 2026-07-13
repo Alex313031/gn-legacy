@@ -94,13 +94,16 @@ toolchain("mingw") {
     outlibfile = "{{root_out_dir}}/$libname"
     description = "AR {{output}}"
     if (host_os == "win") {
-      # Build the archive in target_out_dir, then copy it to root_out_dir.
-      # Use cmd's builtin `copy` (XP-compatible) rather than PowerShell's
-      # Copy-Item, which isn't usable on legacy Windows even with the PS 2.0
-      # add-on. Quote both paths: GN/ninja emit forward-slash paths and cmd's
-      # `copy` would otherwise treat a leading-slash token as a switch (the
-      # CopyFile API itself accepts `/` as a separator just fine).
-      command = "cmd /c $AR {{arflags}} $libfile {{inputs}}&&copy /Y \"$libfile\" \"$outlibfile\""
+      # Build the archive in target_out_dir, then copy it to root_out_dir with
+      # cmd's builtin `copy` (XP-compatible; PowerShell Copy-Item isn't usable on
+      # legacy Windows even with the PS 2.0 add-on). GN/ninja emit forward-slash
+      # paths, and cmd's `copy` on XP does NOT treat `/` as a directory separator
+      # -- it resolves a forward-slash SOURCE down to its bare basename in the CWD,
+      # which then equals the destination ("The file cannot be copied onto
+      # itself."). So stash the paths in vars and rewrite `/`->`\` at run time via
+      # delayed expansion (`!VAR:/=\!`, needs `cmd /v:on`). llvm-ar takes `/` fine,
+      # so its args are left as-is.
+      command = "cmd /v:on /c $AR {{arflags}} $libfile {{inputs}}&&set \"S=$libfile\"&&set \"D=$outlibfile\"&&copy /Y \"!S:/=\\!\" \"!D:/=\\!\""
     } else {
       command = "$AR {{arflags}} $libfile {{inputs}} && cp -af $libfile $outlibfile"
     }
@@ -184,9 +187,11 @@ toolchain("mingw") {
 
   tool("copy") {
     if (host_os == "win") {
-      # Quote both paths so cmd doesn't parse a leading-slash path token as a
-      # switch (GN/ninja emit forward-slash paths).
-      command = "copy /Y \"{{source}}\" \"{{output}}\""
+      # cmd's `copy` on XP doesn't treat `/` as a directory separator, so a
+      # forward-slash source resolves to its bare basename in the CWD and can hit
+      # "The file cannot be copied onto itself." Rewrite `/`->`\` at run time via
+      # delayed expansion (see the alink tool above for the full rationale).
+      command = "cmd /v:on /c set \"S={{source}}\"&&set \"D={{output}}\"&&copy /Y \"!S:/=\\!\" \"!D:/=\\!\""
     } else {
       command = "cp -af {{source}} {{output}}"
     }

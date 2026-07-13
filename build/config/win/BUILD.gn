@@ -90,8 +90,9 @@ config("windows_config") {
         "-O3",
         "-g0",
       ]
-      # Strip binaries
-      cflags += [ "-s", ]
+      # Strip binaries. -s is a link-time flag; putting it in cflags only trips
+      # clang's "argument unused during compilation: '-s'" warning (-g0 above
+      # already keeps debug info out of the objects).
       ldflags += [ "-s", ]
     } else {
       cflags += [

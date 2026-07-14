@@ -12,21 +12,19 @@
 use_relative_paths = True
 
 # Uncomment for all git dependencies specified in this file to be in sync with git
-# submodules (gitlinks). See gclient gitmodules --help.
+# submodules (gitlinks). Not enabled for this repo. See gclient gitmodules --help.
 #git_dependencies = 'SYNC'
 
-# DEPS Flags, can be overridden in .gclient "custom_vars"
+# Custom Flags, can be overridden in .gclient "custom_vars" section.
 vars = {
   # GN source repo version
-  'gn_version': '41f93e4face33b6ac65585bf32fa112b7c85ea3d',
+  'gn_version': '45874dc95fe5cd16a2dface0819f28d64ca2a006',
 
   # Ninja source repo version
-  'ninja_version': 'f7c2d2b63c9672691ef44d6ebf16c48ee3902222',
+  'ninja_version': '8c9642aa6d339b0e3f5fcd13f7a9274f13e6424b',
 
   # MinGW source repo version
-  'mingw_version': '7d3dd889114214997ace0e9dbf2e650a3324bef5',
-
-  #'clang-format_version': '',
+  'mingw_version': 'e33028ec579543508b0e71e793f1a8086aaa030d',
 
   # Whether to download sources used to build MinGW/GN/Ninja itself to tools/src
   'download_toolchain_sources': 'True',

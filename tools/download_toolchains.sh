@@ -15,6 +15,11 @@ yell() { echo -e "$0: $*" >&2; }
 die()  { yell "${RED}$* ${c0}"; exit 1; }
 try() { "$@" || die "${RED}Failed $*"; }
 
+# Edit below 3 lines to update toolchains
+GN_VER="2026.07xp"
+NINJA_VER="v1.13.2xp4"
+MINGW_VER="20260714"
+
 # Download $1 into directory $2, keeping the URL's basename as the filename.
 # curl ships with both Linux and Git Bash on Windows, so one helper covers both.
 # CURL_INSECURE is "-k" when --insecure is passed: old curl (e.g. Git Bash on XP)
@@ -41,11 +46,6 @@ MINGW_WIN32_PATH="${TOOLS_PATH}/mingw/win"
 TMP_DOWN_PATH="${HERE}/TMP_"
 
 export PATH="${TOOLS_PATH}:$PATH"
-
-# Edit below 3 lines to update toolchains
-GN_VER="2026.06xp"
-NINJA_VER="v1.13.2xp2"
-MINGW_VER="20260609"
 
 # Artifact names to download/unpack
 LINUX_GCC_I586="mingw_gcc_linux_i586.zip"
@@ -233,7 +233,7 @@ Options:
   -h, --help Show this help.
   --version  Show script version.
   --i386     Download 32 Bit binaries instead of 64 Bit (XP compatible!).
-  --insecure Skip TLS cert verification (for old curl).
+  --insecure Skip TLS cert verification (for old curl, i.e. on XP).
   --gn       Download GN binaries.
   --ninja    Download Ninja binaries.
   --mingw    Download MinGW Toolchains.

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2025 Alex313031.
+# Copyright (c) 2026 Alex313031.
 
 # Linux gn wrapper for GN-Legacy
 
@@ -9,9 +9,6 @@ export HERE=$(cd "$(dirname "$0")" && pwd) &&
 
 # Pick up gn
 export TOOLS_PATH=${HERE}/tools &&
-
-# Log what we are
-printf "GN\n" &&
 
 # Run gn
 ${TOOLS_PATH}/gn "$@"

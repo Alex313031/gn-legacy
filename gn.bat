@@ -1,4 +1,4 @@
-:: Copyright (c) 2025 Alex313031
+:: Copyright (c) 2026 Alex313031
 
 :: Windows gn wrapper for GN-Legacy
 
@@ -10,9 +10,6 @@ SET CWD=%~dp0
 
 :: Pick up gn.exe
 SET TOOLSDIR=%CWD%tools
-
-:: Log what we are
-ECHO GN
 
 :: Run gn.exe
 "%TOOLSDIR%\gn.exe" %*

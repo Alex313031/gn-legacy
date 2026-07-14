@@ -21,8 +21,5 @@ IF DEFINED MINGW_PATH (
   SET PATH=%TOOLSDIR%;%PATH%
 )
 
-:: Log what we are
-ECHO Ninja
-
 :: Run ninja
 "%TOOLSDIR%\ninja.exe" %*

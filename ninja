@@ -20,8 +20,5 @@ else
   export PATH=${TOOLS_PATH}:$PATH
 fi &&
 
-# Log what we are
-printf "Ninja\n" &&
-
 # Run ninja
 ${TOOLS_PATH}/ninja "$@"

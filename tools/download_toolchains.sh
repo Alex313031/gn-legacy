@@ -18,7 +18,7 @@ try() { "$@" || die "${RED}Failed $*"; }
 # Edit below 3 lines to update toolchains
 GN_VER="2026.07xp"
 NINJA_VER="v1.13.2xp4"
-MINGW_VER="20260714"
+MINGW_VER="20260715"
 
 # Download $1 into directory $2, keeping the URL's basename as the filename.
 # curl ships with both Linux and Git Bash on Windows, so one helper covers both.

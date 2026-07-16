@@ -32,7 +32,7 @@ Fetch() {
 }
 
 SCRIPTNAME=$(basename "$0")
-SCRIPTVER="1.0.7"
+SCRIPTVER="1.0.8"
 
 export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -233,11 +233,12 @@ Options:
   -h, --help Show this help.
   --version  Show script version.
   --i386     Download 32 Bit binaries instead of 64 Bit (XP compatible!).
-  --insecure Skip TLS cert verification (for old curl, i.e. on XP).
+  --insecure Skip TLS cert verification (for old curl).
   --gn       Download GN binaries.
   --ninja    Download Ninja binaries.
   --mingw    Download MinGW Toolchains.
   --no-llvm  Skip LLVM MinGW toolchains and only download GCC ones.
+  -xp, --xp  Convenience flag for Win XP (equivalent to --all --i386 --insecure).
   -a, --all  Download everything (respects --no-llvm and --i386).
 
 EOF
@@ -316,12 +317,6 @@ while :; do
     --gn)
         DOWNLOAD_GN=1
         ;;
-    --i386)
-        DOWNLOAD_I386=1
-        ;;
-    --insecure)
-        CURL_INSECURE="-k"
-        ;;
     --ninja)
         DOWNLOAD_NINJA=1
         ;;
@@ -331,10 +326,23 @@ while :; do
     --no-llvm)
         SKIP_LLVM=1
         ;;
+    --i386)
+        DOWNLOAD_I386=1
+        ;;
+    --insecure)
+        CURL_INSECURE="-k"
+        ;;
     -a|--all)
         DOWNLOAD_GN=1
         DOWNLOAD_NINJA=1
         DOWNLOAD_MINGW=1
+        ;;
+    -xp|--xp)
+        DOWNLOAD_GN=1
+        DOWNLOAD_NINJA=1
+        DOWNLOAD_MINGW=1
+        DOWNLOAD_I386=1
+        CURL_INSECURE="-k"
         ;;
     --)
         shift

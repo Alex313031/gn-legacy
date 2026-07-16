@@ -1,5 +1,9 @@
+// Copyright (c) 2026 Alex313031.
+
+// Static Linux library test.
+
 #include "hello_static.h"
 
-const char* GetStaticText() {
-  return "Hello Wor";
+const wchar_t* GetStaticText() {
+  return L"Hello Wor";
 }

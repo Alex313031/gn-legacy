@@ -1,9 +1,9 @@
-// Copyright 2014 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+// Copyright (c) 2026 Alex313031.
+
+// Shared .so Linux library test.
 
 #include "hello_shared.h"
 
-const char* GetSharedText() {
-  return "ld from Linux!";
+const wchar_t* GetSharedText() {
+  return L"ld from Linux!";
 }

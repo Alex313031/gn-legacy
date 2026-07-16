@@ -1,11 +1,22 @@
 # Copyright (c) 2026 Alex313031
 
-# Tests that a Linux X11 program can be built correctly.
+# Tests that a Linux GTK/Qt GUI program can be built correctly.
+
+import("//build/config/linux/linux.gni")
 
 executable("hello_linux_gui") {
   configs += [
     ":hello_linux_gui_config",
   ]
+
+  # Pull in whichever GUI toolkit is selected. use_gtk / use_qt are mutually
+  # exclusive (enforced in //build/config/linux/linux.gni); with neither set the
+  # program builds as a plain console app.
+  if (use_gtk) {
+    configs += [ "//build/config/linux:gtk" ]
+  } else if (use_qt) {
+    configs += [ "//build/config/linux:qt" ]
+  }
 
   sources = [ "hello_linux_gui.cc" ]
 

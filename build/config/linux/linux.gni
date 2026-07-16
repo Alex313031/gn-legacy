@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Alex313031
+
+# Linux build arguments. These live in a .gni (rather than inline in
+# //build/config/linux/BUILD.gn) so they can be imported wherever they are
+# needed -- notably //build:executable_config, which gates the rpath link flag
+# on use_rpath.
+
+# NOTE: do not import this from //build/config/args.gni. The use_gtk/use_rpath
+# defaults read is_linux, which //build/BUILDCONFIG.gn only defines *after* it
+# imports args.gni. Import it from regular BUILD.gn files (processed once the
+# build config has run) instead.
+
+declare_args() {
+  # Whether to include header dirs for GTK usage.
+  use_gtk = is_linux
+
+  # Whether to include header dirs for QT usage.
+  use_qt = false
+
+  # Choose default GTK version, valid options are 2, 3, and 4. Default is 3
+  gtk_version = "3"
+
+  # Choose default QT version, valid options are 4, 5, and 6. Default is 5
+  qt_version = "5"
+
+  # Whether to use RPATH, to allow an executable to be relocatable.
+  use_rpath = is_linux
+}
+
+# Validate the GTK version.
+if (use_gtk) {
+  assert(!use_qt, "use_gtk and use_qt cannot both be true")
+  assert(gtk_version == "2" || gtk_version == "3" || gtk_version == "4",
+         "Invalid gtk_version \"$gtk_version\": must be \"2\", \"3\", or \"4\".")
+}
+
+# Validate the QT version.
+if (use_qt) {
+  assert(!use_gtk, "use_qt and use_gtk cannot both be true")
+  assert(qt_version == "4" || qt_version == "5" || qt_version == "6",
+         "Invalid qt_version \"$qt_version\": must be \"4\", \"5\", or \"6\".")
+}

@@ -4,12 +4,7 @@
 # expected to grow as macOS support matures.
 
 import("//build/config/args.gni")
-
-declare_args() {
-  # Minimum macOS version to target. Passed to -mmacosx-version-min for both
-  # the compiler and linker.
-  mac_deployment_target = "10.15"
-}
+import("//build/config/mac/macos.gni")
 
 config("mac_config") {
   defines = []
@@ -28,8 +23,19 @@ config("mac_config") {
 
   # Target the configured minimum OS version at both compile and link time so
   # the load command (LC_BUILD_VERSION) and availability checks agree.
-  cflags += [ "-mmacosx-version-min=$mac_deployment_target" ]
-  ldflags += [ "-mmacosx-version-min=$mac_deployment_target" ]
+  cflags += [ "-mmacosx-version-min=$mac_min_target" ]
+  ldflags += [ "-mmacosx-version-min=$mac_min_target" ]
+
+  # Point the compiler and linker at the selected Xcode SDK (headers, libs, and
+  # frameworks). Passed as two tokens so clang sees `-isysroot <path>`.
+  cflags += [
+    "-isysroot",
+    xcode_sdk,
+  ]
+  ldflags += [
+    "-isysroot",
+    xcode_sdk,
+  ]
 
   if (is_debug) {
     cflags += [

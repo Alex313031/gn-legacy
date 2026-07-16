@@ -3,6 +3,7 @@
 # Linux specific configs
 
 import("//build/config/args.gni")
+import("//build/config/linux/linux.gni")
 
 config("linux_config") {
   defines = []
@@ -56,4 +57,55 @@ config("linux_config") {
   libs = [
     "m",
   ]
+}
+
+# GUI toolkit configs. These are opt-in: a GUI target adds
+# "//build/config/linux:gtk" or ":qt" to pull in the toolkit's header dirs and
+# link libraries. use_gtk / use_qt (mutually exclusive, see
+# //build/config/linux/linux.gni) select which one is populated, and
+# gtk_version / qt_version choose the release. The include dirs and libs are
+# discovered from pkg-config at `gn gen` time (via pkg-config.py), so they adapt
+# to whatever the host actually has installed instead of being hardcoded.
+
+config("gtk") {
+  # A config body runs whenever this file is loaded, and linux_config pulls this
+  # file into every Linux build -- so gate the pkg-config calls on use_gtk.
+  # Otherwise a Qt-only (or toolkit-less) build would still shell out here and
+  # fail unless the GTK dev package happened to be installed.
+  if (use_gtk) {
+    # GTK's pkg-config module is "gtk+-2.0" / "gtk+-3.0", but "gtk4" (no "+",
+    # no ".0") for GTK 4.
+    if (gtk_version == "4") {
+      _package = "gtk4"
+    } else {
+      _package = "gtk+-$gtk_version.0"
+    }
+    _pkg_config = "//build/config/linux/pkg-config.py"
+
+    cflags = exec_script(_pkg_config, [ "cflags", _package ], "list lines")
+    libs = exec_script(_pkg_config, [ "libs", _package ], "list lines")
+    lib_dirs = exec_script(_pkg_config, [ "lib_dirs", _package ], "list lines")
+
+    # Let sources branch on the toolkit and its version, e.g. `#if USE_GTK >= 4`.
+    defines = [ "USE_GTK=$gtk_version", ]
+  }
+}
+
+config("qt") {
+  if (use_qt) {
+    # Qt split widgets into their own module from Qt 5 on ("Qt5Widgets",
+    # "Qt6Widgets"); Qt 4 shipped them inside "QtGui".
+    if (qt_version == "4") {
+      _package = "QtGui"
+    } else {
+      _package = "Qt${qt_version}Widgets"
+    }
+    _pkg_config = "//build/config/linux/pkg-config.py"
+
+    cflags = exec_script(_pkg_config, [ "cflags", _package ], "list lines")
+    libs = exec_script(_pkg_config, [ "libs", _package ], "list lines")
+    lib_dirs = exec_script(_pkg_config, [ "lib_dirs", _package ], "list lines")
+
+    defines = [ "USE_QT=$qt_version", ]
+  }
 }

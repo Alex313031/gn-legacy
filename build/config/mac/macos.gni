@@ -1,0 +1,20 @@
+# Copyright (c) 2026 Alex313031
+
+# MacOS build arguments. These live in a .gni (rather than inline in the BUILD.gn)
+# so they can be imported wherever they are needed, mirroring
+# //build/config/win/target_ver.gni and //build/config/linux/linux.gni.
+
+declare_args() {
+  # Minimum macOS version to target. Passed to -mmacosx-version-min for both
+  # the compiler and linker. Default is 10.15 Catalina.
+  mac_min_target = "10.15"
+
+  # XCode base directory. Defaults to system installed XCode.
+  xcode_path = "/Applications/Xcode.app"
+
+  # XCode major version, must match what is installed at xcode_path above. Defaults to latest.
+  xcode_version = "16"
+}
+
+# Where the macOS SDK system headers and frameworks live, derived from xcode_path.
+xcode_sdk = "$xcode_path/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"

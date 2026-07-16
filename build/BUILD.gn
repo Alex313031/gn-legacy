@@ -2,15 +2,19 @@
 # Copyright (c) 2025-2026 Alex313031
 
 import("//build/config/args.gni")
+import("//build/config/linux/linux.gni")
 
 config("executable_config") {
   cflags = []
   ldflags = []
   if (is_linux) {
-    ldflags += [
-      "-pie",
-      "-Wl,-rpath=\$ORIGIN/",
-    ]
+    ldflags += [ "-pie", ]
+
+    # An $ORIGIN rpath makes the executable relocatable: the dynamic loader
+    # looks for shared libraries next to the binary itself.
+    if (use_rpath) {
+      ldflags += [ "-Wl,-rpath=\$ORIGIN/", ]
+    }
   }
 
   # LLVM has explicit linker optimization flags

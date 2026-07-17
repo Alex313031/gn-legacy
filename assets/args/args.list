@@ -1,0 +1,300 @@
+c_std
+    Current value (from the default) = "default"
+      From //build/config/args.gni:19
+
+    C standard to use. Valid values are 99, 11, 17, 23, and "default"
+    C11 is the default.
+
+cpp_std
+    Current value (from the default) = "default"
+      From //build/config/args.gni:15
+
+    C++ standard to use. Valid values are 03, 11, 14, 17, 20, 23, and "default"
+    C++17 is the default.
+
+cpu_march
+    Current value (from the default) = ""
+      From //build/config/simd/simd.gni:10
+
+    What -march to use, see https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
+
+current_cpu
+    Current value (from the default) = ""
+      (Internally set; try `gn help current_cpu`.)
+
+current_os
+    Current value (from the default) = ""
+      (Internally set; try `gn help current_os`.)
+
+dcheck_enabled
+    Current value (from the default) = true
+      From //build/config/args.gni:29
+
+    Whether to enable DCHECKs and extra assertions
+
+gtk_version
+    Current value (from the default) = "3"
+      From //build/config/linux/linux.gni:17
+
+    Choose default GTK version, valid options are 2, 3, and 4.
+    3 is the default
+
+host_cpu
+    Current value (from the default) = "x64"
+      (Internally set; try `gn help host_cpu`.)
+
+host_os
+    Current value (from the default) = "linux"
+      (Internally set; try `gn help host_os`.)
+
+is_debug
+    Current value (from the default) = true
+      From //build/config/args.gni:11
+
+    Whether to compile in debug mode, with symbols and DEBUG defined.
+
+is_official_build
+    Current value (from the default) = false
+      From //build/config/args.gni:37
+
+    Whether this is an official release build for users. Adds additional compiler optimization.
+
+large_address_aware
+    Current value (from the default) = true
+      From //build/config/win/win.gni:12
+
+mac_min_target
+    Current value (from the default) = "10.15"
+      From //build/config/mac/macos.gni:10
+
+    Minimum macOS version to target. Passed to -mmacosx-version-min for both
+    the compiler and linker. Default is 10.15 Catalina.
+
+qt_version
+    Current value (from the default) = "5"
+      From //build/config/linux/linux.gni:21
+
+    Choose default QT version, valid options are 4, 5, and 6.
+    5 is the default
+
+target_cpu
+    Current value (from the default) = ""
+      (Internally set; try `gn help target_cpu`.)
+
+target_os
+    Current value (from the default) = ""
+      (Internally set; try `gn help target_os`.)
+
+use_aes
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:100
+
+    AES
+    Introduced with Westmere (2010), not all 1st gen Intel CPUs have it.
+
+use_avx
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:66
+
+    AVX
+    Normal Thorium baseline
+    Present since Sandy Bridge (2011 2nd Gen. Core i series)
+    and AMD Bulldozer (2012 AMD FX).
+    Requires Windows 7 SP1 / Linux 2.6.30 or later to use.
+    Uses new 128 bit registers and CPU blocks; a new era of SIMD.
+    Includes AES and PCLMUL `-maes -mpclmul -mavx`
+
+use_avx2
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:74
+
+    AVX2 (x86-64-v3)
+    Second generation AVX, expanded to 256-bit registers.
+    Present since Haswell (4th Gen. Core i series), and
+    AMD Excavator (4th Gen. refinement of Bulldozer cores) and 
+    Zen (1st Gen. Ryzen).
+    Includes FMA3 `-mfma -mavx2` (`-ffp-contract` see below at FMA section)
+
+use_avx512
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:83
+
+    AVX-512
+    Third generation AVX, expanded to 512-bit registers.
+    Present since Skylake (Specifically Skylake-X "Extreme Edition"
+    processors), and AMD Zen 4 (4th Gen. Ryzen 7000).
+    Only uses AVX-512 instructions common to all processors.
+    `-mavx512f -mavx512cd -mavx512vl -mavx512bw -mavx512dq
+     -mf16c -mlzcnt -mbmi2`
+
+use_clang_cl
+    Current value (from the default) = false
+      From //build/config/win/win.gni:16
+
+    Whether to use the MSVC compatible clang-cl driver instead
+    of the GCC style driver. Experimental.
+
+use_common_controls
+    Current value (from the default) = true
+      From //build/config/win/win.gni:5
+
+    Whether to specify to use modern common controls.
+
+use_dwarf
+    Current value (from the default) = true
+      From //build/config/args.gni:34
+
+    Whether DWARF debug info will be included in binaries.
+
+use_fma
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:96
+
+    FMA
+    "Fused Multiply Add" operations
+    Present since Haswell and AMD Piledriver (2nd Gen. refinement
+    of Bulldozer).
+    `-mfma -ffp-contract=fast` (use -mfma3 -mfma4 for Piledriver)
+
+use_gtk
+    Current value (from the default) = true
+      From //build/config/linux/linux.gni:10
+
+    Whether to include header dirs for GTK usage.
+
+use_llvm
+    Current value (from the default) = false
+      From //build/config/args.gni:24
+
+    Whether to use LLVM compiler instead of GCC.
+    Linux defaults to GCC, Mac defaults to LLVM.
+    Windows can use either the GCC/MinGW or LLVM/MinGW toolchain.
+
+use_lto
+    Current value (from the default) = false
+      From //build/config/args.gni:42
+
+    Whether to use Link Time Optimization (LTO)
+
+use_mmx
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:103
+
+    MMX, introduced with the Pentium MMX, only used if use_sse = false
+
+use_neon
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:87
+
+    arm32/arm64 specific: Whether to use NEON SIMD instructions.
+    Part of the arm64 armv8-a specification
+
+use_pdbs
+    Current value (from the default) = false
+      From //build/config/win/win.gni:23
+
+    Whether to enable .pdb debug information. Requires the clang-cl driver and
+    is intended to take precedence over use_dwarf, but is not yet consumed by
+    the toolchains.
+
+use_qt
+    Current value (from the default) = false
+      From //build/config/linux/linux.gni:13
+
+    Whether to include header dirs for QT usage.
+
+use_rpath
+    Current value (from the default) = true
+      From //build/config/linux/linux.gni:24
+
+    Whether to use RPATH, to allow an executable to be relocatable.
+
+use_sse
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:23
+
+    SSE The first iteration of SSE, introduced with Pentium 3/Athlon XP
+
+use_sse2
+    Current value (from the default) = true
+      From //build/config/simd/simd.gni:31
+
+    SSE2
+    Normal x64 compiler baseline, present since Willamette (Original
+    2001 Pentium 4) and AMD SledgeHammer (1st Gen. Opteron) and
+    the Athlon 64. Big step from MMX, x87, and SSE (i.e. SSE1)
+    Baseline requirement to run Windows since update KB4103718
+    for Windows 7 SP1/Server 2008 R2 SP1/Home Server 2011.
+
+use_sse3
+    Current value (from the default) = true
+      From //build/config/simd/simd.gni:39
+
+    SSE3
+    Normal Chromium baseline, present since Prescott (2004 Pentium 4)
+    and AMD SanDiego (2nd Gen. Opteron). x64 baseline.
+    Only applicable to 32 Bit Windows and Linux builds, where
+    setting it to false allows making an SSE2 build. (`-mmmx -msse2`)
+    `-msse3`
+
+use_sse41
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:48
+
+    SSE4.1
+    Normal PrimoBrowser baseline
+    Normal ThoriumOS baseline because Core 2 Duo is the lowest
+    hardware that other CrOS subsystems like drivers support.
+    Present since Penryn (2007 45nm Core 2 Duo die shrink), and
+    AMD Jaguar (2013 Athlon CPUs) and Bulldozer (2012 AMD FX).
+    Includes SSSE3 since all SSSE3 `-mssse3 -msse4.1`
+
+use_sse42
+    Current value (from the default) = false
+      From //build/config/simd/simd.gni:57
+
+    SSE4.2 (x86-64-v2)
+    Present since Nehalem (2009 1st Generation Core i series), and
+    the same AMD CPUs as above.
+    Normal LaCrOS baseline since Sept 2023.
+    See https://bugs.chromium.org/p/chromium/issues/detail?id=1475858
+    Baseline for Windows since Windows 10 24H2.
+    `-msse4.2`
+
+win32_ie
+    Current value (from the default) = ""
+      From //build/config/win/target_ver.gni:15
+
+    Sets the _WIN32_IE #define. Automatically set by the winver arg.
+
+win32_winnt
+    Current value (from the default) = ""
+      From //build/config/win/target_ver.gni:9
+
+    Sets the WINVER and _WIN32_WINNT #define. Automatically set by the winver arg.
+
+win64_winnt
+    Current value (from the default) = ""
+      From //build/config/win/target_ver.gni:12
+
+    Sets the _WIN64_WINNT #define. Automatically set by the winver arg.
+
+winver
+    Current value (from the default) = ""
+      From //build/config/win/target_ver.gni:6
+
+    Target Windows version. Can be a name, like "2000", "Vista"
+    or an NT number, like "5.1" for XP, or "6.1" for Win 7.
+
+xcode_path
+    Current value (from the default) = "/Applications/Xcode.app"
+      From //build/config/mac/macos.gni:13
+
+    XCode base directory. Defaults to system installed XCode.
+
+xcode_version
+    Current value (from the default) = "16"
+      From //build/config/mac/macos.gni:16
+
+    XCode major version, must match what is installed at xcode_path above. Defaults to latest.
+

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Alex313031
-//
+
 // Test for the Linux GUI toolkit pipeline. The toolkit is selected with the
 // use_gtk / use_qt build args and pulled in by //build/config/linux:gtk or :qt,
 // which also #defines USE_GTK / USE_QT to the configured version. This opens a
@@ -8,37 +8,12 @@
 // display is reachable it prints the same text to stdout and exits, so it stays
 // a safe build/CI smoke test; with neither toolkit selected it is console-only.
 
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <string>
+#include "hello_linux_gui.h"
 
 #include "hello_shared.h"
 #include "hello_static.h"
 
-#if defined(USE_GTK)
- #include <gtk/gtk.h>
-#elif defined(USE_QT)
- #include <QApplication>
- #include <QPlainTextEdit>
-#endif
-
 namespace {
-
-static const int CW_WIDTH  = 480;
-static const int CW_HEIGHT = 320;
-
-#if defined(USE_QT)
-// Unlike gtk_init_check(), constructing a QApplication with no display aborts,
-// so guard it. (QT_QPA_PLATFORM=offscreen users get the stdout path, which is
-// fine for a smoke test.)
-bool HasDisplay() {
-  return std::getenv("DISPLAY") != nullptr ||
-         std::getenv("WAYLAND_DISPLAY") != nullptr;
-}
-#endif
-
-#if defined(USE_GTK)
 // GTK/GLib APIs take UTF-8 char* strings -- unlike the Win32 GUI APIs, which are
 // UTF-16 wchar_t. Convert the wide text to UTF-8 at the GTK boundary. (Qt does
 // the same job via QString::fromStdWString.)
@@ -64,34 +39,6 @@ std::string ToUtf8(const std::wstring& w) {
   }
   return out;
 }
-#endif
-
-// The text shown in the window (or printed when headless). |toolkit| describes
-// the selected GUI toolkit and its version.
-std::wstring BuildText(const std::wstring& toolkit) {
-  std::wostringstream wostr;
-  wostr << L"This is hello_linux_gui\n\n"
-     << GetStaticText() << GetSharedText() << L"\n\n"
-     << L"Toolkit: " << toolkit << L"\n\n"
-     << L"Compiler:\n";
-#if defined(__VERSION__)
-  wostr << L"  __VERSION__ = " << __VERSION__ << L"\n";
-#endif
-#if defined(__GNUC__)
-  wostr << L"  __GNUC__ = " << __GNUC__ << L"." << __GNUC_MINOR__ << L"."
-     << __GNUC_PATCHLEVEL__ << L"\n";
-#endif
-#if defined(__clang__)
-  wostr << L"  __clang__ = " << __clang_major__ << L"." << __clang_minor__ << L"\n";
-#endif
-#if defined(__cplusplus)
-  wostr << L"  __cplusplus = " << __cplusplus << L"\n";
-#endif
-#if defined(__DATE__)
-  wostr << L"  __DATE__ = " << __DATE__ << L"\n";
-#endif
-  return wostr.str();
-}
 
 #if defined(USE_GTK) && USE_GTK >= 4
 // GTK 4 dropped gtk_main(); drive a GMainLoop and quit it when the window goes
@@ -100,8 +47,7 @@ void OnDestroy(GtkWidget* /*widget*/, gpointer loop) {
   g_main_loop_quit(static_cast<GMainLoop*>(loop));
 }
 #endif
-
-}  // namespace
+} // namespace
 
 int main(int argc, char* argv[]) {
 #if defined(USE_GTK)
@@ -171,4 +117,39 @@ int main(int argc, char* argv[]) {
   std::wcerr << BuildText(L"None (set use_gtk or use_qt)") << std::endl;
 #endif
   return 0;
+}
+
+// Unlike gtk_init_check(), constructing a QApplication with no display aborts,
+// so guard it. (QT_QPA_PLATFORM=offscreen users get the stdout path, which is
+// fine for a smoke test.)
+bool HasDisplay() {
+  return std::getenv("DISPLAY") != nullptr ||
+         std::getenv("WAYLAND_DISPLAY") != nullptr;
+}
+
+// The text shown in the window (or printed when headless). |toolkit| describes
+// the selected GUI toolkit and its version.
+std::wstring BuildText(const std::wstring& toolkit) {
+  std::wostringstream wostr;
+  wostr << L"This is hello_linux_gui\n\n"
+     << GetStaticText() << GetSharedText() << L"\n\n"
+     << L"Toolkit: " << toolkit << L"\n\n"
+     << L"Compiler:\n";
+#if defined(__VERSION__)
+  wostr << L"  __VERSION__ = " << __VERSION__ << L"\n";
+#endif
+#if defined(__GNUC__)
+  wostr << L"  __GNUC__ = " << __GNUC__ << L"." << __GNUC_MINOR__ << L"."
+     << __GNUC_PATCHLEVEL__ << L"\n";
+#endif
+#if defined(__clang__)
+  wostr << L"  __clang__ = " << __clang_major__ << L"." << __clang_minor__ << L"\n";
+#endif
+#if defined(__cplusplus)
+  wostr << L"  __cplusplus = " << __cplusplus << L"\n";
+#endif
+#if defined(__DATE__)
+  wostr << L"  __DATE__ = " << __DATE__ << L"\n";
+#endif
+  return wostr.str();
 }

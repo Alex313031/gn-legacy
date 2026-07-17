@@ -18,7 +18,10 @@ executable("hello_linux_gui") {
     configs += [ "//build/config/linux:qt" ]
   }
 
-  sources = [ "hello_linux_gui.cc" ]
+  sources = [
+    "hello_linux_gui.cc",
+    "hello_linux_gui.h",
+  ]
 
   deps = [
     "../shared:hello_linux_shared",

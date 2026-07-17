@@ -1,6 +1,6 @@
 # Copyright (c) 2026 Alex313031
 
-import("simd.gni")
+import("//build/config/simd/simd.gni")
 
 if (use_x87) {
   assert(target_cpu == "x86", "use_x87 can only be used with 32 bit x86 targets.")
@@ -47,8 +47,14 @@ if (cpu_march == "") {
     # ARMv7 baseline with hard-float
     march = "armv7-a"
   } else if (current_cpu == "arm64") {
-    # ARMv8 baseline with NEON SIMD
-    march = "armv8-a+simd"
+    # ARMv8-A baseline. +simd (NEON) is added only when use_neon is set, and
+    # simd_config sets __ARM_NEON__ to match. Note NEON is part of the armv8-a
+    # baseline, so plain "armv8-a" still permits it -- +simd is explicit.
+    if (use_neon) {
+      march = "armv8-a+simd"
+    } else {
+      march = "armv8-a"
+    }
   }
 } else {
   march = cpu_march
@@ -158,15 +164,17 @@ config("simd_config") {
       ldflags += [ "-ffp-contract=fast", ]
     }
   } else if (current_cpu == "arm") {
-    cflags += [
-      "-mfpu=vfpv3-d16",
-      "-mfloat-abi=hard",
-    ]
+    # Always use hard float for ARM32
+    cflags += [ "-mfloat-abi=hard", ]
+    if (use_neon) {
+      cflags += [ "-mfpu=neon", ]
+    } else {
+      cflags += [ "-mfpu=vfpv3-d16", ]
+    }
   } else if (current_cpu == "arm64") {
-    defines += [ "__ARM_NEON__=1" ]
-    cflags += [
-      "-mfpu=neon",
-    ]
+    if (use_neon) {
+      defines += [ "__ARM_NEON__=1" ]
+    }
   }
   cflags += [
     "-march=$march",

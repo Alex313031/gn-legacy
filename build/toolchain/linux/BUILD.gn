@@ -5,14 +5,21 @@ import("//build/config/args.gni")
 
 # Linux toolchain specifics
 
-toolchain("gcc") {
-  # Link through the g++ driver on every host: invoking `ld` directly skips
+toolchain("linux") {
+  # Link through the driver: invoking `ld` or `lld` directly skips
   # CRT startup objects and the default system libraries, which breaks C++
   # executables. The driver handles those for us.
-  CC = "gcc"
-  CXX = "g++"
-  LD = "g++"
-  AR = "ar"
+  if (use_llvm) {
+    CC = "clang"
+    CXX = "clang++"
+    LD = "clang++"
+    AR = "llvm-ar"
+  } else {
+    CC = "gcc"
+    CXX = "g++"
+    LD = "g++"
+    AR = "ar"
+  }
 
   tool("cc") {
     depfile = "{{output}}.d"

@@ -4,6 +4,7 @@
 
 import("//build/config/args.gni")
 import("//build/config/win/target_ver.gni")
+import("//build/config/win/win.gni")
 
 config("windows_config") {
   # All Windows apps should have this defined.

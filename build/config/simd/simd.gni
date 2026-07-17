@@ -81,6 +81,10 @@ declare_args() {
   # `-mavx512f -mavx512cd -mavx512vl -mavx512bw -mavx512dq
   #  -mf16c -mlzcnt -mbmi2`
   use_avx512 = false
+
+  # arm32/arm64 specific: Whether to use NEON SIMD instructions.
+  # Part of the arm64 armv8-a specification
+  use_neon = current_cpu == "arm64"
 }
 
 declare_args() {
@@ -101,6 +105,11 @@ declare_args() {
 
 use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
 
+if (use_neon) {
+  is_neon_supported = (current_cpu == "arm" || current_cpu == "arm64")
+  assert(is_neon_supported, "use_neon cannot be true on non-ARM targets")
+}
+
 if (use_x87) {
   assert(current_cpu == "x86", "use_x87 true when current_cpu != x86")
 }
@@ -111,13 +120,13 @@ if (use_mmx && current_cpu != "x86") {
 
 # Make sure we are a x86 arch
 if (use_sse2 || use_sse3 || use_sse41 || use_sse42 || use_avx || use_avx2 || use_avx512) {
-  assert(target_cpu == "x86" || target_cpu == "x64", "x86 SIMD intrinsic optimizations can only be used with x86 or x64 targets.")
+  assert(current_cpu == "x86" || current_cpu == "x64", "x86 SIMD intrinsic optimizations can only be used with x86 or x64 targets.")
 }
 
 # 32 Bit OSes cant use anything above SSE4.2, and 32 Bit Apps can't benefit
 # from anything higher usually.
 if (use_avx || use_avx2 || use_avx512 || use_fma) {
-  assert(target_cpu != "x86", "AVX, AVX2, AVX-512, or FMA require x64. Set target_cpu to x64")
+  assert(current_cpu != "x86", "AVX, AVX2, AVX-512, or FMA require x64. Set target_cpu to x64")
 }
 
 # AVX2 should always have FMA, however, there are times one might want

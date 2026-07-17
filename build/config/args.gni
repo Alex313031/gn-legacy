@@ -2,20 +2,26 @@
 
 import("//build/config/simd/simd.gni")
 
+is_linux = host_os == "linux" && current_os == "linux" && target_os == "linux"
+is_mac = host_os == "mac" && current_os == "mac" && target_os == "mac"
+is_win = (host_os == "win" && current_os == "win") || target_os == "win"
+
 declare_args() {
   # Whether to compile in debug mode, with symbols and DEBUG defined.
   is_debug = true
 
-  # What C++ standard to use, valid values are 03, 11, 14, 17, and 20, and 23
-  # default is C++17
+  # C++ standard to use. Valid values are 03, 11, 14, 17, 20, 23, and "default"
+  # C++17 is the default.
   cpp_std = "default"
 
-  # What C standard to use, valid values are 99, 11, 17, and 23
-  # default is C11
+  # C standard to use. Valid values are 99, 11, 17, 23, and "default"
+  # C11 is the default.
   c_std = "default"
 
-  # Whether to use LLVM compiler instead of GCC/MinGW
-  use_llvm = false
+  # Whether to use LLVM compiler instead of GCC.
+  # Linux defaults to GCC, Mac defaults to LLVM.
+  # Windows can use either the GCC/MinGW or LLVM/MinGW toolchain.
+  use_llvm = is_mac
 }
 
 declare_args() {

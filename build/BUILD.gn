@@ -3,6 +3,8 @@
 
 import("//build/config/args.gni")
 import("//build/config/linux/linux.gni")
+import("//build/config/mac/macos.gni")
+import("//build/config/win/win.gni")
 
 config("executable_config") {
   cflags = []

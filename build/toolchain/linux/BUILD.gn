@@ -22,6 +22,7 @@ toolchain("linux") {
   }
 
   tool("cc") {
+    precompiled_header_type = "gcc"
     depfile = "{{output}}.d"
     command = "$CC -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
     depsformat = "gcc"

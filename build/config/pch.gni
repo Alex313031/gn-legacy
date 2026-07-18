@@ -1,0 +1,59 @@
+# Copyright (c) 2026 Alex313031
+
+# CURRENTLY UNUSED: PCH is disabled for the clang-cl driver in
+# //build/toolchain/win (precompiled_header_type is only set for the GCC path).
+# This template is kept for when clang-cl PCH is re-enabled -- flip that tool
+# back to precompiled_header_type = "msvc" and route PCH targets through here.
+#
+# pch_target(): wrap any binary target type with precompiled-header support that
+# works under both the GCC/clang++ and the MSVC-style clang-cl drivers.
+#
+# Why this exists: GN's "gcc" PCH force-injects the header via -include, so
+# GCC-path sources need not #include it. clang-cl uses MSVC "msvc" PCH (/Yc
+# create, /Yu use); this gn (2369) emits /Yu but not the matching /FI, so a
+# source that doesn't #include the header fails with
+#   "#include of '<header>' not seen while attempting to use precompiled header".
+# This template adds that /FI<header> for the clang-cl driver, restoring the
+# GCC-style force-inject without editing any sources. On the GCC/clang++ path
+# (use_clang_cl false, incl. all Linux/macOS builds) it is a transparent
+# pass-through -- no /FI, since -include already force-injects.
+#
+# Usage -- same as the wrapped target, plus a `target_type` string. NOTE: assign
+# `configs = [...]` (not `+=`): a template invocation has no set_defaults-seeded
+# `configs` to append to, so the template appends your list to the target-type
+# defaults for you.
+#   pch_target("hexlogger") {
+#     target_type = "static_library"   # or "executable", "shared_library", ...
+#     configs = [ ":hexlogger_config" ]
+#     precompiled_header = "logging_base.h"
+#     precompiled_source = "pch.cc"
+#     sources = [ ... ]
+#   }
+
+import("//build/config/win/win.gni")
+
+template("pch_target") {
+  assert(defined(invoker.target_type),
+         "pch_target() requires a target_type, e.g. target_type = \"executable\"")
+  target(invoker.target_type, target_name) {
+    # Forward everything except our control variable (the real target would
+    # reject it) and `configs`, which set_defaults has already seeded on the real
+    # target -- overwriting it via the blind forward would drop the default
+    # configs, so append the invoker's list instead.
+    forward_variables_from(invoker, "*", [ "target_type", "configs" ])
+    if (defined(invoker.configs)) {
+      configs += invoker.configs
+    }
+
+    # clang-cl's /Yu expects the pch header to be included in every TU; force it
+    # in so unmodified sources still get the PCH. Guarded on use_clang_cl (only
+    # ever true for the clang-cl driver on Windows), and on precompiled_header
+    # being set, so the template is safe to use on any target.
+    if (use_clang_cl && defined(precompiled_header)) {
+      if (!defined(cflags_cc)) {
+        cflags_cc = []
+      }
+      cflags_cc += [ "/FI" + precompiled_header ]
+    }
+  }
+}

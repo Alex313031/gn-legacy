@@ -99,6 +99,13 @@ toolchain("mingw") {
   }
 
   tool("cc") {
+    # PCH is gcc-style for the GCC/clang++ path. It's disabled for clang-cl for
+    # now: clang-cl needs MSVC-style PCH, and this gn (2369) emits /Yu without the
+    # /FI that force-includes the header, so unmodified sources fail "not seen".
+    # Leaving precompiled_header_type unset makes GN skip PCH for these targets.
+    if (!use_clang_cl) {
+      precompiled_header_type = "gcc"
+    }
     depfile = "{{output}}.d"
     if (use_clang_cl) {
       # clang-cl rejects the GCC depfile flags (-MMD/-MF), so forward them to the
@@ -115,7 +122,12 @@ toolchain("mingw") {
   }
 
   tool("cxx") {
-    precompiled_header_type = "gcc"
+    # gcc-style PCH for the GCC/clang++ path; disabled for clang-cl for now (see
+    # the cc tool above for why). A future re-enable uses precompiled_header_type
+    # = "msvc" plus a per-target /FI force-include (a pch_target() template).
+    if (!use_clang_cl) {
+      precompiled_header_type = "gcc"
+    }
     depfile = "{{output}}.d"
     if (use_clang_cl) {
       command = "$CXX --target=$clang_target /Zl /clang:-MMD /clang:-MP /clang:-MF /clang:$depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} /c {{source}} -o {{output}}"

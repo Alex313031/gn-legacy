@@ -53,5 +53,12 @@ Thumbs.db
 # Temp download directory
 /TMP_/
 
+# Third-party projects built with gn-legacy live under src/ but aren't part of
+# this repo. Ignore everything in src/ except the top-level build file and the
+# bundled pepatcher example app.
+/src/*
+!/src/BUILD.gn
+!/src/pepatcher/
+
 # Personal script I use
 /buildall.sh

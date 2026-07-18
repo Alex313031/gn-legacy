@@ -1,6 +1,6 @@
 # Copyright (c) 2026 Alex313031
 
-# Linux specific configs
+# Linux specific build configs
 
 import("//build/config/args.gni")
 import("//build/config/linux/linux.gni")
@@ -20,27 +20,8 @@ config("linux_config") {
     "-fexec-charset=UTF-8",
   ]
 
-  if (is_debug) {
-    cflags += [
-      "-Og",
-      "-g2",
-    ]
-    if (use_dwarf) {
-      cflags += [ "-gdwarf-2" ]
-    }
-  } else {
-    if (is_official_build) {
-      cflags += [
-        "-O3",
-        "-g0",
-      ]
-    } else {
-      cflags += [
-        "-O2",
-        "-g1",
-      ]
-    }
-  }
+  # Optimization/debug-info level is shared across platforms; see
+  # //build/config:compiler_defaults.
 
   # PIC for PIE. -fPIC is compile-time only; the -pie link flag lives in
   # //build:executable_config.

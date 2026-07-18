@@ -1,3 +1,8 @@
+# Copyright (c) 2026 Alex313031
+
+# Windows-specific build arguments.
+
+import("//build/config/args.gni")
 import("//build/config/win/target_ver.gni")
 
 declare_args() {
@@ -13,16 +18,24 @@ declare_args() {
 
   # Whether to use the MSVC compatible clang-cl driver instead
   # of the GCC style driver. Experimental.
-  use_clang_cl = false
+  use_clang_cl = use_llvm && is_win
 }
 
 declare_args() {
   # Whether to enable .pdb debug information. Requires the clang-cl driver and
-  # is intended to take precedence over use_dwarf, but is not yet consumed by
-  # the toolchains.
+  # is intended to take precedence over use_dwarf.
   use_pdbs = use_clang_cl
+}
+
+# clang-cl only ships in the LLVM/MinGW toolchain bins, and it targets the GNU
+# environment (--target=...-windows-gnu) so it can reach the MinGW sysroot. It
+# therefore has no meaning under the GCC toolchain.
+if (use_clang_cl) {
+  assert(use_llvm, "use_clang_cl requires use_llvm (clang-cl ships only in the LLVM/MinGW toolchain)")
+  assert(is_win, "use_clang_cl can only be used when targeting Windows")
 }
 
 if (use_pdbs) {
   assert(use_clang_cl, "use_clang_cl must be true when use_pdbs is true")
+  assert(is_win, "use_pdbs can only be used when targeting Windows")
 }

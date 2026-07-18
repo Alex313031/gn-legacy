@@ -61,8 +61,13 @@ config("windows_config") {
     defines += [ "USE_COMMCTRLS", ]
   }
 
-  # Default to statically linked binaries
-  cflags += [ "-static", ]
+  # Default to statically linked binaries. -static is a link-time flag; clang-cl
+  # rejects it at compile ("unknown argument", which /WX would promote to an
+  # error), so only the GCC/LLVM drivers get it in cflags. The ldflags entry
+  # (consumed by the GNU link driver) is what actually forces static linking.
+  if (!use_clang_cl) {
+    cflags += [ "-static", ]
+  }
   ldflags += [ "-static", ]
 
   defines += [ "_CRT_SECURE_NO_WARNINGS", ]
@@ -77,29 +82,36 @@ config("windows_config") {
     ]
   }
 
-  if (is_debug) {
-    cflags += [
-      "-Og",
-      "-g2",
-    ]
-    if (use_dwarf) {
-      cflags += [ "-gdwarf-2" ]
-    }
-  } else {
-    if (is_official_build) {
+  # clang-cl optimization and debug-info flags (the shared GCC-style -O/-g ladder
+  # lives in //build/config:compiler_defaults). clang-cl gates its MSVC /O group
+  # on the *-windows-msvc target, so in our MinGW (--target=...-gnu) mode /O2 etc.
+  # are silently dropped as "unused"; forward the -O/-g forms through /clang:
+  # instead (same clang backend). Debug-info format follows use_pdbs (CodeView
+  # via -gcodeview, extracted to a .pdb by the linker) else use_dwarf (DWARF).
+  if (use_clang_cl) {
+    if (is_debug) {
       cflags += [
-        "-O3",
-        "-g0",
+        "/clang:-Og",
+        "/clang:-g2",
       ]
-      # Strip binaries. -s is a link-time flag; putting it in cflags only trips
-      # clang's "argument unused during compilation: '-s'" warning (-g0 above
-      # already keeps debug info out of the objects).
-      ldflags += [ "-s", ]
+      if (use_pdbs) {
+        cflags += [ "-gcodeview" ]
+      } else if (use_dwarf) {
+        cflags += [ "/clang:-gdwarf-2" ]
+      }
+    } else if (is_official_build) {
+      cflags += [
+        "/clang:-O3",
+        "/clang:-g0",
+      ]
     } else {
       cflags += [
-        "-O2",
-        "-g1",
+        "/clang:-O2",
+        "/clang:-g1",
       ]
+      if (use_pdbs) {
+        cflags += [ "-gcodeview" ]
+      }
     }
   }
 }
@@ -109,10 +121,17 @@ config("unicode_base") {
     "UNICODE",
     "_UNICODE",
   ]
-  cflags = [
-    "-finput-charset=UTF-8",
-    "-fexec-charset=UTF-8",
-  ]
+  if (use_clang_cl) {
+    cflags = [
+      "/source-charset:utf-8",
+      "/execution-charset:utf-8",
+    ]
+  } else {
+    cflags = [
+      "-finput-charset=UTF-8",
+      "-fexec-charset=UTF-8",
+    ]
+  }
 }
 
 # Link-time only: stamp the PE OS/subsystem version fields so the binary
@@ -170,7 +189,11 @@ config("unicode") {
 # page rather than being forced to UTF-8.
 config("ansi") {
   defines = [ "_MBCS", ]
-  cflags = [ "-finput-charset=UTF-8", ]
+  if (use_clang_cl) {
+    cflags = [ "/source-charset:utf-8", ]
+  } else {
+    cflags = [ "-finput-charset=UTF-8", ]
+  }
 }
 
 config("mwindows") {

@@ -1,10 +1,20 @@
 # Copyright (c) 2014-2025 The Chromium Authors
 # Copyright (c) 2025-2026 Alex313031
 
-import("//build/config/args.gni")
+# Windows toolchain specifics. Supports a GCC or LLVM MinGW toolchain, and
+# either the GCC style driver, or (on top of the LLVM toolchain)
+# the MSVC-style clang-cl driver (when use_clang_cl is true).
 
-# Windows toolchain specifics, currently supports either a GCC or LLVM MinGW toolchain.
-# Eventually, MSVC and/or clang in MSVC mode will be supported.
+import("//build/toolchain/toolchain.gni")
+import("//build/config/win/win.gni")
+
+# clang-cl note: this repo ships no MSVC CRT/SDK, only the MinGW sysroot, so
+# clang-cl cannot run in its native *-windows-msvc mode. Instead the cc/cxx
+# tools invoke clang-cl with --target=<arch>-w64-windows-gnu so it parses
+# MSVC-style flags but compiles against the MinGW headers. clang-cl still stamps
+# every object with /DEFAULTLIB:libcmt,oldnames autolink directives, so the
+# tools also pass /Zl to strip them; the link step stays on the GNU driver
+# ($LD) below and links the MinGW CRT as usual.
 
 toolchain("mingw") {
   # Generic compiler output path
@@ -39,10 +49,24 @@ toolchain("mingw") {
     print("GN-Legacy can only target x86/x64 for now.")
   }
 
+  # clang-cl (use_clang_cl) is the same binary for C and C++ -- it dispatches on
+  # the source extension -- and lives unprefixed alongside the arch-prefixed
+  # clang++. It only compiles; the linker (LD) stays the GNU clang++ driver. Its
+  # MinGW GNU target triple <mingw_prefix>-w64-windows-gnu resolves the same
+  # sysroot the regular clang defaults to.
+  if (use_clang_cl) {
+    clang_target = "$mingw_prefix-w64-windows-gnu"
+  }
+
   if (host_os == "win") {
     if (use_llvm) {
-      CC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang.exe"
-      CXX = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang++.exe"
+      if (use_clang_cl) {
+        CC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\clang-cl.exe"
+        CXX = CC
+      } else {
+        CC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang.exe"
+        CXX = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang++.exe"
+      }
       LD = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-clang++.exe"
       AR = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-ar.exe"
       RC = "..\\..\\tools\\mingw\\win\\$bin_prefix\\bin\\$mingw_prefix-w64-mingw32-windres.exe"
@@ -55,8 +79,13 @@ toolchain("mingw") {
     }
   } else {
     if (use_llvm) {
-      CC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang"
-      CXX = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang++"
+      if (use_clang_cl) {
+        CC = "../../tools/mingw/linux/$bin_prefix/bin/clang-cl"
+        CXX = CC
+      } else {
+        CC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang"
+        CXX = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang++"
+      }
       LD = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang++"
       AR = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar"
       RC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-windres"
@@ -71,7 +100,14 @@ toolchain("mingw") {
 
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "$CC -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    if (use_clang_cl) {
+      # clang-cl rejects the GCC depfile flags (-MMD/-MF), so forward them to the
+      # underlying clang via /clang: -- this still yields a gcc-format depfile, so
+      # depsformat stays "gcc". /Zl drops the MSVC-CRT autolink directives.
+      command = "$CC --target=$clang_target /Zl /clang:-MMD /clang:-MP /clang:-MF /clang:$depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} /c {{source}} -o {{output}}"
+    } else {
+      command = "$CC -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    }
     depsformat = "gcc"
     description = "CC {{output}}"
     outputs =
@@ -81,7 +117,11 @@ toolchain("mingw") {
   tool("cxx") {
     precompiled_header_type = "gcc"
     depfile = "{{output}}.d"
-    command = "$CXX -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    if (use_clang_cl) {
+      command = "$CXX --target=$clang_target /Zl /clang:-MMD /clang:-MP /clang:-MF /clang:$depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} /c {{source}} -o {{output}}"
+    } else {
+      command = "$CXX -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    }
     depsformat = "gcc"
     description = "CXX {{output}}"
     outputs =
@@ -129,8 +169,6 @@ toolchain("mingw") {
       os_specific_option = "-Wl,-soname=$soname -Wl,--out-implib,$libfile"
     }
 
-    command = "$LD -shared {{ldflags}} @$rspfile -o $sofile {{solibs}} {{libs}} $os_specific_option"
-
     description = "DLL LINK $soname"
 
     # Use this for {{output_extension}} expansions unless a target manually
@@ -142,7 +180,22 @@ toolchain("mingw") {
     # it (in which case {{output_dir}} will be what the target specifies).
     default_output_dir = "{{root_out_dir}}"
 
-    outputs = [ sofile, libfile ]
+    if (use_pdbs) {
+      # Emit a standalone .pdb for the DLL too (see the link tool above).
+      pdbfile = "{{output_dir}}/{{target_output_name}}.pdb"
+      command = "$LD -shared {{ldflags}} @$rspfile -o $sofile {{solibs}} {{libs}} $os_specific_option -Wl,--pdb=$pdbfile"
+      outputs = [
+        sofile,
+        libfile,
+        pdbfile,
+      ]
+    } else {
+      command = "$LD -shared {{ldflags}} @$rspfile -o $sofile {{solibs}} {{libs}} $os_specific_option"
+      outputs = [
+        sofile,
+        libfile,
+      ]
+    }
     link_output = sofile
     depend_output = sofile
   }
@@ -167,11 +220,24 @@ toolchain("mingw") {
     outfile = "{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
     rspfile_content = "{{inputs}}"
-    command = "$LD {{ldflags}} @$rspfile -o $outfile {{solibs}} {{libs}}"
-    description = "LINK $outfile"
     default_output_dir = "{{root_out_dir}}"
     default_output_extension = ".exe"
-    outputs = [ outfile ]
+    description = "LINK $outfile"
+    if (use_pdbs) {
+      # ld.lld extracts the CodeView emitted by clang-cl -gcodeview (see
+      # //build/config/win:windows_config) into a standalone .pdb next to the
+      # binary. --pdb is an lld GNU-driver extension; the objects must carry
+      # CodeView or the .pdb comes out empty.
+      pdbfile = "{{target_output_name}}.pdb"
+      command = "$LD {{ldflags}} @$rspfile -o $outfile {{solibs}} {{libs}} -Wl,--pdb=$pdbfile"
+      outputs = [
+        outfile,
+        pdbfile,
+      ]
+    } else {
+      command = "$LD {{ldflags}} @$rspfile -o $outfile {{solibs}} {{libs}}"
+      outputs = [ outfile ]
+    }
   }
 
   tool("stamp") {

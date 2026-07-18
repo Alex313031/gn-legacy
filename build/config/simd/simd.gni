@@ -1,7 +1,8 @@
 # Copyright (c) 2025-2026 Alex313031
 
-## For information about compiler flags and optimizations
-## that this uses, see https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
+# Args for controlling compiler SIMD flags/level.
+# For information about compiler flags and optimizations
+# that this uses, see https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
 
 import("//build/config/win/target_ver.gni")
 

@@ -1,0 +1,55 @@
+# Copyright (c) 2026 Alex313031
+
+# Toolchain-specific arguments.
+# Should have no imports!
+
+# Define is_* like Chromium does
+is_linux = host_os == "linux" && current_os == "linux" && target_os == "linux"
+is_mac = host_os == "mac" && current_os == "mac" && target_os == "mac"
+is_win = (host_os == "win" && current_os == "win") || target_os == "win"
+
+declare_args() {
+  # C++ standard to use. Valid values are 03, 11, 14, 17, 20, 23, and "default"
+  # C++17 is the default.
+  cpp_std = "default"
+
+  # C standard to use. Valid values are 99, 11, 17, 23, and "default"
+  # C11 is the default.
+  c_std = "default"
+
+  # Whether to use LLVM compiler instead of GCC.
+  # Linux defaults to GCC, Mac defaults to LLVM.
+  # Windows can use either the GCC/MinGW or LLVM/MinGW toolchain.
+  use_llvm = is_mac
+}
+
+# Assert C/C++ standards make sense
+if (cpp_std != "03" && cpp_std != "11" && cpp_std != "14" && cpp_std != "17" && cpp_std != "20" && cpp_std != "23") {
+ assert(cpp_std == "default", "Invalid C++ standard!")
+}
+
+if (c_std != "99" && c_std != "11" && c_std != "17" && c_std != "23") {
+ assert(c_std == "default", "Invalid C standard!")
+}
+
+# Default to C++17 and C11
+if (cpp_std == "default") {
+  cpp_std = "17"
+}
+
+if (c_std == "default") {
+  # Maybe bump to 17?
+  c_std = "11"
+}
+
+if (is_win) {
+  # The MinGW toolchains can only target x86/x64/arm64.
+  is_supported_win_arch = (target_cpu == "x86" || target_cpu == "x64" || target_cpu == "arm64")
+
+  assert(is_supported_win_arch, "Unsupported target architecture for Windows")
+
+  # Only the LLVM toolchain supports targeting arm64
+  if (!use_llvm) {
+    assert(target_cpu != "arm64", "The GCC/MinGW toolchain does not support Windows on ARM (arm64)")
+  }
+}

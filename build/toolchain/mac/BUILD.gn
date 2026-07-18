@@ -1,9 +1,9 @@
 # Copyright (c) 2014-2025 The Chromium Authors
 # Copyright (c) 2025-2026 Alex313031
 
-import("//build/config/args.gni")
+# MacOS toolchain specifics, this is incomplete and assumes clang.
 
-# MacOS toolchain specifics, this is incomplete.
+import("//build/toolchain/toolchain.gni")
 
 toolchain("clang") {
   # On macOS the system compiler is clang; `gcc`/`g++` are just symlinks to it.

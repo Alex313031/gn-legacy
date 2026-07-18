@@ -1,27 +1,13 @@
 # Copyright (c) 2025-2026 Alex313031
 
-import("//build/config/simd/simd.gni")
+# Platform agnostic general build arguments.
 
-is_linux = host_os == "linux" && current_os == "linux" && target_os == "linux"
-is_mac = host_os == "mac" && current_os == "mac" && target_os == "mac"
-is_win = (host_os == "win" && current_os == "win") || target_os == "win"
+import("//build/config/simd/simd.gni")
+import("//build/toolchain/toolchain.gni")
 
 declare_args() {
   # Whether to compile in debug mode, with symbols and DEBUG defined.
   is_debug = true
-
-  # C++ standard to use. Valid values are 03, 11, 14, 17, 20, 23, and "default"
-  # C++17 is the default.
-  cpp_std = "default"
-
-  # C standard to use. Valid values are 99, 11, 17, 23, and "default"
-  # C11 is the default.
-  c_std = "default"
-
-  # Whether to use LLVM compiler instead of GCC.
-  # Linux defaults to GCC, Mac defaults to LLVM.
-  # Windows can use either the GCC/MinGW or LLVM/MinGW toolchain.
-  use_llvm = is_mac
 }
 
 declare_args() {
@@ -51,20 +37,4 @@ if (use_lto) {
 
 if (use_dwarf) {
   assert(is_debug, "DWARF debug info cannot be enabled when is_debug = false")
-}
-
-if (cpp_std != "03" && cpp_std != "11" && cpp_std != "14" && cpp_std != "17" && cpp_std != "20" && cpp_std != "23") {
- assert(cpp_std == "default", "Invalid C++ standard!")
-}
-
-if (c_std != "99" && c_std != "11" && c_std != "17" && c_std != "23") {
- assert(c_std == "default", "Invalid C standard!")
-}
-
-if (cpp_std == "default") {
-  cpp_std = "17"
-}
-
-if (c_std == "default") {
-  c_std = "11"
 }

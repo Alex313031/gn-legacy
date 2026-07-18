@@ -1,7 +1,11 @@
 # Copyright (c) 2025-2026 Alex313031
 
+# Main compiler config, selects defaults applicable to all platforms.
+# Platform-specific and SIMD flag configs are in subdirs.
+
 import("//build/config/args.gni")
 import("//build/config/win/target_ver.gni")
+import("//build/config/win/win.gni")
 
 config("compiler_defaults") {
   configs = []
@@ -25,17 +29,76 @@ config("compiler_defaults") {
     ]
   }
 
-  # Log all compiler warnings
-  cflags += [ "-Wall" ]
+  # Log all compiler warnings. /W3 is the clang-cl counterpart to GCC -Wall
+  # (/W4 additionally pulls in -Wextra, which is stricter); /WX is -Werror.
+  # use_clang_cl is only ever true for Windows targets (see win.gni), so these
+  # cl-style spellings never reach a non-cl clang on Linux/Mac.
+  if (use_clang_cl) {
+    cflags += [ "/W3" ]
+  } else {
+    cflags += [ "-Wall" ]
+  }
   if (dcheck_enabled) {
     defines += [ "DCHECK_ON=1" ]
     # Warnings are errors by default if DCHECK is on.
-    cflags += [ "-Werror" ]
+    if (use_clang_cl) {
+      cflags += [ "/WX" ]
+    } else {
+      cflags += [ "-Werror" ]
+    }
   }
 
-  # Set C/C++ standards
-  cflags_c += [ "-std=c$c_std" ]
-  cflags_cc += [ "-std=c++$cpp_std" ]
+  # Set C/C++ standards. clang-cl's /std: values are gated on the MSVC target
+  # and don't cover the older standards this project supports (c++03/11, c99),
+  # so forward -std= to the underlying clang via /clang: for identical semantics
+  # to the GCC/LLVM paths.
+  if (use_clang_cl) {
+    cflags_c += [ "/clang:-std=c$c_std" ]
+    cflags_cc += [ "/clang:-std=c++$cpp_std" ]
+
+    # clang-cl inherits MSVC's exceptions-disabled default, whereas the GCC/
+    # clang++ MinGW driver enables C++ exceptions by default. Add /EHsc for
+    # parity, else `try`/`throw` fail to compile ("exceptions disabled"). RTTI
+    # is already on by clang-cl's default (/GR).
+    cflags_cc += [ "/EHsc" ]
+  } else {
+    cflags_c += [ "-std=c$c_std" ]
+    cflags_cc += [ "-std=c++$cpp_std" ]
+  }
+
+  # Optimization and debug-info level, common to every platform under the GCC-
+  # style drivers (GCC and clang/clang++). The Windows clang-cl driver needs the
+  # /clang: passthrough spelling and CodeView/pdb handling, so its variant lives
+  # in //build/config/win:windows_config.
+  if (!use_clang_cl) {
+    if (is_debug) {
+      cflags += [
+        "-Og",
+        "-g2",
+      ]
+      if (use_dwarf) {
+        cflags += [ "-gdwarf-2" ]
+      }
+    } else if (is_official_build) {
+      cflags += [
+        "-O3",
+        "-g0",
+      ]
+    } else {
+      cflags += [
+        "-O2",
+        "-g1",
+      ]
+    }
+  }
+
+  # Strip symbols from official-release binaries (link-time; -g0 above already
+  # keeps debug info out of the objects). Works for the GNU ld / LLD linkers on
+  # Linux and Windows. macOS's mach-o linker has no -s (obsolete) -- strip there
+  # with the `strip` tool or ship a separate .dSYM instead.
+  if (is_official_build && !is_mac) {
+    ldflags += [ "-s" ]
+  }
 
   # Static CRT. These are link-time flags, so they go in ldflags (the link
   # tools only consume {{ldflags}}, not cflags). They are GCC driver flags:
@@ -61,7 +124,7 @@ config("compiler_defaults") {
   # Win32 tends to have pragmas clang doesn't recognize. -Wno-return-type-c-linkage
   # silences a cosmetic clang-only warning for C++ functions whose return type has
   # C linkage (extern "C") -- for parity with GCC; trust the programmer.
-  if (use_llvm && target_os == "win") {
+  if (use_llvm && is_win) {
     cflags += [ "-Wno-unknown-pragmas", ]
     cflags_cc += [ "-Wno-return-type-c-linkage", ]
   }

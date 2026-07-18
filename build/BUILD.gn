@@ -77,8 +77,11 @@ config("static_lib_config") {
   }
 
   # Self-contained static archives (no libgcc/CRT dependency leakage). macOS
-  # clang links against libSystem and doesn't support -static.
-  if (!is_mac) {
+  # clang links against libSystem and doesn't support -static, and the Windows
+  # clang-cl driver rejects -static at compile (an error under /WX). Neither
+  # omission matters: -static only affects linking, and archives aren't linked.
+  # (use_clang_cl is only ever true for Windows targets; see win.gni.)
+  if (!is_mac && !use_clang_cl) {
     cflags += [ "-static", ]
   }
   if (is_linux) {

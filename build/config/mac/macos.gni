@@ -1,8 +1,6 @@
 # Copyright (c) 2026 Alex313031
 
-# MacOS build arguments. These live in a .gni (rather than inline in the BUILD.gn)
-# so they can be imported wherever they are needed, mirroring
-# //build/config/win/target_ver.gni and //build/config/linux/linux.gni.
+# MacOS build arguments.
 
 declare_args() {
   # Minimum macOS version to target. Passed to -mmacosx-version-min for both

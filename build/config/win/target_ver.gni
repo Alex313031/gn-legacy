@@ -1,5 +1,8 @@
 # Copyright (c) 2025-2026 Alex313031
 
+# Args that control minimum Windows target version.
+# Should have no imports!
+
 declare_args() {
   # Target Windows version. Can be a name, like "2000", "Vista"
   # or an NT number, like "5.1" for XP, or "6.1" for Win 7.

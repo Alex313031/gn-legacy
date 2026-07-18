@@ -6,7 +6,7 @@ __This directory contains documentation related to how to use gn-legacy, and how
 
 See [USAGE.md](./USAGE.md) for info on how to use this project for your own C/C++ project's source code.
 
-See [TOOLS.md](./tools.md) for info about the binaries and toolchains downloaded in [tools](../tools/).
+See [TOOLS.md](./TOOLS.md) for info about the binaries and toolchains downloaded in [tools](../tools/).
 
 See [MSVC_VER.md](./MSVC_VER.md) for info about MSVC **_MSC_VER** mappings.
 

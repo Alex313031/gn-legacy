@@ -1,7 +1,23 @@
 # Visual Studio Version to Macros Mapping
 
-_MSC_VER is defined by MSVC, and we need to define it when compiling Windows programs
-for MSVC compatibility.
+`_MSC_VER` is the compiler-version macro that MSVC predefines (e.g. `1920` for
+Visual Studio 2019 16.0).
+
+**GN-Legacy does not define `_MSC_VER`, and it can't.** Under `use_clang_cl` the
+clang-cl driver runs in MinGW mode (`--target=<arch>-w64-windows-gnu`), which is
+genuinely the MinGW environment (GNU ABI, mingw-w64 headers, libc++), not MSVC,
+so it correctly leaves `_MSC_VER` undefined. Forcing it with `-D_MSC_VER=` makes
+the toolchain's own headers take MSVC-only paths and fail to compile: libc++
+pulls the absent `vcruntime_new.h`, clang's stddef trips on "short wchar_t",
+mingw's COM headers (`unknwnbase.h`/`servprov.h`) break, and even plain-C wide
+string literals (`L"..."`) stop working.
+
+If a project gates behavior on `#ifdef _MSC_VER`, adjust it to also accept
+`__clang__` / `__GNUC__` (both of which clang-cl **does** define here) rather
+than assuming a real MSVC toolchain.
+
+The table below is kept only as a reference for the VS-version ↔ `_MSC_VER`
+mapping.
 
 Source: https://dev.to/yumetodo/list-of-mscver-and-mscfullver-8nd
 

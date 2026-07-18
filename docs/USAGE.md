@@ -8,7 +8,7 @@
 
 #### Prerequisites:
   This toolchain requires `git`, `zip`, `unzip`, and `curl`.  
-  For Debian based distros: `sudo apt install --needed git zip unzip curl`.  
+  For Debian based distros: `sudo apt install git zip unzip curl`.  
   On Windows, just install [Git for Windows](https://git-scm.com/install/windows) (it has zip/unzip and curl preinstalled).
 
 #### Initial Setup
@@ -20,7 +20,7 @@ git clone --recursive https://github.com/Alex313031/gn-legacy.git
 ```
 
 #### Without gclient
-Then, we need to download the MinGW toolchains (See [About the Compiler](#about-the-compiler)). I host pre-built .zips of both the Windows and Linux (for cross-building) toolchains for i586/i686/x64.  
+Then, we need to download the MinGW toolchains (See [About the Compiler](./TOOLS.md#about-the-compiler-toolchain)). I host pre-built .zips of both the Windows and Linux (for cross-building) toolchains for i586/i686/x64.  
 The script `download_toolchains.sh` will automatically detect whether you are on Linux or Windows and download the appropriate toolchains. It uses curl and unzip, so those have to be installed.  
 This command also downloads the `gn` and `ninja` binaries this repo needs.
 
@@ -69,12 +69,12 @@ gn.bat args out\Release
  A text editor will pop up, editing *out/$BUILDDIR/args.gn*, and here is where you set build arguments, such as target windows version, C++ standard, debug/release mode, etc.
 
 Two sample *args.gn* files are provided to get up and running quickly, with comments explaining what the args do. Depending on whether you want a debug or release build,
-choose either the [release_args.gn](./assets/args/release_args.gn) or [debug_args.gn](./assets/args/debug_args.gn) file. Copy the contents and paste it into the text editor, or type your own custom args.
+choose either the [release_args.gn](../assets/args/release_args.gn) or [debug_args.gn](../assets/args/debug_args.gn) file. Copy the contents and paste it into the text editor, or type your own custom args.
 Once you save the file and exit the text editor, gn will start generating .ninja files for all your sources.
 
 Next, build it!  
 Ninja will read the .ninja files generated in the previous step, and then invoke
-the compiler and append the flags/directories needed to compile sources, according to configurations in [./build/](./build/):
+the compiler and append the flags/directories needed to compile sources, according to configurations in [./build/](../build/):
 
 ```bash
 # You can append the flag `-j#` at the end, where "#" is the number of jobs, for multi-threaded compile.
@@ -104,7 +104,7 @@ ninja.bat -C out\build -t clean
 
 Projects use *BUILD.gn* files in place of a `Makefile` or `.vcxproj` file. A BUILD.gn file describes the sources, configs, and project-specific
 defines or compilation flags. They are hierarchical by design, and can depend on one another.  
-Targets should be added as a subdirectory of `./src/`, and the target added to the [main BUILD.gn](./src/BUILD.gn) in `./src/BUILD.gn`.
+Targets should be added as a subdirectory of `./src/`, and the target added to the [main BUILD.gn](../src/BUILD.gn) in `./src/BUILD.gn`.
 
-See the [./test/win/](./test/win/) dir for a good example on making an .exe, .dll, and static .lib using inter-dependant *BUILD.gn* files.  
+See the [./test/win/](../test/win/) dir for a good example on making an .exe, .dll, and static .lib using inter-dependant *BUILD.gn* files.  
 For more help, see [Resources](#resources).

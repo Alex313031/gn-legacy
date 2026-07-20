@@ -45,8 +45,16 @@ toolchain("mingw") {
     } else {
       bin_prefix = "x64"
     }
+  } else if (target_cpu == "arm64") {
+    # Windows on ARM is LLVM-only: the GCC/MinGW toolchain has no aarch64 flavor
+    # (asserted in //build/toolchain/toolchain.gni, which forces use_llvm here).
+    # Tool binaries use the aarch64 MinGW triple; the toolchain dir follows the
+    # short-name convention used by the others (arm64_llvm, unzipped from
+    # mingw_llvm_<host>_arm64.zip).
+    mingw_prefix = "aarch64"
+    bin_prefix = "arm64_llvm"
   } else {
-    print("GN-Legacy can only target x86/x64 for now.")
+    print("GN-Legacy can only target x86/x64/arm64 for now.")
   }
 
   # clang-cl (use_clang_cl) is the same binary for C and C++ -- it dispatches on

@@ -33,6 +33,9 @@ instead of the default GCC-style driver. It still targets the MinGW runtime (so 
 [build/config](../build/config/) are translated to their MSVC spellings where applicable. Pair it with `use_pdbs = true` to emit CodeView debug info and standalone
 `.pdb` files next to your binaries. Both args are Windows + LLVM only.
 
+Windows on ARM (`target_cpu = "arm64"`) is supported on the LLVM toolchain only (the GCC flavor has no aarch64 build). It uses the `aarch64` MinGW toolchain,
+which is a separate opt-in download — fetch it with `./tools/download_toolchains.sh --arm64`.
+
 ## Resources
 
 See the:  

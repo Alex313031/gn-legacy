@@ -61,6 +61,13 @@ config("compiler_defaults") {
     # parity, else `try`/`throw` fail to compile ("exceptions disabled"). RTTI
     # is already on by clang-cl's default (/GR).
     cflags_cc += [ "/EHsc" ]
+
+    # clang-cl (--driver-mode=cl) turns off the GNU keyword extensions, but in
+    # our --target=...-gnu mode this is really the MinGW/GNU environment and some
+    # sources (e.g. wimlib's compiler.h/list.h) use the GNU `typeof` keyword.
+    # Re-enable GNU keywords so `typeof` is recognized (GNU statement-expressions
+    # `({ ... })` already work under clang-cl).
+    cflags += [ "/clang:-fgnu-keywords" ]
   } else {
     cflags_c += [ "-std=c$c_std" ]
     cflags_cc += [ "-std=c++$cpp_std" ]

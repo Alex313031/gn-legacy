@@ -21,6 +21,7 @@ declare_args() {
   ## you would add use_avx, etc.
 
   # SSE The first iteration of SSE, introduced with Pentium 3/Athlon XP
+  # Used in i686 mode, best for Windows 2000.
   use_sse = current_cpu == "x86" && !is_winnt
 
   # SSE2
@@ -29,6 +30,7 @@ declare_args() {
   # the Athlon 64. Big step from MMX, x87, and SSE (i.e. SSE1)
   # Baseline requirement to run Windows since update KB4103718
   # for Windows 7 SP1/Server 2008 R2 SP1/Home Server 2011.
+  # Best for Windows XP+
   use_sse2 = current_cpu == "x64" || (current_cpu == "x86" && !is_winnt && !is_win2k)
 
   # SSE3
@@ -37,6 +39,7 @@ declare_args() {
   # Only applicable to 32 Bit Windows and Linux builds, where
   # setting it to false allows making an SSE2 build. (`-mmmx -msse2`)
   # `-msse3`
+  # Good baseline for modern x64 programs.
   use_sse3 = current_cpu == "x64"
 
   # SSE4.1
@@ -46,6 +49,7 @@ declare_args() {
   # Present since Penryn (2007 45nm Core 2 Duo die shrink), and
   # AMD Jaguar (2013 Athlon CPUs) and Bulldozer (2012 AMD FX).
   # Includes SSSE3 since all SSSE3 `-mssse3 -msse4.1`
+  # You would probably only want to set this when targeting Core 2 Duo
   use_sse41 = false
 
   # SSE4.2 (x86-64-v2)
@@ -55,6 +59,7 @@ declare_args() {
   # See https://bugs.chromium.org/p/chromium/issues/detail?id=1475858
   # Baseline for Windows since Windows 10 24H2.
   # `-msse4.2`
+  # This is the max target for Windows 2000/XP/Vista, and all 32 bit OSes.
   use_sse42 = false
 
   # AVX
@@ -64,6 +69,7 @@ declare_args() {
   # Requires Windows 7 SP1 / Linux 2.6.30 or later to use.
   # Uses new 128 bit registers and CPU blocks; a new era of SIMD.
   # Includes AES and PCLMUL `-maes -mpclmul -mavx`
+  # Good for math intensive programs or matrix operations.
   use_avx = false
 
   # AVX2 (x86-64-v3)
@@ -72,6 +78,7 @@ declare_args() {
   # AMD Excavator (4th Gen. refinement of Bulldozer cores) and 
   # Zen (1st Gen. Ryzen).
   # Includes FMA3 `-mfma -mavx2` (`-ffp-contract` see below at FMA section)
+  # This is the max target for Windows 7.
   use_avx2 = false
 
   # AVX-512
@@ -81,10 +88,11 @@ declare_args() {
   # Only uses AVX-512 instructions common to all processors.
   # `-mavx512f -mavx512cd -mavx512vl -mavx512bw -mavx512dq
   #  -mf16c -mlzcnt -mbmi2`
+  # Don't assume people have this, use with care.
   use_avx512 = false
 
   # arm32/arm64 specific: Whether to use NEON SIMD instructions.
-  # Part of the arm64 armv8-a specification
+  # Part of the arm64 armv8-a+simd specification, enabled by default for arm64.
   use_neon = current_cpu == "arm64"
 }
 
@@ -100,11 +108,15 @@ declare_args() {
   # Introduced with Westmere (2010), not all 1st gen Intel CPUs have it.
   use_aes = use_avx || use_avx2 || use_avx512
 
-  # MMX, introduced with the Pentium MMX, only used if use_sse = false
-  use_mmx = !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+  # MMX, introduced with the Pentium MMX; only when no SSE level is on.
+  # The current_cpu guard keeps it (and use_x87 below) false on x64/arm64,
+  # where "no SSE" would otherwise wrongly select MMX/x87.
+  # This is the max target for Windows NT 4.0
+  use_mmx = current_cpu == "x86" && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
 }
 
-use_x87 = !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+# Baseline i586, no SIMD, just pure x86 plus x87 floating point instructions.
+use_x87 = current_cpu == "x86" && !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
 
 if (use_neon) {
   is_neon_supported = (current_cpu == "arm" || current_cpu == "arm64")

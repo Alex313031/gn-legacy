@@ -1,18 +1,14 @@
 # Copyright (c) 2026 Alex313031
 
 group("gn_tests") {
-  public_deps = [ ":hello_all", ]
+  public_deps = [ ":hello_all" ]
 }
 
 group("hello_all") {
   public_deps = []
   if (is_linux) {
-    public_deps += [
-      "linux:hello_linux",
-    ]
+    public_deps += [ "linux:hello_linux" ]
   } else if (is_win) {
-    public_deps += [
-      "win:hello_win",
-    ]
+    public_deps += [ "win:hello_win" ]
   }
 }

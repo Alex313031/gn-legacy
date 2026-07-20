@@ -31,7 +31,8 @@ declare_args() {
   # Baseline requirement to run Windows since update KB4103718
   # for Windows 7 SP1/Server 2008 R2 SP1/Home Server 2011.
   # Best for Windows XP+
-  use_sse2 = current_cpu == "x64" || (current_cpu == "x86" && !is_winnt && !is_win2k)
+  use_sse2 =
+      current_cpu == "x64" || (current_cpu == "x86" && !is_winnt && !is_win2k)
 
   # SSE3
   # Normal Chromium baseline, present since Prescott (2004 Pentium 4)
@@ -75,7 +76,7 @@ declare_args() {
   # AVX2 (x86-64-v3)
   # Second generation AVX, expanded to 256-bit registers.
   # Present since Haswell (4th Gen. Core i series), and
-  # AMD Excavator (4th Gen. refinement of Bulldozer cores) and 
+  # AMD Excavator (4th Gen. refinement of Bulldozer cores) and
   # Zen (1st Gen. Ryzen).
   # Includes FMA3 `-mfma -mavx2` (`-ffp-contract` see below at FMA section)
   # This is the max target for Windows 7.
@@ -112,14 +113,16 @@ declare_args() {
   # The current_cpu guard keeps it (and use_x87 below) false on x64/arm64,
   # where "no SSE" would otherwise wrongly select MMX/x87.
   # This is the max target for Windows NT 4.0
-  use_mmx = current_cpu == "x86" && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+  use_mmx = current_cpu == "x86" && !use_sse && !use_sse2 && !use_sse3 &&
+            !use_sse41 && !use_sse42
 }
 
 # Baseline i586, no SIMD, just pure x86 plus x87 floating point instructions.
-use_x87 = current_cpu == "x86" && !use_mmx && !use_sse && !use_sse2 && !use_sse3 && !use_sse41 && !use_sse42
+use_x87 = current_cpu == "x86" && !use_mmx && !use_sse && !use_sse2 &&
+          !use_sse3 && !use_sse41 && !use_sse42
 
 if (use_neon) {
-  is_neon_supported = (current_cpu == "arm" || current_cpu == "arm64")
+  is_neon_supported = current_cpu == "arm" || current_cpu == "arm64"
   assert(is_neon_supported, "use_neon cannot be true on non-ARM targets")
 }
 
@@ -132,28 +135,34 @@ if (use_mmx && current_cpu != "x86") {
 }
 
 # Make sure we are a x86 arch
-if (use_sse2 || use_sse3 || use_sse41 || use_sse42 || use_avx || use_avx2 || use_avx512) {
-  assert(current_cpu == "x86" || current_cpu == "x64", "x86 SIMD intrinsic optimizations can only be used with x86 or x64 targets.")
+if (use_sse2 || use_sse3 || use_sse41 || use_sse42 || use_avx || use_avx2 ||
+    use_avx512) {
+  assert(
+      current_cpu == "x86" || current_cpu == "x64",
+      "x86 SIMD intrinsic optimizations can only be used with x86 or x64 targets.")
 }
 
 # 32 Bit OSes cant use anything above SSE4.2, and 32 Bit Apps can't benefit
 # from anything higher usually.
 if (use_avx || use_avx2 || use_avx512 || use_fma) {
-  assert(current_cpu != "x86", "AVX, AVX2, AVX-512, or FMA require x64. Set target_cpu to x64")
+  assert(current_cpu != "x86",
+         "AVX, AVX2, AVX-512, or FMA require x64. Set target_cpu to x64")
 }
 
 # AVX2 should always have FMA, however, there are times one might want
 # to set use_fma = true even with AVX2 off, such as when making a build for
 # an AMD Piledriver or Steamroller CPU.
 if (use_avx2 && !use_fma) {
-  print("WARNING: Use_avx2 is true while use_fma is false. This will create a build compiled with AVX2, but without FMA or floating point contraction.")
+  print(
+      "WARNING: Use_avx2 is true while use_fma is false. This will create a build compiled with AVX2, but without FMA or floating point contraction.")
   print("This should only be set intentionally for testing.")
   print("")
 }
 
 # Same for AVX-512
 if (use_avx512 && !use_fma) {
-  print("WARNING: Use_avx512 is true while use_fma is false. This will create a build compiled with AVX-512, but without FMA or floating point contraction.")
+  print(
+      "WARNING: Use_avx512 is true while use_fma is false. This will create a build compiled with AVX-512, but without FMA or floating point contraction.")
   print("This should only be set intentionally for testing.")
   print("")
 }
@@ -162,8 +171,10 @@ if (use_avx512 && !use_fma) {
 # your args. However, there are a few CPUs out there for which this makes sense.
 # Alex313031 TODO: Maybe add -mfma3 -mfma4 for this config?
 if (!use_avx2 && use_fma) {
-  print("WARNING: Use_avx2 is false while use_fma true. This will create an AVX build with FMA.")
-  print("This should only be set intentionally for testing, or for specific CPUs that have AVX and FMA, but not AVX2, such as AMD Piledriver.")
+  print(
+      "WARNING: Use_avx2 is false while use_fma true. This will create an AVX build with FMA.")
+  print(
+      "This should only be set intentionally for testing, or for specific CPUs that have AVX and FMA, but not AVX2, such as AMD Piledriver.")
   print("")
 }
 
@@ -179,7 +190,8 @@ if (use_aes && !use_avx) {
 
 if (use_fma || use_avx || use_avx2 || use_avx512) {
   if (is_legacy_windows) {
-    print("WARNING: Windows versions before 7 do not support AVX/AVX2/AVX-512/FMA instructions")
+    print(
+        "WARNING: Windows versions before 7 do not support AVX/AVX2/AVX-512/FMA instructions")
     print("")
   }
 }

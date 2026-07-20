@@ -3,9 +3,7 @@
 # Tests that a Linux shared .so library can be built correctly.
 
 shared_library("hello_linux_shared") {
-  configs += [
-    ":hello_linux_shared_config",
-  ]
+  configs += [ ":hello_linux_shared_config" ]
   sources = [
     "hello_shared.cc",
     "hello_shared.h",
@@ -14,7 +12,5 @@ shared_library("hello_linux_shared") {
 
 config("hello_linux_shared_config") {
   defines = [ "HELLO_SHARED_IMPLEMENTATION" ]
-  include_dirs = [
-    "./"
-  ]
+  include_dirs = [ "./" ]
 }

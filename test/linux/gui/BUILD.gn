@@ -5,9 +5,7 @@
 import("//build/config/linux/linux.gni")
 
 executable("hello_linux_gui") {
-  configs += [
-    ":hello_linux_gui_config",
-  ]
+  configs += [ ":hello_linux_gui_config" ]
 
   # Pull in whichever GUI toolkit is selected. use_gtk / use_qt are mutually
   # exclusive (enforced in //build/config/linux/linux.gni); with neither set the
@@ -31,9 +29,7 @@ executable("hello_linux_gui") {
 }
 
 config("hello_linux_gui_config") {
-  include_dirs = [
-    "./",
-  ]
+  include_dirs = [ "./" ]
   configs = [
     "../shared:hello_linux_shared_config",
     "../static:hello_linux_static_config",

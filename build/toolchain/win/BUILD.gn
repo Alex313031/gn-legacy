@@ -5,8 +5,8 @@
 # either the GCC style driver, or (on top of the LLVM toolchain)
 # the MSVC-style clang-cl driver (when use_clang_cl is true).
 
-import("//build/toolchain/toolchain.gni")
 import("//build/config/win/win.gni")
+import("//build/toolchain/toolchain.gni")
 
 # clang-cl note: this repo ships no MSVC CRT/SDK, only the MinGW sysroot, so
 # clang-cl cannot run in its native *-windows-msvc mode. Instead the cc/cxx
@@ -95,13 +95,15 @@ toolchain("mingw") {
         CXX = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang++"
       }
       LD = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-clang++"
-      AR = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar"
+      AR =
+          "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar"
       RC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-windres"
     } else {
       CC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-gcc"
       CXX = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++"
       LD = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-g++"
-      AR = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar"
+      AR =
+          "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-ar"
       RC = "../../tools/mingw/linux/$bin_prefix/bin/$mingw_prefix-w64-mingw32-windres"
     }
   }
@@ -165,12 +167,16 @@ toolchain("mingw") {
       # so its args are left as-is.
       command = "cmd /v:on /c $AR {{arflags}} $libfile {{inputs}}&&set \"S=$libfile\"&&set \"D=$outlibfile\"&&copy /Y \"!S:/=\\!\" \"!D:/=\\!\""
     } else {
-      command = "$AR {{arflags}} $libfile {{inputs}} && cp -af $libfile $outlibfile"
+      command =
+          "$AR {{arflags}} $libfile {{inputs}} && cp -af $libfile $outlibfile"
     }
 
     default_output_extension = ".a"
     output_prefix = "lib"
-    outputs = [ libfile, outlibfile ]
+    outputs = [
+      libfile,
+      outlibfile,
+    ]
   }
 
   tool("solink") {

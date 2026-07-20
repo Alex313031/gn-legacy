@@ -27,8 +27,9 @@ declare_args() {
 # Validate the GTK version.
 if (use_gtk) {
   assert(!use_qt, "use_gtk and use_qt cannot both be true")
-  assert(gtk_version == "2" || gtk_version == "3" || gtk_version == "4",
-         "Invalid gtk_version \"$gtk_version\": must be \"2\", \"3\", or \"4\".")
+  assert(
+      gtk_version == "2" || gtk_version == "3" || gtk_version == "4",
+      "Invalid gtk_version \"$gtk_version\": must be \"2\", \"3\", or \"4\".")
 }
 
 # Validate the QT version.

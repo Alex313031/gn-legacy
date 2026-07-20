@@ -45,10 +45,12 @@ toolchain("clang") {
   }
 
   tool("solink") {
-    soname = "{{target_output_name}}{{output_extension}}"  # e.g. "libfoo.dylib".
+    soname =
+        "{{target_output_name}}{{output_extension}}"  # e.g. "libfoo.dylib".
     sofile = "{{output_dir}}/$soname"
     rspfile = soname + ".rsp"
     description = "DYNLIB $soname"
+
     # Use the bare soname (not $sofile, which includes {{output_dir}} and would
     # bake the build directory into the dylib's install name). @executable_path
     # resolves next to the loading binary -- the mach-o analogue of the Linux

@@ -3,9 +3,7 @@
 # Tests that a Linux static .a library can be built correctly.
 
 static_library("hello_linux_static") {
-  configs += [
-    ":hello_linux_static_config",
-  ]
+  configs += [ ":hello_linux_static_config" ]
   sources = [
     "hello_static.cc",
     "hello_static.h",
@@ -14,7 +12,5 @@ static_library("hello_linux_static") {
 
 config("hello_linux_static_config") {
   defines = [ "HELLO_STATIC_IMPLEMENTATION" ]
-  include_dirs = [
-    "./"
-  ]
+  include_dirs = [ "./" ]
 }

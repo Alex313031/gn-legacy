@@ -8,7 +8,7 @@ import("//build/config/win/win.gni")
 
 config("windows_config") {
   # All Windows apps should have this defined.
-  defines = [ "_WIN32", ]
+  defines = [ "_WIN32" ]
   cflags = []
   ldflags = []
   libs = []
@@ -26,10 +26,10 @@ config("windows_config") {
     ]
   }
   if (current_cpu == "arm64") {
-    defines += [ "_M_ARM64", ]
+    defines += [ "_M_ARM64" ]
   }
   if (current_cpu == "x64" || current_cpu == "arm64") {
-    defines += [ "_WIN64", ]
+    defines += [ "_WIN64" ]
   }
 
   # LLVM's libc++/libunwind reference the pthread API (thread-safe statics,
@@ -58,7 +58,7 @@ config("windows_config") {
   }
 
   if (use_common_controls) {
-    defines += [ "USE_COMMCTRLS", ]
+    defines += [ "USE_COMMCTRLS" ]
   }
 
   # Default to statically linked binaries. -static is a link-time flag; clang-cl
@@ -66,20 +66,18 @@ config("windows_config") {
   # error), so only the GCC/LLVM drivers get it in cflags. The ldflags entry
   # (consumed by the GNU link driver) is what actually forces static linking.
   if (!use_clang_cl) {
-    cflags += [ "-static", ]
+    cflags += [ "-static" ]
   }
-  ldflags += [ "-static", ]
+  ldflags += [ "-static" ]
 
-  defines += [ "_CRT_SECURE_NO_WARNINGS", ]
+  defines += [ "_CRT_SECURE_NO_WARNINGS" ]
   if (is_legacy_windows) {
     defines += [
       "PSAPI_VERSION=1",
       "_CRT_NONSTDC_NO_WARNINGS",
     ]
   } else {
-    defines += [
-      "PSAPI_VERSION=2",
-    ]
+    defines += [ "PSAPI_VERSION=2" ]
   }
 
   # clang-cl optimization and debug-info flags (the shared GCC-style -O/-g ladder
@@ -151,21 +149,21 @@ config("subsystem_base") {
 config("console_subsystem") {
   ldflags = []
   libs = []
-  defines = [ "_CONSOLE", ]
-  configs = [ ":subsystem_base", ]
-  ldflags += [ "-Wl,--subsystem,console:$subsystem", ]
+  defines = [ "_CONSOLE" ]
+  configs = [ ":subsystem_base" ]
+  ldflags += [ "-Wl,--subsystem,console:$subsystem" ]
+
   # Default libs for console apps, everything needs kernel32.
-  libs += [
-    "kernel32",
-  ]
+  libs += [ "kernel32" ]
 }
 
 config("windowed_subsystem") {
   ldflags = []
   libs = []
-  defines = [ "_WINDOWS", ]
-  configs = [ ":subsystem_base", ]
-  ldflags += [ "-Wl,--subsystem,windows:$subsystem", ]
+  defines = [ "_WINDOWS" ]
+  configs = [ ":subsystem_base" ]
+  ldflags += [ "-Wl,--subsystem,windows:$subsystem" ]
+
   # Default common libs for GUI Win32 apps.
   libs += [
     "kernel32",
@@ -176,8 +174,8 @@ config("windowed_subsystem") {
 }
 
 config("unicode") {
-  configs = [ ":unicode_base", ]
-  ldflags = [ "-municode", ]
+  configs = [ ":unicode_base" ]
+  ldflags = [ "-municode" ]
 }
 
 # Non-Unicode (ANSI/MBCS) counterpart to :unicode. Add this (and remove
@@ -188,22 +186,22 @@ config("unicode") {
 # is intentionally left at the default so narrow literals use the runtime code
 # page rather than being forced to UTF-8.
 config("ansi") {
-  defines = [ "_MBCS", ]
+  defines = [ "_MBCS" ]
   if (use_clang_cl) {
-    cflags = [ "/source-charset:utf-8", ]
+    cflags = [ "/source-charset:utf-8" ]
   } else {
-    cflags = [ "-finput-charset=UTF-8", ]
+    cflags = [ "-finput-charset=UTF-8" ]
   }
 }
 
 config("mwindows") {
-  ldflags = [ "-mwindows", ]
+  ldflags = [ "-mwindows" ]
 }
 
 config("mconsole") {
-  ldflags = [ "-mconsole", ]
+  ldflags = [ "-mconsole" ]
 }
 
 config("nominmax") {
-  defines = [ "NOMINMAX", ]
+  defines = [ "NOMINMAX" ]
 }

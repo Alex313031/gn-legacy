@@ -24,12 +24,13 @@ declare_args() {
 }
 
 # Assert C/C++ standards make sense
-if (cpp_std != "03" && cpp_std != "11" && cpp_std != "14" && cpp_std != "17" && cpp_std != "20" && cpp_std != "23") {
- assert(cpp_std == "default", "Invalid C++ standard!")
+if (cpp_std != "03" && cpp_std != "11" && cpp_std != "14" && cpp_std != "17" &&
+    cpp_std != "20" && cpp_std != "23") {
+  assert(cpp_std == "default", "Invalid C++ standard!")
 }
 
 if (c_std != "99" && c_std != "11" && c_std != "17" && c_std != "23") {
- assert(c_std == "default", "Invalid C standard!")
+  assert(c_std == "default", "Invalid C standard!")
 }
 
 # Default to C++17 and C11
@@ -44,12 +45,14 @@ if (c_std == "default") {
 
 if (is_win) {
   # The MinGW toolchains can only target x86/x64/arm64.
-  is_supported_win_arch = (target_cpu == "x86" || target_cpu == "x64" || target_cpu == "arm64")
+  is_supported_win_arch =
+      target_cpu == "x86" || target_cpu == "x64" || target_cpu == "arm64"
 
   assert(is_supported_win_arch, "Unsupported target architecture for Windows")
 
   # Only the LLVM toolchain supports targeting arm64
   if (!use_llvm) {
-    assert(target_cpu != "arm64", "The GCC/MinGW toolchain does not support Windows on ARM (arm64)")
+    assert(target_cpu != "arm64",
+           "The GCC/MinGW toolchain does not support Windows on ARM (arm64)")
   }
 }

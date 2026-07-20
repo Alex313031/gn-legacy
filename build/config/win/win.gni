@@ -31,7 +31,9 @@ declare_args() {
 # environment (--target=...-windows-gnu) so it can reach the MinGW sysroot. It
 # therefore has no meaning under the GCC toolchain.
 if (use_clang_cl) {
-  assert(use_llvm, "use_clang_cl requires use_llvm (clang-cl ships only in the LLVM/MinGW toolchain)")
+  assert(
+      use_llvm,
+      "use_clang_cl requires use_llvm (clang-cl ships only in the LLVM/MinGW toolchain)")
   assert(is_win, "use_clang_cl can only be used when targeting Windows")
 }
 

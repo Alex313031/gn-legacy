@@ -10,27 +10,27 @@ config("executable_config") {
   cflags = []
   ldflags = []
   if (is_linux) {
-    ldflags += [ "-pie", ]
+    ldflags += [ "-pie" ]
 
     # An $ORIGIN rpath makes the executable relocatable: the dynamic loader
     # looks for shared libraries next to the binary itself.
     if (use_rpath) {
-      ldflags += [ "-Wl,-rpath=\$ORIGIN/", ]
+      ldflags += [ "-Wl,-rpath=\$ORIGIN/" ]
     }
   }
 
   # LLVM has explicit linker optimization flags
   if (use_llvm) {
     if (is_debug) {
-      ldflags += [ "-Wl,-O0", ]
+      ldflags += [ "-Wl,-O0" ]
     } else {
       if (is_official_build) {
-        ldflags += [ "-Wl,-O3", ]
+        ldflags += [ "-Wl,-O3" ]
       } else {
         if (dcheck_enabled) {
-          ldflags += [ "-Wl,-O1", ]
+          ldflags += [ "-Wl,-O1" ]
         } else {
-          ldflags += [ "-Wl,-O2", ]
+          ldflags += [ "-Wl,-O2" ]
         }
       }
     }
@@ -56,7 +56,7 @@ config("executable_config") {
 config("shared_lib_config") {
   configs = []
   if (is_win) {
-    configs += [ "config/win:subsystem_base", ]
+    configs += [ "config/win:subsystem_base" ]
   }
 
   # The DLL link flag (-shared) is hardcoded in the solink tool command in
@@ -73,7 +73,7 @@ config("static_lib_config") {
   ldflags = []
 
   if (is_win) {
-    configs += [ "config/win:subsystem_base", ]
+    configs += [ "config/win:subsystem_base" ]
   }
 
   # Self-contained static archives (no libgcc/CRT dependency leakage). macOS
@@ -82,10 +82,9 @@ config("static_lib_config") {
   # omission matters: -static only affects linking, and archives aren't linked.
   # (use_clang_cl is only ever true for Windows targets; see win.gni.)
   if (!is_mac && !use_clang_cl) {
-    cflags += [ "-static", ]
+    cflags += [ "-static" ]
   }
   if (is_linux) {
-    ldflags += [ "-static", ]
+    ldflags += [ "-static" ]
   }
 }
-

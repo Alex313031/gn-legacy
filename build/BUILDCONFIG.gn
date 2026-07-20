@@ -22,7 +22,6 @@ if (current_os == "") {
 
 # Keep this here
 import("//build/config/args.gni")
-
 _linker_configs = []
 if (is_win) {
   # For Console Win32 App, remove these config and add "//build/config/win:console_subsystem".
@@ -37,21 +36,24 @@ if (is_win) {
 _binary_target_configs = [ "//build/config:compiler_defaults" ]
 
 # Executables get additional linker configuration (linker config + subsystem/unicode).
-_executable_target_configs = _binary_target_configs + [ "//build:executable_config" ] + _linker_configs
+_executable_target_configs =
+    _binary_target_configs + [ "//build:executable_config" ] + _linker_configs
 
 # Static libs get -static.
-_static_lib_target_configs = _binary_target_configs + [ "//build:static_lib_config" ]
+_static_lib_target_configs =
+    _binary_target_configs + [ "//build:static_lib_config" ]
 
 # Shared libs get separate flags per-target platform.
-_shared_lib_target_configs = _binary_target_configs + [ "//build:shared_lib_config" ]
+_shared_lib_target_configs =
+    _binary_target_configs + [ "//build:shared_lib_config" ]
 
 _source_set_target_configs = _binary_target_configs
 
 if (is_win) {
   # Remove "//build/config/win:unicode_base" from these types of targets if Unicode is not desired.
-  _static_lib_target_configs += [ "//build/config/win:unicode_base", ]
-  _shared_lib_target_configs += [ "//build/config/win:unicode_base", ]
-  _source_set_target_configs += [ "//build/config/win:unicode_base", ]
+  _static_lib_target_configs += [ "//build/config/win:unicode_base" ]
+  _shared_lib_target_configs += [ "//build/config/win:unicode_base" ]
+  _source_set_target_configs += [ "//build/config/win:unicode_base" ]
 }
 
 # Set default configs for different target types.

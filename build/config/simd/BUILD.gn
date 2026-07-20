@@ -3,7 +3,8 @@
 import("//build/config/simd/simd.gni")
 
 if (use_x87) {
-  assert(target_cpu == "x86", "use_x87 can only be used with 32 bit x86 targets.")
+  assert(target_cpu == "x86",
+         "use_x87 can only be used with 32 bit x86 targets.")
 }
 
 if (cpu_march == "") {
@@ -77,7 +78,7 @@ config("simd_config") {
       ]
     } else {
       if (use_mmx) {
-        cflags += [ "-mmmx", ]
+        cflags += [ "-mmmx" ]
         if (!use_sse) {
           cflags += [
             "-mfpmath=387",
@@ -86,20 +87,23 @@ config("simd_config") {
           ]
         }
         if (!use_sse2) {
-          cflags += [ "-mno-sse2", ]
+          cflags += [ "-mno-sse2" ]
         }
       }
       if (use_sse || use_sse2 || use_sse3 || use_sse41 || use_sse42) {
-        cflags += [ "-mfpmath=sse", ]
+        cflags += [ "-mfpmath=sse" ]
       }
       if (use_sse) {
-        cflags += [ "-mfxsr", "-msse", ]
+        cflags += [
+          "-mfxsr",
+          "-msse",
+        ]
       }
       if (use_sse2) {
-        cflags += [ "-msse2", ]
+        cflags += [ "-msse2" ]
       }
       if (use_sse3) {
-        cflags += [ "-msse3", ]
+        cflags += [ "-msse3" ]
       }
       if (use_sse41) {
         cflags += [
@@ -108,7 +112,7 @@ config("simd_config") {
         ]
       }
       if (use_sse42) {
-        cflags += [ "-msse4.2", ]
+        cflags += [ "-msse4.2" ]
       }
     }
   } else if (current_cpu == "x64") {
@@ -117,7 +121,7 @@ config("simd_config") {
       "-msse2",
     ]
     if (use_sse3) {
-      cflags += [ "-msse3", ]
+      cflags += [ "-msse3" ]
     }
     if (use_sse41) {
       cflags += [
@@ -126,7 +130,7 @@ config("simd_config") {
       ]
     }
     if (use_sse42) {
-      cflags += [ "-msse4.2", ]
+      cflags += [ "-msse4.2" ]
     }
     if (use_avx) {
       cflags += [
@@ -135,7 +139,7 @@ config("simd_config") {
       ]
     }
     if (use_aes) {
-      cflags += [ "-maes", ]
+      cflags += [ "-maes" ]
     }
     if (use_avx2) {
       cflags += [
@@ -161,22 +165,20 @@ config("simd_config") {
         "-mfma",
         "-ffp-contract=fast",
       ]
-      ldflags += [ "-ffp-contract=fast", ]
+      ldflags += [ "-ffp-contract=fast" ]
     }
   } else if (current_cpu == "arm") {
     # Always use hard float for ARM32
-    cflags += [ "-mfloat-abi=hard", ]
+    cflags += [ "-mfloat-abi=hard" ]
     if (use_neon) {
-      cflags += [ "-mfpu=neon", ]
+      cflags += [ "-mfpu=neon" ]
     } else {
-      cflags += [ "-mfpu=vfpv3-d16", ]
+      cflags += [ "-mfpu=vfpv3-d16" ]
     }
   } else if (current_cpu == "arm64") {
     if (use_neon) {
       defines += [ "__ARM_NEON__=1" ]
     }
   }
-  cflags += [
-    "-march=$march",
-  ]
+  cflags += [ "-march=$march" ]
 }

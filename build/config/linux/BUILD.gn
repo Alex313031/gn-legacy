@@ -25,19 +25,15 @@ config("linux_config") {
 
   # PIC for PIE. -fPIC is compile-time only; the -pie link flag lives in
   # //build:executable_config.
-  cflags += [
-    "-fPIC",
-  ]
+  cflags += [ "-fPIC" ]
 
   # Default to using threads. -pthread is needed at compile time (defines the
   # threading feature macros) and at link time (pulls in libpthread).
-  cflags += [ "-pthread", ]
-  ldflags += [ "-pthread", ]
+  cflags += [ "-pthread" ]
+  ldflags += [ "-pthread" ]
 
   # Default linux system libraries
-  libs = [
-    "m",
-  ]
+  libs = [ "m" ]
 }
 
 # GUI toolkit configs. These are opt-in: a GUI target adds
@@ -63,12 +59,27 @@ config("gtk") {
     }
     _pkg_config = "//build/config/linux/pkg-config.py"
 
-    cflags = exec_script(_pkg_config, [ "cflags", _package ], "list lines")
-    libs = exec_script(_pkg_config, [ "libs", _package ], "list lines")
-    lib_dirs = exec_script(_pkg_config, [ "lib_dirs", _package ], "list lines")
+    cflags = exec_script(_pkg_config,
+                         [
+                           "cflags",
+                           _package,
+                         ],
+                         "list lines")
+    libs = exec_script(_pkg_config,
+                       [
+                         "libs",
+                         _package,
+                       ],
+                       "list lines")
+    lib_dirs = exec_script(_pkg_config,
+                           [
+                             "lib_dirs",
+                             _package,
+                           ],
+                           "list lines")
 
     # Let sources branch on the toolkit and its version, e.g. `#if USE_GTK >= 4`.
-    defines = [ "USE_GTK=$gtk_version", ]
+    defines = [ "USE_GTK=$gtk_version" ]
   }
 }
 
@@ -83,10 +94,25 @@ config("qt") {
     }
     _pkg_config = "//build/config/linux/pkg-config.py"
 
-    cflags = exec_script(_pkg_config, [ "cflags", _package ], "list lines")
-    libs = exec_script(_pkg_config, [ "libs", _package ], "list lines")
-    lib_dirs = exec_script(_pkg_config, [ "lib_dirs", _package ], "list lines")
+    cflags = exec_script(_pkg_config,
+                         [
+                           "cflags",
+                           _package,
+                         ],
+                         "list lines")
+    libs = exec_script(_pkg_config,
+                       [
+                         "libs",
+                         _package,
+                       ],
+                       "list lines")
+    lib_dirs = exec_script(_pkg_config,
+                           [
+                             "lib_dirs",
+                             _package,
+                           ],
+                           "list lines")
 
-    defines = [ "USE_QT=$qt_version", ]
+    defines = [ "USE_QT=$qt_version" ]
   }
 }

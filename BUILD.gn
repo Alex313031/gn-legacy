@@ -6,7 +6,8 @@ import("//build/config/args.gni")
 
 group("gn_all") {
   public_deps = [
-    "./test:gn_tests", # Test targets, keep for ensuring toolchain can produce valid binaries.
-    "./src:all", # This is where your source code lives, in ./src/
+    "./src:all",  # This is where your source code lives, in ./src/
+    "./test:gn_tests",  # Test targets, keep for ensuring toolchain can produce
+                        # valid binaries.
   ]
 }

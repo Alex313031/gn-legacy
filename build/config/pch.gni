@@ -33,14 +33,20 @@
 import("//build/config/win/win.gni")
 
 template("pch_target") {
-  assert(defined(invoker.target_type),
-         "pch_target() requires a target_type, e.g. target_type = \"executable\"")
+  assert(
+      defined(invoker.target_type),
+      "pch_target() requires a target_type, e.g. target_type = \"executable\"")
   target(invoker.target_type, target_name) {
     # Forward everything except our control variable (the real target would
     # reject it) and `configs`, which set_defaults has already seeded on the real
     # target -- overwriting it via the blind forward would drop the default
     # configs, so append the invoker's list instead.
-    forward_variables_from(invoker, "*", [ "target_type", "configs" ])
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "target_type",
+                             "configs",
+                           ])
     if (defined(invoker.configs)) {
       configs += invoker.configs
     }

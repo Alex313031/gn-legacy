@@ -14,7 +14,7 @@ config("compiler_defaults") {
   cflags_c = []
   cflags_cc = []
   ldflags = []
-  arflags = [ "rcs", ]
+  arflags = [ "rcs" ]
 
   # Debug defines/flags
   if (is_debug) {
@@ -40,6 +40,7 @@ config("compiler_defaults") {
   }
   if (dcheck_enabled) {
     defines += [ "DCHECK_ON=1" ]
+
     # Warnings are errors by default if DCHECK is on.
     if (use_clang_cl) {
       cflags += [ "/WX" ]
@@ -132,8 +133,8 @@ config("compiler_defaults") {
   # silences a cosmetic clang-only warning for C++ functions whose return type has
   # C linkage (extern "C") -- for parity with GCC; trust the programmer.
   if (use_llvm && is_win) {
-    cflags += [ "-Wno-unknown-pragmas", ]
-    cflags_cc += [ "-Wno-return-type-c-linkage", ]
+    cflags += [ "-Wno-unknown-pragmas" ]
+    cflags_cc += [ "-Wno-return-type-c-linkage" ]
   }
 
   # SIMD flags

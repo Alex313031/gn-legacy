@@ -7,74 +7,33 @@ import("//build/config/mac/macos.gni")
 import("//build/config/win/win.gni")
 
 config("executable_config") {
+  configs = [
+    ":exec_shared_config",
+    "config:rpath_config",
+  ]
   cflags = []
   ldflags = []
+
   if (is_linux) {
+    # We always want PIE for Linux, for security.
     ldflags += [ "-pie" ]
-
-    # An $ORIGIN rpath makes the executable relocatable: the dynamic loader
-    # looks for shared libraries next to the binary itself.
-    if (use_rpath) {
-      ldflags += [ "-Wl,-rpath=\$ORIGIN/" ]
-    }
-  }
-
-  # LLVM has explicit linker optimization flags
-  if (use_llvm) {
-    if (is_debug) {
-      ldflags += [ "-Wl,-O0" ]
-    } else {
-      if (is_official_build) {
-        ldflags += [ "-Wl,-O3" ]
-      } else {
-        if (dcheck_enabled) {
-          ldflags += [ "-Wl,-O1" ]
-        } else {
-          ldflags += [ "-Wl,-O2" ]
-        }
-      }
-    }
-  }
-
-  # Full LTO/ThinLTO config
-  if (use_lto) {
-    if (use_llvm) {
-      # Clang spelling; -flto=auto / -flto-partition are GCC-only.
-      cflags += [ "-flto=full" ]
-      ldflags += [ "-flto=full" ]
-    } else {
-      cflags += [ "-flto=auto" ]
-      ldflags += [ "-flto" ]
-      if (dcheck_enabled) {
-        # For checking code ordering issues
-        ldflags += [ "-flto-partition=1to1" ]
-      }
-    }
   }
 }
 
 config("shared_lib_config") {
-  configs = []
-  if (is_win) {
-    configs += [ "config/win:subsystem_base" ]
-  }
-
-  # The DLL link flag (-shared) is hardcoded in the solink tool command in
-  # //build/toolchain/win:mingw, so nothing is added here for the link itself.
-  # Do NOT add -mdll: solink already passes -shared, and GCC rejects the
-  # combination outright ("shared and mdll are not compatible") -- only clang
-  # tolerates it. (-shared/-mdll in cflags is also wrong: at the compile step
-  # they are "argument unused during compilation" and never reach the linker.)
+  configs = [
+    ":exec_shared_config",
+    "config:rpath_config",
+  ]
+  # NOTE: Do NOT add -mdll: solink already passes -shared, and GCC rejects the
+  # combination outright ("shared and mdll are not compatible"), only clang
+  # tolerates it.
 }
 
 config("static_lib_config") {
-  configs = []
+  configs = [ ":exec_shared_config" ]
   cflags = []
   ldflags = []
-
-  if (is_win) {
-    configs += [ "config/win:subsystem_base" ]
-  }
 
   # Self-contained static archives (no libgcc/CRT dependency leakage). macOS
   # clang links against libSystem and doesn't support -static, and the Windows
@@ -86,5 +45,16 @@ config("static_lib_config") {
   }
   if (is_linux) {
     ldflags += [ "-static" ]
+  }
+}
+
+# Configs universal to all target types, used here only.
+config("exec_shared_config") {
+  configs = []
+
+  # Set PE subsystem number, doesn't specfy console or GUI
+  # (see console_substem and windowed_subsystem for that).
+  if (is_win) {
+    configs += [ "config/win:subsystem_base" ]
   }
 }

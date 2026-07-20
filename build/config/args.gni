@@ -2,37 +2,86 @@
 
 # Platform agnostic general build arguments.
 
+import("//build/config/linux/linux.gni")
 import("//build/config/simd/simd.gni")
 import("//build/toolchain/toolchain.gni")
 
 declare_args() {
   # Whether to compile in debug mode, with symbols and DEBUG defined.
+  # When false, it compiles in release mode. is_official_build can be used
+  # in release mode to enable extra compiler codegen optimizations.
   is_debug = true
 }
 
 declare_args() {
-  # Whether to enable DCHECKs and extra assertions
+  # Whether to enable DCHECKs and extra assertions/compiler warnings.
   dcheck_enabled = is_debug
 }
 
 declare_args() {
-  # Whether DWARF debug info will be included in binaries.
+  # Whether DWARF debug info will be included in binaries. Only enabled
+  # by default for DCHECK builds (dcheck_enabled = true), but can be used as
+  # long as it is a debug build (is_debug = true)
   use_dwarf = dcheck_enabled
 
-  # Whether this is an official release build for users. Adds additional compiler optimization.
+  # Whether this is an official release build for users.
+  # Adds additional compiler optimizations, such as -O3 over -O2.
   is_official_build = !is_debug && !dcheck_enabled
 }
 
 declare_args() {
-  # Whether to use Link Time Optimization (LTO)
+  # Whether to use Link Time Optimization (LTO), for inter-procedural and cross-translation
+  # unit optimization. Can improve data locality.
   use_lto = is_official_build
 }
 
-if (is_official_build) {
-  assert(!is_debug, "is_official_build cannot be true when is_debug = true")
+# Extra optimization args
+declare_args() {
+  # When true, use "thin" LTO, instead of "Full" LTO (the default).
+  # Good for large projects due to increased compilation speed.
+  use_thin_lto = use_lto && use_llvm && (is_linux && target_cpu == "x64")
+
+  # Use LLVM's special post-link "polyhedral data-locality optimizer" called polly.
+  # See https://polly.llvm.org/ for more info.
+  use_polly = false
+
+  # Use fast-math. When enabled, passes -ffast-math via CFLAGS. See https://kristerw.github.io/2021/10/19/fast-math/
+  # WARNING: Experimental, can cause code non-conformance/code breakage.
+  use_fast_math = false
 }
+
+if (is_official_build) {
+  assert(
+      !is_debug,
+      "is_official_build (Official Build) cannot be true when is_debug = true (Debug Build)")
+}
+
 if (use_lto) {
-  assert(!is_debug, "use_lto cannot be used when is_debug = true")
+  assert(!is_debug, "LTO (use_lto = true) cannot be used when is_debug = true")
+}
+
+if (use_fast_math) {
+  assert(
+      !dcheck_enabled,
+      "use_fast_math cannot be enabled with DCHECKs enabled (dcheck_enabled = true)")
+}
+
+if (use_thin_lto) {
+  assert(
+      use_llvm,
+      "use_thin_lto: Thin LTO can only be enabled when LLVM is enabled (use_llvm = true).")
+  assert(use_lto,
+         "use_thin_lto: LTO (use_lto) must be true when using Thin LTO.")
+}
+
+if (use_polly) {
+  assert(
+      use_llvm,
+      "use_polly: Polly can only be enabled when LLVM is enabled (use_llvm = true).")
+  assert(use_lto, "use_polly: LTO (use_lto) must be true when enabling Polly.")
+  assert(
+      is_official_build,
+      "use_polly: Polly can only be enabled in official builds (is_official_build = true).")
 }
 
 if (use_dwarf) {

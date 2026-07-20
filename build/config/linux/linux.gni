@@ -7,7 +7,7 @@
 
 declare_args() {
   # Whether to include header dirs for GTK usage.
-  use_gtk = is_linux
+  use_gtk = target_os == "linux" && host_os == "linux"
 
   # Whether to include header dirs for QT usage.
   use_qt = false
@@ -21,7 +21,7 @@ declare_args() {
   qt_version = "5"
 
   # Whether to use RPATH, to allow an executable to be relocatable.
-  use_rpath = is_linux
+  use_rpath = target_os == "linux"
 }
 
 # Validate the GTK version.

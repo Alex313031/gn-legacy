@@ -4,6 +4,7 @@
 # Platform-specific and SIMD flag configs are in subdirs.
 
 import("//build/config/args.gni")
+import("//build/config/linux/linux.gni")
 import("//build/config/win/target_ver.gni")
 import("//build/config/win/win.gni")
 
@@ -49,6 +50,16 @@ config("compiler_defaults") {
     }
   }
 
+  # Set default compiler optimization level (i.e. -O1, -O2).
+  # NOTE: leave this here.
+  configs += [ ":optimization_config" ]
+
+  # Add LTO if enabled.
+  configs += [ ":lto_config" ]
+
+  # Add Polly if applicable/enabled (LLVM only).
+  configs += [ ":polly_config" ]
+
   # Set C/C++ standards. clang-cl's /std: values are gated on the MSVC target
   # and don't cover the older standards this project supports (c++03/11, c99),
   # so forward -std= to the underlying clang via /clang: for identical semantics
@@ -72,32 +83,6 @@ config("compiler_defaults") {
   } else {
     cflags_c += [ "-std=c$c_std" ]
     cflags_cc += [ "-std=c++$cpp_std" ]
-  }
-
-  # Optimization and debug-info level, common to every platform under the GCC-
-  # style drivers (GCC and clang/clang++). The Windows clang-cl driver needs the
-  # /clang: passthrough spelling and CodeView/pdb handling, so its variant lives
-  # in //build/config/win:windows_config.
-  if (!use_clang_cl) {
-    if (is_debug) {
-      cflags += [
-        "-Og",
-        "-g2",
-      ]
-      if (use_dwarf) {
-        cflags += [ "-gdwarf-2" ]
-      }
-    } else if (is_official_build) {
-      cflags += [
-        "-O3",
-        "-g0",
-      ]
-    } else {
-      cflags += [
-        "-O2",
-        "-g1",
-      ]
-    }
   }
 
   # Strip symbols from official-release binaries (link-time; -g0 above already
@@ -139,4 +124,138 @@ config("compiler_defaults") {
 
   # SIMD flags
   configs += [ "simd:simd_config" ]
+}
+
+# rpath is POSIX-only, for Windows you have to use SetDllDirectory() (XP+ only).
+# See https://en.wikipedia.org/wiki/Rpath
+config("rpath_config") {
+  ldflags = []
+
+  # An $ORIGIN rpath makes the executable relocatable: the dynamic loader
+  # looks for shared libraries next to the binary itself.
+  if (is_linux || is_mac) {
+    if (use_rpath) {
+      ldflags += [ "-Wl,-rpath=\$ORIGIN/" ]
+    }
+  }
+}
+
+# Global optimization config, controls how code is generated.
+# See https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/Optimize-Options.html
+config("optimization_config") {
+  cflags = []
+  ldflags = []
+
+  # Optimization and debug-info level, common to every platform under the GCC-
+  # style drivers (GCC and clang/clang++). The Windows clang-cl driver needs the
+  # /clang: passthrough spelling and CodeView/pdb handling, so its variant lives
+  # in //build/config/win:windows_config.
+  if (!use_clang_cl) {
+    if (is_debug) {
+      cflags += [
+        "-Og",
+        "-g2",
+      ]
+      if (use_dwarf) {
+        cflags += [ "-gdwarf-2" ]
+      }
+    } else if (is_official_build) {
+      cflags += [
+        "-O3",
+        "-g0",
+      ]
+    } else {
+      cflags += [
+        "-O2",
+        "-g1",
+      ]
+    }
+  }
+
+  # LLVM has explicit linker optimization flags
+  if (use_llvm) {
+    if (is_debug) {
+      ldflags += [ "-Wl,-O0" ]
+    } else {
+      if (is_official_build) {
+        ldflags += [ "-Wl,-O3" ]
+      } else {
+        if (dcheck_enabled) {
+          ldflags += [ "-Wl,-O1" ]
+        } else {
+          ldflags += [ "-Wl,-O2" ]
+        }
+      }
+    }
+  }
+
+  # See https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/Optimize-Options.html#index-ffast-math
+  # and https://learn.microsoft.com/en-us/cpp/build/reference/fp-specify-floating-point-behavior.
+  if (use_fast_math) {
+    if (use_clang_cl) {
+      cflags += [ "/fp:fast" ]
+    } else {
+      cflags += [ "-ffast-math" ]
+    }
+  }
+}
+
+# Full LTO/ThinLTO config: Link-Time Optimization
+# See https://en.wikipedia.org/wiki/Link-time_optimization
+config("lto_config") {
+  cflags = []
+  ldflags = []
+  if (use_lto) {
+    if (use_llvm) {
+      # See https://clang.llvm.org/docs/ThinLTO.html
+      if (use_thin_lto) {
+        cflags += [
+          "-flto=thin",
+
+          # Split LTO modules for parallelism
+          "-fsplit-lto-unit",
+        ]
+        ldflags += [ "-flto=thin" ]
+
+        # Let linking use all cores.
+        ldflags += [ "-Wl,--thinlto-jobs=all" ]
+      } else {
+        # Clang spelling; -flto=auto / -flto-partition are GCC-only.
+        cflags += [ "-flto=full" ]
+        ldflags += [ "-flto=full" ]
+      }
+    } else {
+      cflags += [ "-flto=auto" ]
+      ldflags += [ "-flto" ]
+      if (dcheck_enabled) {
+        # For checking code ordering issues
+        ldflags += [ "-flto-partition=1to1" ]
+      }
+    }
+  }
+}
+
+# Use LLVM's Polly optimizer, see https://polly.llvm.org/
+config("polly_config") {
+  cflags = []
+  ldflags = []
+
+  if (use_llvm && use_lto) {
+    # Aggressive register extension instruction pruning, use only in Polly config
+    # but applicable to regular LTO too.
+    cflags += [
+      "-mllvm",
+      "-aggressive-ext-opt",
+    ]
+    if (use_polly) {
+      ldflags += [
+        "-Wl,-mllvm,-polly",  # Enable polly
+        "-Wl,-mllvm,-polly-detect-profitability-min-per-loop-insts=30",  # Loop
+                                                                         # tweaking
+        "-Wl,-mllvm,-polly-run-dce",  # Dead code elimination
+        "-Wl,-mllvm,-polly-vectorizer=stripmine",  # Polyhedral vectorizor
+                                                   # strategy
+      ]
+    }
+  }
 }

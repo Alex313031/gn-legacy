@@ -6,19 +6,60 @@
 import("//build/toolchain/toolchain.gni")
 
 toolchain("linux") {
+  # Cross builds (target_cpu != host_cpu) go through linux_target_triple from
+  # //build/toolchain/toolchain.gni. x86<->x64 is special-cased for GCC: the
+  # native driver covers both via multilib (-m32/-m64, needs the gcc-multilib
+  # package), so no cross binaries are required for a 32 bit x86 build.
+  # Arch selection is baked into the tool strings rather than a config: config
+  # cflags cannot change which compiler binary runs, and the --target/-m32
+  # flags must reach every compile AND link command (like the win toolchain's
+  # clang --target handling).
+  #
   # Link through the driver: invoking `ld` or `lld` directly skips
   # CRT startup objects and the default system libraries, which breaks C++
   # executables. The driver handles those for us.
   if (use_llvm) {
-    CC = "clang"
-    CXX = "clang++"
-    LD = "clang++"
+    # clang is inherently a cross compiler; select the target instead of a
+    # different binary. Cross builds need the matching GCC cross runtime and
+    # sysroot installed (e.g. Debian/Ubuntu gcc-aarch64-linux-gnu +
+    # libc6-dev-arm64-cross for arm64). The --target is passed even for native
+    # builds so a PATH that puts a differently-configured clang first (e.g.
+    # this repo's MinGW LLVM bin dir, whose clang defaults to a Windows
+    # target) still produces Linux binaries.
+    _flags = " --target=$linux_target_triple"
+    CC = "clang$_flags"
+    CXX = "clang++$_flags"
+    LD = "clang++$_flags"
     AR = "llvm-ar"
   } else {
-    CC = "gcc"
-    CXX = "g++"
-    LD = "g++"
-    AR = "ar"
+    # Computed here, not at toolchain scope: this fork of GN errors on
+    # variables that go unused, and the LLVM branch above reads neither.
+    is_cross = target_cpu != host_cpu
+    is_x86_multilib_cross =
+        is_cross && (target_cpu == "x86" || target_cpu == "x64") &&
+        (host_cpu == "x86" || host_cpu == "x64")
+    if (is_cross && !is_x86_multilib_cross) {
+      # GCC cross binaries, e.g. aarch64-linux-gnu-gcc (Debian/Ubuntu package
+      # gcc-aarch64-linux-gnu / g++-aarch64-linux-gnu, and the
+      # arm-linux-gnueabihf equivalents for 32 bit ARM).
+      CC = "$linux_target_triple-gcc"
+      CXX = "$linux_target_triple-g++"
+      LD = "$linux_target_triple-g++"
+      AR = "$linux_target_triple-ar"
+    } else {
+      _flags = ""
+      if (is_x86_multilib_cross) {
+        if (target_cpu == "x86") {
+          _flags = " -m32"
+        } else {
+          _flags = " -m64"
+        }
+      }
+      CC = "gcc$_flags"
+      CXX = "g++$_flags"
+      LD = "g++$_flags"
+      AR = "ar"
+    }
   }
 
   tool("cc") {
@@ -44,7 +85,10 @@ toolchain("linux") {
   tool("alink") {
     libname = "{{target_output_name}}{{output_extension}}"
     libfile = "{{target_out_dir}}/$libname"
-    command = "$AR {{arflags}} {{output}} {{inputs}}"
+
+    # rm first: `ar r` updates an existing archive, so members of removed
+    # sources would otherwise survive incremental rebuilds.
+    command = "rm -f {{output}} && $AR {{arflags}} {{output}} {{inputs}}"
     description = "AR {{target_output_name}}{{output_extension}}"
 
     outputs = [ libfile ]
@@ -78,7 +122,9 @@ toolchain("linux") {
   }
 
   tool("link") {
-    outfile = "{{target_output_name}}{{output_extension}}"
+    # Anchor to {{output_dir}} (defaulted below) so a target that overrides
+    # output_dir links where GN expects, like solink above.
+    outfile = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
     command = "$LD {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
     description = "LINK $outfile"

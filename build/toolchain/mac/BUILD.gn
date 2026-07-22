@@ -36,7 +36,10 @@ toolchain("clang") {
   tool("alink") {
     libname = "{{target_output_name}}{{output_extension}}"
     libfile = "{{target_out_dir}}/$libname"
-    command = "$AR {{arflags}} {{output}} {{inputs}}"
+
+    # rm first: `ar r` updates an existing archive, so members of removed
+    # sources would otherwise survive incremental rebuilds.
+    command = "rm -f {{output}} && $AR {{arflags}} {{output}} {{inputs}}"
     description = "AR {{target_output_name}}{{output_extension}}"
 
     outputs = [ libfile ]
@@ -76,7 +79,9 @@ toolchain("clang") {
   }
 
   tool("link") {
-    outfile = "{{target_output_name}}{{output_extension}}"
+    # Anchor to {{output_dir}} (defaulted below) so a target that overrides
+    # output_dir links where GN expects, like solink above.
+    outfile = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
     command = "$LD {{ldflags}} -o $outfile @$rspfile {{solibs}} {{libs}}"
     description = "LINK $outfile"

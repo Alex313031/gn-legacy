@@ -5,22 +5,35 @@
 # needed -- notably //build:executable_config, which gates the rpath link flag
 # on use_rpath.
 
+# use_qt is declared first (own block) so use_gtk's default can see it:
+# setting just use_qt = true then turns GTK off instead of tripping the
+# mutual-exclusion assert below.
 declare_args() {
-  # Whether to include header dirs for GTK usage.
-  use_gtk = target_os == "linux" && host_os == "linux"
-
   # Whether to include header dirs for QT usage.
+  # Defaults to false, preferring GTK instead in this repo, for legacy projects.
   use_qt = false
+}
+
+# TODO: Opt use_gtk back in explicitly on Linux once a target-arch pkg-config environment
+# (PKG_CONFIG_LIBDIR/PKG_CONFIG_SYSROOT_DIR pointed at a sysroot) is set up.
+declare_args() {
+  # Whether to include header dirs for GTK usage, for developing GUI Linux apps.
+  # Defaults to false when cross-compiling (target_cpu != host_cpu): the :gtk config queries the
+  # host's pkg-config, which would hand back host-arch include/lib paths, not target-arch paths.
+  # Otherwise, defaults to true on Linux.
+  use_gtk = target_os == "linux" && host_os == "linux" &&
+            target_cpu == host_cpu && !use_qt
 
   # Choose default GTK version, valid options are 2, 3, and 4.
-  # 3 is the default
+  # 3 is the default, supports most GTK software.
   gtk_version = "3"
 
   # Choose default QT version, valid options are 4, 5, and 6.
-  # 5 is the default
+  # 5 is the default, as it is widely supported and 6 doesn't support legacy OSes.
   qt_version = "5"
 
   # Whether to use RPATH, to allow an executable to be relocatable.
+  # Defaults to true on Linux
   use_rpath = target_os == "linux"
 }
 

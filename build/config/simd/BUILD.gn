@@ -7,6 +7,10 @@ if (use_x87) {
          "use_x87 can only be used with 32 bit x86 targets.")
 }
 
+# Initialized empty so an arch the ladder below doesn't handle reaches the
+# assert with its real message instead of "Undefined identifier".
+march = ""
+
 if (cpu_march == "") {
   if (current_cpu == "x86") {
     if (is_winnt || use_x87) {

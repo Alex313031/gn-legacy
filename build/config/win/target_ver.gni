@@ -4,17 +4,20 @@
 # Should have no imports!
 
 declare_args() {
-  # Target Windows version. Can be a name, like "2000", "Vista"
+  # Minimum target Windows version. Can be a name, like "2000", "Vista"
   # or an NT number, like "5.1" for XP, or "6.1" for Win 7.
   winver = ""
 
-  # Sets the WINVER and _WIN32_WINNT #define. Automatically set by the winver arg.
+  # Sets the WINVER and _WIN32_WINNT #define for 32 bit targets.
+  # Automatically set by the winver arg, but can be overridden.
   win32_winnt = ""
 
-  # Sets the _WIN64_WINNT #define. Automatically set by the winver arg.
+  # Sets the WINVER and _WIN32_WINNT #define for 64 bit targets (never below 0x0502).
+  # Automatically set by the winver arg, but can be overridden.
   win64_winnt = ""
 
-  # Sets the _WIN32_IE #define. Automatically set by the winver arg.
+  # Sets the _WIN32_IE #define, controls minimum Internet Explorer (for comctl32.dll version).
+  # Automatically set by the winver arg, but can be overridden.
   win32_ie = ""
 }
 
@@ -39,6 +42,7 @@ is_win10 = winver == "10" || winver == "10.0" || winver == "threshold" ||
 is_win11 =
     winver == "11" || winver == "10.1" || winver == "11.0" || winver == "eleven"
 
+# Anything older than Windows 7 is considered "legacy" here.
 is_legacy_windows =
     is_winnt || is_win2k || is_winxp || is_win2003 || is_winvista
 

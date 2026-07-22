@@ -43,6 +43,36 @@ if (c_std == "default") {
   c_std = "11"
 }
 
+declare_args() {
+  # GNU target triple used when cross-compiling on Linux (target_cpu !=
+  # host_cpu). Selects both the GCC cross binaries ("<triple>-gcc") and the
+  # clang --target value. Empty picks a Debian/Ubuntu-style default from
+  # target_cpu below; override it for other naming schemes (e.g. musl or
+  # vendor toolchains).
+  linux_target_triple = ""
+}
+
+if (is_linux) {
+  # The Linux toolchain can target x86/x64/arm/arm64.
+  is_supported_linux_arch = target_cpu == "x86" || target_cpu == "x64" ||
+                            target_cpu == "arm" || target_cpu == "arm64"
+
+  assert(is_supported_linux_arch, "Unsupported target architecture for Linux")
+
+  if (linux_target_triple == "") {
+    if (target_cpu == "arm") {
+      # Hard-float, matching -mfloat-abi=hard in //build/config/simd:simd_config.
+      linux_target_triple = "arm-linux-gnueabihf"
+    } else if (target_cpu == "arm64") {
+      linux_target_triple = "aarch64-linux-gnu"
+    } else if (target_cpu == "x86") {
+      linux_target_triple = "i686-linux-gnu"
+    } else if (target_cpu == "x64") {
+      linux_target_triple = "x86_64-linux-gnu"
+    }
+  }
+}
+
 if (is_win) {
   # The MinGW toolchains can only target x86/x64/arm64.
   is_supported_win_arch =

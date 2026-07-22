@@ -36,6 +36,18 @@ instead of the default GCC-style driver. It still targets the MinGW runtime (so 
 Windows on ARM (`target_cpu = "arm64"`) is supported on the LLVM toolchain only (the GCC flavor has no aarch64 build). It uses the `aarch64` MinGW toolchain,
 which is a separate opt-in download — fetch it with `./tools/download_toolchains.sh --arm64`.
 
+## Linux
+
+Linux builds use the system compilers (GCC by default, clang with `use_llvm = true`) and can target `x86`, `x64`, `arm`, and `arm64` via `target_cpu`.
+Cross builds resolve their tools through a GNU target triple (gn arg `linux_target_triple`, defaulting to the Debian/Ubuntu names —
+`arm-linux-gnueabihf`, `aarch64-linux-gnu`): GCC uses the `<triple>-gcc` cross binaries (e.g. packages `g++-arm-linux-gnueabihf` / `g++-aarch64-linux-gnu`),
+while clang stays a single binary and gets `--target=<triple>` (it still needs the matching GCC cross runtime + libc headers installed, e.g. `libc6-dev-arm64-cross`).
+The exception is 32 bit x86 on an x64 host, which uses the native GCC's multilib support (`-m32`, package `gcc-multilib`) instead of a cross toolchain.
+32 bit ARM is hard-float (`-mfloat-abi=hard`), with `-mfpu=neon` when `use_neon = true` and `-mfpu=vfpv3-d16` otherwise; arm64 compiles with `-march=armv8-a+simd`
+(NEON, the arm64 default) or plain `-march=armv8-a` when `use_neon = false`.
+Note that `use_gtk` defaults off when cross-compiling, since the host's `pkg-config` would return host-arch paths — re-enable it only with a
+target-arch `pkg-config` environment (`PKG_CONFIG_LIBDIR`/`PKG_CONFIG_SYSROOT_DIR`).
+
 ## Resources
 
 See the:  

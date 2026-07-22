@@ -133,9 +133,12 @@ config("rpath_config") {
 
   # An $ORIGIN rpath makes the executable relocatable: the dynamic loader
   # looks for shared libraries next to the binary itself.
-  if (is_linux || is_mac) {
-    if (use_rpath) {
+  if (use_rpath) {
+    if (is_linux) {
       ldflags += [ "-Wl,-rpath=\$ORIGIN/" ]
+    } else if (is_mac) {
+      # ld64 has no -rpath= spelling; @loader_path is mach-o's $ORIGIN.
+      ldflags += [ "-Wl,-rpath,@loader_path/" ]
     }
   }
 }
@@ -207,6 +210,15 @@ config("lto_config") {
   ldflags = []
   if (use_lto) {
     if (use_llvm) {
+      # Link with lld: the LTO link flags below (--thinlto-jobs, -mllvm for
+      # Polly) are lld extensions that GNU bfd ld rejects, and clang's LTO
+      # through bfd needs the LLVMgold plugin anyway. Linux only -- the MinGW
+      # clang already defaults to lld, and macOS's ld64 handles LTO natively.
+      # Requires the lld package to be installed alongside clang.
+      if (is_linux) {
+        ldflags += [ "-fuse-ld=lld" ]
+      }
+
       # See https://clang.llvm.org/docs/ThinLTO.html
       if (use_thin_lto) {
         cflags += [
@@ -220,13 +232,19 @@ config("lto_config") {
         # Let linking use all cores.
         ldflags += [ "-Wl,--thinlto-jobs=all" ]
       } else {
-        # Clang spelling; -flto=auto / -flto-partition are GCC-only.
-        cflags += [ "-flto=full" ]
+        # "Full" LTO, Clang spelling; -flto=auto / -flto-partition are GCC-only.
+        cflags += [
+          "-flto=full",
+          "-ffat-lto-objects",  # Full COFF, to allow mixing LTO and non-LTO
+                                # objects/libraries.
+        ]
         ldflags += [ "-flto=full" ]
       }
     } else {
-      cflags += [ "-flto=auto" ]
+      # GCC has no thin-LTO variant; -flto=auto parallelizes the LTRANS
+      # stage across all cores instead.
       ldflags += [ "-flto" ]
+      cflags += [ "-flto=auto" ]
       if (dcheck_enabled) {
         # For checking code ordering issues
         ldflags += [ "-flto-partition=1to1" ]

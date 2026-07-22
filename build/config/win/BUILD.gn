@@ -13,20 +13,25 @@ config("windows_config") {
   ldflags = []
   libs = []
 
+  # MSVC-style arch macros with their MSVC values (mingw-w64 defines the same
+  # ones once a Windows header is included; these -D's cover header-less TUs).
   if (current_cpu == "x86") {
     defines += [
-      "_M_X86",
-      "_M_I386",
+      "_M_IX86=600",
+
+      # _M_X86 and _M_I386 are not MSVC macros, they are custom aliases to match _M_X64.
+      "_M_X86=1",
+      "_M_I386=1",
     ]
   }
   if (current_cpu == "x64") {
     defines += [
-      "_M_X64",
-      "_M_AMD64",
+      "_M_X64=100",
+      "_M_AMD64=100",
     ]
   }
   if (current_cpu == "arm64") {
-    defines += [ "_M_ARM64" ]
+    defines += [ "_M_ARM64=1" ]
   }
   if (current_cpu == "x64" || current_cpu == "arm64") {
     defines += [ "_WIN64" ]
@@ -43,9 +48,21 @@ config("windows_config") {
     ]
   }
 
+  # The Windows headers only ever read WINVER/_WIN32_WINNT, even in 64 bit
+  # builds, so 64 bit targets get the (>= 0x0502) win64_winnt value there.
+  # _WIN64_WINNT is this repo's own convention macro, kept for sources using it.
+  if (current_cpu == "x64" || current_cpu == "arm64") {
+    defines += [
+      "WINVER=$win64_winnt",
+      "_WIN32_WINNT=$win64_winnt",
+    ]
+  } else {
+    defines += [
+      "WINVER=$win32_winnt",
+      "_WIN32_WINNT=$win32_winnt",
+    ]
+  }
   defines += [
-    "WINVER=$win32_winnt",
-    "_WIN32_WINNT=$win32_winnt",
     "_WIN64_WINNT=$win64_winnt",
     "_WIN32_IE=$win32_ie",
   ]

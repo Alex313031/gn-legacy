@@ -10,6 +10,10 @@ declare_args() {
   # Whether to compile in debug mode, with symbols and DEBUG defined.
   # When false, it compiles in release mode. is_official_build can be used
   # in release mode to enable extra compiler codegen optimizations.
+  # Note that a "release" build (is_debug = false), is not the same as
+  # an "official" build (is_official_build = true). You can use this to toggle
+  # debug compilation flags, but for making maximally optimized binaries for end users
+  # is_official_build should be set to true (and this set to false).
   is_debug = true
 }
 
@@ -22,16 +26,20 @@ declare_args() {
   # Whether DWARF debug info will be included in binaries. Only enabled
   # by default for DCHECK builds (dcheck_enabled = true), but can be used as
   # long as it is a debug build (is_debug = true).
+  # This repo defaults to dwarf 2 for maximum compatibility.
   use_dwarf = dcheck_enabled && is_debug
 
-  # Whether this is an official release build for users.
-  # Adds additional compiler optimizations, such as -O3 over -O2.
+  # Whether this is an official release build for end users, it adds additional compiler
+  # optimizations, for example -O3 over -O2. More optimized than a non-debug build (confusingly
+  # sometimes called a "release build"), this flag should be used when making final, public facing
+  # builds of your software (what would more traditionally be considered a "release" build).
   is_official_build = !is_debug && !dcheck_enabled
 }
 
 declare_args() {
   # Whether to use Link Time Optimization (LTO), for inter-procedural and cross-translation
-  # unit optimization. Can improve data locality.
+  # unit optimization. Can improve data locality and speed.
+  # Enabled by default for official builds (is_official_build = true)
   use_lto = is_official_build
 }
 

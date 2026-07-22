@@ -57,8 +57,8 @@ toolchain("mingw") {
     print("GN-Legacy can only target x86/x64/arm64 for now.")
   }
 
-  # clang-cl (use_clang_cl) is the same binary for C and C++ -- it dispatches on
-  # the source extension -- and lives unprefixed alongside the arch-prefixed
+  # clang-cl (use_clang_cl) is the same binary for C and C++ (it dispatches on
+  # the source extension) and lives unprefixed alongside the arch-prefixed
   # clang++. It only compiles; the linker (LD) stays the GNU clang++ driver. Its
   # MinGW GNU target triple <mingw_prefix>-w64-windows-gnu resolves the same
   # sysroot the regular clang defaults to.
@@ -118,9 +118,10 @@ toolchain("mingw") {
     }
     depfile = "{{output}}.d"
     if (use_clang_cl) {
-      # clang-cl rejects the GCC depfile flags (-MMD/-MF), so forward them to the
-      # underlying clang via /clang: -- this still yields a gcc-format depfile, so
-      # depsformat stays "gcc". /Zl drops the MSVC-CRT autolink directives.
+      # clang-cl rejects the GCC depfile flags (-MMD/-MF), so forward them to
+      # the underlying clang via /clang:. This still yields a gcc-format
+      # depfile, so depsformat stays "gcc". /Zl drops the MSVC-CRT autolink
+      # directives.
       command = "$CC --target=$clang_target /Zl /clang:-MMD /clang:-MP /clang:-MF /clang:$depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} /c {{source}} -o {{output}}"
     } else {
       command = "$CC -MMD -MP -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
@@ -160,13 +161,13 @@ toolchain("mingw") {
       # cmd's builtin `copy` (XP-compatible; PowerShell Copy-Item isn't usable on
       # legacy Windows even with the PS 2.0 add-on). GN/ninja emit forward-slash
       # paths, and cmd's `copy`/`del` on XP do NOT treat `/` as a directory
-      # separator -- they resolve a forward-slash path down to its bare basename
+      # separator: they resolve a forward-slash path down to its bare basename
       # in the CWD (copy then hits "The file cannot be copied onto itself.").
-      # So stash the paths in vars and rewrite `/`->`\` at run time via delayed
-      # expansion (`!VAR:/=\!`, needs `cmd /v:on`). llvm-ar takes `/` fine, so
-      # its args are left as-is. The `del` first is because `ar r` updates an
-      # existing archive, so members of removed sources would otherwise survive
-      # incremental rebuilds.
+      # So stash the paths in vars and rewrite `/` to `\` at run time via
+      # delayed expansion (`!VAR:/=\!`, needs `cmd /v:on`). llvm-ar takes `/`
+      # fine, so its args are left as-is. The `del` first is because `ar r`
+      # updates an existing archive, so members of removed sources would
+      # otherwise survive incremental rebuilds.
       # NOTE: del may slow down builds on legacy Windows! May guard this behind is_legacy_windows
       command = "cmd /v:on /c set \"S=$libfile\"&&set \"D=$outlibfile\"&&(if exist \"!S:/=\\!\" del \"!S:/=\\!\")&&$AR {{arflags}} $libfile {{inputs}}&&copy /Y \"!S:/=\\!\" \"!D:/=\\!\""
     } else {
@@ -201,13 +202,7 @@ toolchain("mingw") {
 
     description = "DLL LINK $soname"
 
-    # Use this for {{output_extension}} expansions unless a target manually
-    # overrides it (in which case {{output_extension}} will be what the target
-    # specifies).
     default_output_extension = ".dll"
-
-    # Use this for {{output_dir}} expansions unless a target manually overrides
-    # it (in which case {{output_dir}} will be what the target specifies).
     default_output_dir = "{{root_out_dir}}"
 
     if (use_pdbs) {
@@ -287,8 +282,8 @@ toolchain("mingw") {
     if (host_os == "win") {
       # cmd's `copy` on XP doesn't treat `/` as a directory separator, so a
       # forward-slash source resolves to its bare basename in the CWD and can hit
-      # "The file cannot be copied onto itself." Rewrite `/`->`\` at run time via
-      # delayed expansion (see the alink tool above for the full rationale).
+      # "The file cannot be copied onto itself." Rewrite `/` to `\` at run time
+      # via delayed expansion (see the alink tool above for the full rationale).
       command = "cmd /v:on /c set \"S={{source}}\"&&set \"D={{output}}\"&&copy /Y \"!S:/=\\!\" \"!D:/=\\!\""
     } else {
       command = "cp -af {{source}} {{output}}"

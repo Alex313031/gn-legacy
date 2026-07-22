@@ -42,7 +42,7 @@ config("mac_config") {
 
   # macOS binaries are position-independent (PIE) by default; -fPIC keeps
   # parity with the other platforms. There is no ELF-style `-s` strip flag for
-  # the mach-o linker (it is obsolete) -- strip with the `strip` tool, or
+  # the mach-o linker (it is obsolete there); strip with the `strip` tool, or
   # generate a separate .dSYM with dsymutil, post-link if desired.
   cflags += [ "-fPIC" ]
 

@@ -35,11 +35,10 @@ config("static_lib_config") {
   cflags = []
   ldflags = []
 
-  # Self-contained static archives (no libgcc/CRT dependency leakage). macOS
-  # clang links against libSystem and doesn't support -static, and the Windows
-  # clang-cl driver rejects -static at compile (an error under /WX). Neither
-  # omission matters: -static only affects linking, and archives aren't linked.
-  # (use_clang_cl is only ever true for Windows targets; see win.gni.)
+  # Self-contained static archives (no libgcc/CRT dependency leakage). Skipped
+  # where the driver rejects -static (macOS clang, and clang-cl under /WX);
+  # nothing is lost, since -static only affects linking and archives are
+  # never linked.
   if (!is_mac && !use_clang_cl) {
     cflags += [ "-static" ]
   }
@@ -52,8 +51,8 @@ config("static_lib_config") {
 config("exec_shared_config") {
   configs = []
 
-  # Set PE subsystem number, doesn't specfy console or GUI
-  # (see console_substem and windowed_subsystem for that).
+  # Set the PE subsystem version numbers; doesn't specify console or GUI
+  # (see console_subsystem and windowed_subsystem for that).
   if (is_win) {
     configs += [ "config/win:subsystem_base" ]
   }

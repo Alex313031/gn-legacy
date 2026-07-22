@@ -8,6 +8,9 @@ import("//build/config/win/target_ver.gni")
 
 declare_args() {
   # What -march to use, see https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
+  # Empty (the default) derives one from the SIMD args below (see the ladder
+  # in simd/BUILD.gn); setting it overrides that automatic choice entirely,
+  # e.g. cpu_march = "znver3" for an AMD Zen 3 tuned build.
   cpu_march = ""
 }
 

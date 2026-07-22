@@ -7,25 +7,24 @@ import("//build/toolchain/toolchain.gni")
 
 toolchain("linux") {
   # Cross builds (target_cpu != host_cpu) go through linux_target_triple from
-  # //build/toolchain/toolchain.gni. x86<->x64 is special-cased for GCC: the
-  # native driver covers both via multilib (-m32/-m64, needs the gcc-multilib
-  # package), so no cross binaries are required for a 32 bit x86 build.
-  # Arch selection is baked into the tool strings rather than a config: config
-  # cflags cannot change which compiler binary runs, and the --target/-m32
-  # flags must reach every compile AND link command (like the win toolchain's
-  # clang --target handling).
+  # //build/toolchain/toolchain.gni. Building x86 on an x64 host is the
+  # exception for GCC: the native driver covers it via multilib (-m32, needs
+  # the gcc-multilib package), so no cross binaries are required.
+  #
+  # The arch flags are baked into the tool strings rather than a config,
+  # because config cflags cannot change which compiler binary runs, and
+  # --target/-m32 must reach every compile and link command.
   #
   # Link through the driver: invoking `ld` or `lld` directly skips
   # CRT startup objects and the default system libraries, which breaks C++
   # executables. The driver handles those for us.
   if (use_llvm) {
-    # clang is inherently a cross compiler; select the target instead of a
-    # different binary. Cross builds need the matching GCC cross runtime and
-    # sysroot installed (e.g. Debian/Ubuntu gcc-aarch64-linux-gnu +
-    # libc6-dev-arm64-cross for arm64). The --target is passed even for native
-    # builds so a PATH that puts a differently-configured clang first (e.g.
-    # this repo's MinGW LLVM bin dir, whose clang defaults to a Windows
-    # target) still produces Linux binaries.
+    # clang is inherently a cross compiler, so select the target rather than
+    # a different binary. Cross builds need the matching GCC cross runtime and
+    # sysroot installed (e.g. Debian gcc-aarch64-linux-gnu and
+    # libc6-dev-arm64-cross). The --target is passed even for native builds so
+    # a differently-configured clang earlier in PATH (such as this repo's
+    # MinGW one, which defaults to a Windows target) still targets Linux.
     _flags = " --target=$linux_target_triple"
     CC = "clang$_flags"
     CXX = "clang++$_flags"
@@ -106,13 +105,7 @@ toolchain("linux") {
 
     command = "$LD -shared {{ldflags}} -o $sofile $os_specific_option @$rspfile"
 
-    # Use this for {{output_extension}} expansions unless a target manually
-    # overrides it (in which case {{output_extension}} will be what the target
-    # specifies).
     default_output_extension = ".so"
-
-    # Use this for {{output_dir}} expansions unless a target manually overrides
-    # it (in which case {{output_dir}} will be what the target specifies).
     default_output_dir = "{{root_out_dir}}"
 
     outputs = [ sofile ]

@@ -2,7 +2,7 @@
 
 # CURRENTLY UNUSED: PCH is disabled for the clang-cl driver in
 # //build/toolchain/win (precompiled_header_type is only set for the GCC path).
-# This template is kept for when clang-cl PCH is re-enabled -- flip that tool
+# This template is kept for when clang-cl PCH is re-enabled: flip that tool
 # back to precompiled_header_type = "msvc" and route PCH targets through here.
 #
 # pch_target(): wrap any binary target type with precompiled-header support that
@@ -15,10 +15,10 @@
 #   "#include of '<header>' not seen while attempting to use precompiled header".
 # This template adds that /FI<header> for the clang-cl driver, restoring the
 # GCC-style force-inject without editing any sources. On the GCC/clang++ path
-# (use_clang_cl false, incl. all Linux/macOS builds) it is a transparent
-# pass-through -- no /FI, since -include already force-injects.
+# (use_clang_cl false, including all Linux/macOS builds) it is a transparent
+# pass-through: no /FI is added, since -include already force-injects.
 #
-# Usage -- same as the wrapped target, plus a `target_type` string. NOTE: assign
+# Usage: same as the wrapped target, plus a `target_type` string. NOTE: assign
 # `configs = [...]` (not `+=`): a template invocation has no set_defaults-seeded
 # `configs` to append to, so the template appends your list to the target-type
 # defaults for you.
@@ -38,8 +38,8 @@ template("pch_target") {
       "pch_target() requires a target_type, e.g. target_type = \"executable\"")
   target(invoker.target_type, target_name) {
     # Forward everything except our control variable (the real target would
-    # reject it) and `configs`, which set_defaults has already seeded on the real
-    # target -- overwriting it via the blind forward would drop the default
+    # reject it) and `configs`, which set_defaults has already seeded on the
+    # real target; overwriting it via the blind forward would drop the default
     # configs, so append the invoker's list instead.
     forward_variables_from(invoker,
                            "*",

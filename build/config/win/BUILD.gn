@@ -211,14 +211,19 @@ config("ansi") {
   }
 }
 
+# Driver-level GUI subsystem flag, for non-Unicode GUI apps (see the notes in
+# //build/BUILDCONFIG.gn about swapping this in for :windowed_subsystem).
 config("mwindows") {
   ldflags = [ "-mwindows" ]
 }
 
+# Console counterpart to :mwindows, for non-Unicode console apps.
 config("mconsole") {
   ldflags = [ "-mconsole" ]
 }
 
+# Stops windows.h from defining the min/max macros, which break std::min,
+# std::max, and std::numeric_limits<T>::max().
 config("nominmax") {
   defines = [ "NOMINMAX" ]
 }

@@ -6,13 +6,14 @@ import("//build/config/args.gni")
 import("//build/config/win/target_ver.gni")
 
 declare_args() {
-  # Whether to specify to use modern common controls.
+  # Whether to use modern themed common controls (comctl32 6.0). Defines
+  # USE_COMMCTRLS for sources to check. Off for NT 4, which predates them.
   use_common_controls = !is_winnt
 
   # Whether the app should be compiled as LARGE_ADDRESS_AWARE to
   # allow 32 bit apps to access up to 4GB virtual address space. Parenthesized
   # so legacy targets are excluded on both x86 and x64 (without the parens, &&
-  # binds tighter than ||, so any x64 build -- even legacy -- would be true).
+  # binds tighter than ||, so any x64 build, even a legacy one, would be true).
   large_address_aware =
       !is_legacy_windows && (current_cpu == "x86" || current_cpu == "x64")
 

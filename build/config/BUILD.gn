@@ -15,6 +15,8 @@ config("compiler_defaults") {
   cflags_c = []
   cflags_cc = []
   ldflags = []
+
+  # ar flags: (r)eplace or insert members, (c)reate quietly, (s) write index.
   arflags = [ "rcs" ]
 
   # Debug defines/flags
@@ -74,11 +76,9 @@ config("compiler_defaults") {
     # is already on by clang-cl's default (/GR).
     cflags_cc += [ "/EHsc" ]
 
-    # clang-cl (--driver-mode=cl) turns off the GNU keyword extensions, but in
-    # our --target=...-gnu mode this is really the MinGW/GNU environment and some
-    # sources (e.g. wimlib's compiler.h/list.h) use the GNU `typeof` keyword.
-    # Re-enable GNU keywords so `typeof` is recognized (GNU statement-expressions
-    # `({ ... })` already work under clang-cl).
+    # clang-cl turns off the GNU keyword extensions, but our --target=...-gnu
+    # mode is really the MinGW environment, and some sources (e.g. wimlib)
+    # use the GNU `typeof` keyword. Re-enable it.
     cflags += [ "/clang:-fgnu-keywords" ]
   } else {
     cflags_c += [ "-std=c$c_std" ]
@@ -87,17 +87,16 @@ config("compiler_defaults") {
 
   # Strip symbols from official-release binaries (link-time; -g0 above already
   # keeps debug info out of the objects). Works for the GNU ld / LLD linkers on
-  # Linux and Windows. macOS's mach-o linker has no -s (obsolete) -- strip there
-  # with the `strip` tool or ship a separate .dSYM instead.
+  # Linux and Windows. macOS's mach-o linker has no -s (it is obsolete there);
+  # strip with the `strip` tool or ship a separate .dSYM instead.
   if (is_official_build && !is_mac) {
     ldflags += [ "-s" ]
   }
 
-  # Static CRT. These are link-time flags, so they go in ldflags (the link
-  # tools only consume {{ldflags}}, not cflags). They are GCC driver flags:
-  # Clang/LLVM has no libgcc/libstdc++ (it gets standalone binaries from the
-  # unconditional -static in the platform configs instead), and macOS clang
-  # links against libSystem and doesn't support them either.
+  # Statically link libgcc/libstdc++ into the binary. Link-time flags, so they
+  # go in ldflags (the link tools only consume {{ldflags}}). GCC only: LLVM
+  # gets standalone binaries from the platform configs' -static instead, and
+  # macOS clang links against libSystem.
   if (!use_llvm && !is_mac) {
     ldflags += [
       "-static-libgcc",
@@ -115,8 +114,8 @@ config("compiler_defaults") {
   }
 
   # Win32 tends to have pragmas clang doesn't recognize. -Wno-return-type-c-linkage
-  # silences a cosmetic clang-only warning for C++ functions whose return type has
-  # C linkage (extern "C") -- for parity with GCC; trust the programmer.
+  # silences a cosmetic clang-only warning for C++ functions whose return type
+  # has C linkage (extern "C"); trust the programmer. GCC has no such warning.
   if (use_llvm && is_win) {
     cflags += [ "-Wno-unknown-pragmas" ]
     cflags_cc += [ "-Wno-return-type-c-linkage" ]
@@ -212,9 +211,9 @@ config("lto_config") {
     if (use_llvm) {
       # Link with lld: the LTO link flags below (--thinlto-jobs, -mllvm for
       # Polly) are lld extensions that GNU bfd ld rejects, and clang's LTO
-      # through bfd needs the LLVMgold plugin anyway. Linux only -- the MinGW
-      # clang already defaults to lld, and macOS's ld64 handles LTO natively.
-      # Requires the lld package to be installed alongside clang.
+      # through bfd needs the LLVMgold plugin anyway. Linux only, since the
+      # MinGW clang already defaults to lld and macOS's ld64 handles LTO
+      # natively. Requires the lld package to be installed alongside clang.
       if (is_linux) {
         ldflags += [ "-fuse-ld=lld" ]
       }
@@ -223,9 +222,7 @@ config("lto_config") {
       if (use_thin_lto) {
         cflags += [
           "-flto=thin",
-
-          # Split LTO modules for parallelism
-          "-fsplit-lto-unit",
+          "-fsplit-lto-unit",  # Split LTO modules for parallelism
         ]
         ldflags += [ "-flto=thin" ]
 
@@ -233,18 +230,20 @@ config("lto_config") {
         ldflags += [ "-Wl,--thinlto-jobs=all" ]
       } else {
         # "Full" LTO, Clang spelling; -flto=auto / -flto-partition are GCC-only.
-        cflags += [
-          "-flto=full",
-          "-ffat-lto-objects",  # Full COFF, to allow mixing LTO and non-LTO
-                                # objects/libraries.
-        ]
+        cflags += [ "-flto=full" ]
         ldflags += [ "-flto=full" ]
       }
     } else {
-      # GCC has no thin-LTO variant; -flto=auto parallelizes the LTRANS
-      # stage across all cores instead.
-      ldflags += [ "-flto" ]
+      # GCC has no thin-LTO variant.
+      ldflags += [
+        "-flto",
+        "-ffat-lto-objects",  # Full COFF, to allow mixing LTO and non-LTO
+                              # objects/libraries.
+      ]
+
+      # -flto=auto parallelizes the LTRANS stage across all cores.
       cflags += [ "-flto=auto" ]
+
       if (dcheck_enabled) {
         # For checking code ordering issues
         ldflags += [ "-flto-partition=1to1" ]
@@ -259,8 +258,8 @@ config("polly_config") {
   ldflags = []
 
   if (use_llvm && use_lto) {
-    # Aggressive register extension instruction pruning, use only in Polly config
-    # but applicable to regular LTO too.
+    # Aggressive extension-instruction optimization. Lives in this config for
+    # tidiness but benefits any LLVM LTO build, not just Polly ones.
     cflags += [
       "-mllvm",
       "-aggressive-ext-opt",

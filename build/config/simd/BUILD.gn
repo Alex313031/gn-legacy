@@ -54,7 +54,8 @@ if (cpu_march == "") {
   } else if (current_cpu == "arm64") {
     # ARMv8-A baseline. +simd (NEON) is added only when use_neon is set, and
     # simd_config sets __ARM_NEON__ to match. Note NEON is part of the armv8-a
-    # baseline, so plain "armv8-a" still permits it -- +simd is explicit.
+    # baseline, so plain "armv8-a" still permits it; +simd just makes it
+    # explicit.
     if (use_neon) {
       march = "armv8-a+simd"
     } else {

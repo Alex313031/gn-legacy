@@ -20,11 +20,11 @@ if (current_os == "") {
   current_os = target_os
 }
 
-# Keep this here
+# Import only after the cpu/os defaults above are resolved (see comment there).
 import("//build/config/args.gni")
 _linker_configs = []
 if (is_win) {
-  # For Console Win32 App, remove these config and add "//build/config/win:console_subsystem".
+  # For a Console Win32 app, remove this config and add "//build/config/win:console_subsystem".
   _linker_configs += [ "//build/config/win:windowed_subsystem" ]
 
   # For Non-Unicode Win32 GUI App, remove this config and add "//build/config/win:mwindows"

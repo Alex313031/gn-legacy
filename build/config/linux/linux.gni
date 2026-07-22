@@ -2,7 +2,7 @@
 
 # Linux build arguments. These live in a .gni (rather than inline in
 # //build/config/linux/BUILD.gn) so they can be imported wherever they are
-# needed -- notably //build:executable_config, which gates the rpath link flag
+# needed, notably //build:executable_config, which gates the rpath link flag
 # on use_rpath.
 
 # use_qt is declared first (own block) so use_gtk's default can see it:

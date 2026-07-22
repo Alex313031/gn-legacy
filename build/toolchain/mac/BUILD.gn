@@ -56,20 +56,14 @@ toolchain("clang") {
 
     # Use the bare soname (not $sofile, which includes {{output_dir}} and would
     # bake the build directory into the dylib's install name). @executable_path
-    # resolves next to the loading binary -- the mach-o analogue of the Linux
+    # resolves next to the loading binary, the mach-o analogue of the Linux
     # $ORIGIN rpath.
     os_specific_option = "-install_name @executable_path/$soname"
     rspfile_content = "{{inputs}} {{solibs}} {{libs}}"
 
     command = "$LD -shared {{ldflags}} -o $sofile $os_specific_option @$rspfile"
 
-    # Use this for {{output_extension}} expansions unless a target manually
-    # overrides it (in which case {{output_extension}} will be what the target
-    # specifies).
     default_output_extension = ".dylib"
-
-    # Use this for {{output_dir}} expansions unless a target manually overrides
-    # it (in which case {{output_dir}} will be what the target specifies).
     default_output_dir = "{{root_out_dir}}"
 
     outputs = [ sofile ]

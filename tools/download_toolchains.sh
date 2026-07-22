@@ -32,7 +32,7 @@ Fetch() {
 }
 
 SCRIPTNAME=$(basename "$0")
-SCRIPTVER="1.0.8"
+SCRIPTVER="1.0.9"
 
 export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -61,6 +61,9 @@ LINUX_LLVM_X64="mingw_llvm_linux_x64.zip"
 WIN_LLVM_I586="mingw_llvm_win_i586.zip"
 WIN_LLVM_I686="mingw_llvm_win_i686.zip"
 WIN_LLVM_X64="mingw_llvm_win_x64.zip"
+# ARM64 (Windows on ARM) is LLVM-only, opt-in via --arm64
+LINUX_LLVM_ARM64="mingw_llvm_linux_arm64.zip"
+WIN_LLVM_ARM64="mingw_llvm_win_arm64.zip"
 # GN / Ninja
 GN_LINUX_X86="gn_linux_i386.zip"
 GN_LINUX_X64="gn_linux.zip"
@@ -153,6 +156,11 @@ DownloadMinGWLinux () {
       Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_X64}" "$TMP_DOWN_PATH"
     fi
   fi
+  # ARM64 is LLVM-only and opt-in (--arm64); unaffected by --i386 (it is 64-bit).
+  if [ "$DOWNLOAD_ARM64" == "1" ]; then
+    printf "${GRE}Downloading arm64 Linux LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${LINUX_LLVM_ARM64}" "$TMP_DOWN_PATH"
+  fi
 
   # Unpack zips
   printf "${GRE}Unzipping ${LINUX_GCC_I586}... ${c0}\n"
@@ -173,6 +181,10 @@ DownloadMinGWLinux () {
       printf "${GRE}Unzipping ${LINUX_LLVM_X64}... ${c0}\n"
       try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_X64}" -d "${MINGW_LINUX_PATH}"
     fi
+  fi
+  if [ "$DOWNLOAD_ARM64" == "1" ]; then
+    printf "${GRE}Unzipping ${LINUX_LLVM_ARM64}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${LINUX_LLVM_ARM64}" -d "${MINGW_LINUX_PATH}"
   fi
 }
 
@@ -201,6 +213,11 @@ DownloadMinGWWindows () {
       Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_LLVM_X64}" "$TMP_DOWN_PATH"
     fi
   fi
+  # ARM64 is LLVM-only and opt-in (--arm64); unaffected by --i386 (it is 64-bit).
+  if [ "$DOWNLOAD_ARM64" == "1" ]; then
+    printf "${GRE}Downloading arm64 Windows LLVM Toolchain version ${MINGW_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/mingw-build/releases/download/${MINGW_VER}/${WIN_LLVM_ARM64}" "$TMP_DOWN_PATH"
+  fi
 
   # Unpack zips
   printf "${GRE}Unzipping ${WIN_GCC_I586}... ${c0}\n"
@@ -222,6 +239,10 @@ DownloadMinGWWindows () {
       try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_X64}" -d "${MINGW_WIN32_PATH}"
     fi
   fi
+  if [ "$DOWNLOAD_ARM64" == "1" ]; then
+    printf "${GRE}Unzipping ${WIN_LLVM_ARM64}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${WIN_LLVM_ARM64}" -d "${MINGW_WIN32_PATH}"
+  fi
 }
 
 show_help() {
@@ -238,6 +259,8 @@ Options:
   --ninja    Download Ninja binaries.
   --mingw    Download MinGW Toolchains.
   --no-llvm  Skip LLVM MinGW toolchains and only download GCC ones.
+  --arm64    Also download the ARM64 (Windows on ARM) LLVM toolchain. Opt-in;
+             implies --mingw and is LLVM-only.
   -xp, --xp  Convenience flag for Win XP (equivalent to --all --i386 --insecure).
   -a, --all  Download everything (respects --no-llvm and --i386).
 
@@ -325,6 +348,10 @@ while :; do
         ;;
     --no-llvm)
         SKIP_LLVM=1
+        ;;
+    --arm64)
+        DOWNLOAD_ARM64=1
+        DOWNLOAD_MINGW=1
         ;;
     --i386)
         DOWNLOAD_I386=1

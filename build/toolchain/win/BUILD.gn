@@ -23,7 +23,7 @@ toolchain("mingw") {
   object_path = "{{target_out_dir}}/{{label_name}}/{{source_name_part}}"
 
   if (target_cpu == "x86") {
-    if (is_winnt || use_x87 || use_mmx || !use_sse) {
+    if (is_winnt || use_x87 || (use_mmx && !use_sse)) {
       mingw_prefix = "i586"
       if (use_llvm) {
         bin_prefix = "i586_llvm"

@@ -16,9 +16,17 @@ die()  { yell "${RED}$* ${c0}"; exit 1; }
 try() { "$@" || die "${RED}Failed $*"; }
 
 # Edit below 3 lines to update toolchains
-GN_VER="2026.07xp"
-NINJA_VER="v1.13.2xp4"
+GN_VER="2026.08xp"
+NINJA_VER="v1.13.2xp5"
 MINGW_VER="20260717"
+
+# Bump script version here
+SCRIPTVER="1.1.0"
+
+# Name of file
+SCRIPTNAME=$(basename "$0")
+# Where script lives
+export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Download $1 into directory $2, keeping the URL's basename as the filename.
 # curl ships with both Linux and Git Bash on Windows, so one helper covers both.
@@ -30,11 +38,6 @@ CURL_INSECURE=""
 Fetch() {
   try curl -fSL ${CURL_INSECURE} --retry 3 -o "${2}/$(basename "$1")" "$1"
 }
-
-SCRIPTNAME=$(basename "$0")
-SCRIPTVER="1.0.9"
-
-export HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # One dir up
 GN_ROOT="${HERE}/.."
@@ -65,17 +68,36 @@ WIN_LLVM_X64="mingw_llvm_win_x64.zip"
 LINUX_LLVM_ARM64="mingw_llvm_linux_arm64.zip"
 WIN_LLVM_ARM64="mingw_llvm_win_arm64.zip"
 # GN / Ninja
+# The arm64 flavours are host binaries for Linux aarch64 machines, picked
+# automatically when uname -m says the host is arm64, or forced with --arm64
+# (e.g. fetching for deployment to an arm64 machine). Linux-only for now:
+# there are no Windows arm64 GN/Ninja builds yet, so Windows on ARM hosts
+# get the x64 binaries and run them under emulation.
 GN_LINUX_X86="gn_linux_i386.zip"
 GN_LINUX_X64="gn_linux.zip"
+GN_LINUX_ARM64="gn_linux_arm64.zip"
 GN_WIN_X86="gn_win32.zip"
 GN_WIN_X64="gn_win64.zip"
 NINJA_LINUX_X86="ninja_linux_i386.zip"
 NINJA_LINUX_X64="ninja_linux.zip"
+NINJA_LINUX_ARM64="ninja_linux_arm64.zip"
 NINJA_WIN_X86="ninja_win32.zip"
 NINJA_WIN_X64="ninja_win64.zip"
 
+# True when GN/Ninja downloads should be the arm64 flavours: an arm64 host
+# can't run the x86/x64 binaries, and --arm64 forces it for cross-fetching
+# (or when emulation makes uname -m report x86_64 on an arm64 box).
+WantArm64HostBinaries() {
+  [ "$DOWNLOAD_ARM64" == "1" ] || [ "$HOST_IS_ARM64" == "1" ]
+}
+
 DownloadGNLinux() {
-  if [ "$DOWNLOAD_I386" == "1" ]; then
+  if WantArm64HostBinaries; then
+    printf "${GRE}Downloading GN Linux arm64 Binary Version ${GN_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_LINUX_ARM64}" "$TMP_DOWN_PATH"
+    printf "${GRE}Unzipping ${GN_LINUX_ARM64}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${GN_LINUX_ARM64}" -d "${TOOLS_PATH}"
+  elif [ "$DOWNLOAD_I386" == "1" ]; then
     printf "${GRE}Downloading GN Linux x86 Binary Version ${GN_VER} ${c0}\n"
     Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_LINUX_X86}" "$TMP_DOWN_PATH"
     printf "${GRE}Unzipping ${GN_LINUX_X86}... ${c0}\n"
@@ -89,6 +111,9 @@ DownloadGNLinux() {
 }
 
 DownloadGNWindows() {
+  if WantArm64HostBinaries; then
+    printf "${YEL}No Windows arm64 GN builds yet; downloading x64 (runs under Windows on ARM emulation).${c0}\n"
+  fi
   if [ "$DOWNLOAD_I386" == "1" ]; then
     printf "${GRE}Downloading GN Windows x86 Binary Version ${GN_VER} ${c0}\n"
     Fetch "https://github.com/Alex313031/gn-xp/releases/download/${GN_VER}/${GN_WIN_X86}" "$TMP_DOWN_PATH"
@@ -103,7 +128,12 @@ DownloadGNWindows() {
 }
 
 DownloadNinjaLinux() {
-  if [ "$DOWNLOAD_I386" == "1" ]; then
+  if WantArm64HostBinaries; then
+    printf "${GRE}Downloading Ninja Linux arm64 Binary Version ${NINJA_VER} ${c0}\n"
+    Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_LINUX_ARM64}" "$TMP_DOWN_PATH"
+    printf "${GRE}Unzipping ${NINJA_LINUX_ARM64}... ${c0}\n"
+    try unzip -o "$TMP_DOWN_PATH/${NINJA_LINUX_ARM64}" -d "${TOOLS_PATH}"
+  elif [ "$DOWNLOAD_I386" == "1" ]; then
     printf "${GRE}Downloading Ninja Linux x86 Binary Version ${NINJA_VER} ${c0}\n"
     Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_LINUX_X86}" "$TMP_DOWN_PATH"
     printf "${GRE}Unzipping ${NINJA_LINUX_X86}... ${c0}\n"
@@ -117,6 +147,9 @@ DownloadNinjaLinux() {
 }
 
 DownloadNinjaWindows() {
+  if WantArm64HostBinaries; then
+    printf "${YEL}No Windows arm64 Ninja builds yet; downloading x64 (runs under Windows on ARM emulation).${c0}\n"
+  fi
   if [ "$DOWNLOAD_I386" == "1" ]; then
     printf "${GRE}Downloading Ninja Windows x86 Binary Version ${NINJA_VER} ${c0}\n"
     Fetch "https://github.com/Alex313031/ninja-xp/releases/download/${NINJA_VER}/${NINJA_WIN_X86}" "$TMP_DOWN_PATH"
@@ -260,7 +293,11 @@ Options:
   --mingw    Download MinGW Toolchains.
   --no-llvm  Skip LLVM MinGW toolchains and only download GCC ones.
   --arm64    Also download the ARM64 (Windows on ARM) LLVM toolchain. Opt-in;
-             implies --mingw and is LLVM-only.
+             implies --mingw and is LLVM-only. With --gn/--ninja, downloads
+             the arm64 flavours of GN/Ninja instead of x86/x64 (this also
+             happens automatically when running on an arm64 host). Those are
+             Linux-only for now; on Windows the x64 binaries are used (they
+             run under Windows on ARM emulation).
   -xp, --xp  Convenience flag for Win XP (equivalent to --all --i386 --insecure).
   -a, --all  Download everything (respects --no-llvm and --i386).
 
@@ -290,6 +327,11 @@ CleanUp() {
 RunDownloads() {
   CheckDeps
   OS_NAME=$(uname -s)
+  # uname -m says aarch64 on Linux, but MSYS/Git Bash on Windows on ARM may
+  # say either; --arm64 covers hosts where emulation hides the real machine.
+  case "$(uname -m)" in
+    aarch64|arm64) HOST_IS_ARM64=1 ;;
+  esac
   mkdir -p "${TMP_DOWN_PATH}" &&
   case "$OS_NAME" in
     CYGWIN*|MINGW*|MSYS*)

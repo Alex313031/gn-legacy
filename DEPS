@@ -24,7 +24,7 @@ vars = {
   'ninja_version': '12656c3c96cd0203032cbead44d2061a371511bd',
 
   # MinGW source repo version
-  'mingw_version': '3858ff7c159f1c4120742bb352216a494f62d9ac',
+  'mingw_version': 'eb75a334e8ca003a3c7617c80ad79ab000d2a95c',
 
   # Whether to download sources used to build MinGW/GN/Ninja itself to tools/src
   'download_toolchain_sources': 'True',

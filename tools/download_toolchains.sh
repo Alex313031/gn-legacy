@@ -18,10 +18,10 @@ try() { "$@" || die "${RED}Failed $*"; }
 # Edit below 3 lines to update toolchains
 GN_VER="2026.08xp"
 NINJA_VER="v1.13.2xp5"
-MINGW_VER="20260717"
+MINGW_VER="20260812"
 
 # Bump script version here
-SCRIPTVER="1.1.0"
+SCRIPTVER="1.1.1"
 
 # Name of file
 SCRIPTNAME=$(basename "$0")

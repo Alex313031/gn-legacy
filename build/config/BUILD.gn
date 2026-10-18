@@ -235,14 +235,19 @@ config("lto_config") {
       }
     } else {
       # GCC has no thin-LTO variant.
-      ldflags += [
-        "-flto",
-        "-ffat-lto-objects",  # Full COFF, to allow mixing LTO and non-LTO
-                              # objects/libraries.
-      ]
+      ldflags += [ "-flto" ]
 
-      # -flto=auto parallelizes the LTRANS stage across all cores.
-      cflags += [ "-flto=auto" ]
+      cflags += [
+        # -flto=auto parallelizes the LTRANS stage across all cores.
+        "-flto=auto",
+
+        # Emit full COFF alongside the GIMPLE so objects can be mixed with
+        # non-LTO code and, crucially, so plain `ar`/`ranlib`/`nm` can index
+        # them: a slim LTO object has no real symbols without the GCC plugin,
+        # which leaves a static_library's archive index empty and every
+        # consumer failing with "undefined reference" at link time.
+        "-ffat-lto-objects",
+      ]
 
       if (dcheck_enabled) {
         # For checking code ordering issues

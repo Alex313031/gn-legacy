@@ -18,13 +18,13 @@ use_relative_paths = True
 # Custom Flags, can be overridden in .gclient "custom_vars" section.
 vars = {
   # GN source repo version
-  'gn_version': 'de045b518e22764b72dafdd3e7f63f051d25810a',
+  'gn_version': '8937f0c4293e33f3e0e50f5090942448ec36f37f',
 
   # Ninja source repo version
-  'ninja_version': '12656c3c96cd0203032cbead44d2061a371511bd',
+  'ninja_version': 'd46ebd85fab096effcaca0f33a541d01b9fae2b7',
 
   # MinGW source repo version
-  'mingw_version': 'eb75a334e8ca003a3c7617c80ad79ab000d2a95c',
+  'mingw_version': '8c8fad727c50b25838bc587142bd7745e36b4fd4',
 
   # Whether to download sources used to build MinGW/GN/Ninja itself to tools/src
   'download_toolchain_sources': 'True',

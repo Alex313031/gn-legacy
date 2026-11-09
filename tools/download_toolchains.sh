@@ -16,9 +16,9 @@ die()  { yell "${RED}$* ${c0}"; exit 1; }
 try() { "$@" || die "${RED}Failed $*"; }
 
 # Edit below 3 lines to update toolchains
-GN_VER="2026.08xp"
-NINJA_VER="v1.13.2xp5"
-MINGW_VER="20260812"
+GN_VER="2026.11xp"
+NINJA_VER="v1.13.2xp6"
+MINGW_VER="20261108"
 
 # Bump script version here
 SCRIPTVER="1.1.1"

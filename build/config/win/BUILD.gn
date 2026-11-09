@@ -87,11 +87,17 @@ config("windows_config") {
   }
   ldflags += [ "-static" ]
 
-  defines += [ "_CRT_SECURE_NO_WARNINGS" ]
+  if (!dcheck_enabled) {
+    # Silence some annoying CRT security warnings
+    # unless we are a DCHECK build.
+    defines += [ "_CRT_SECURE_NO_WARNINGS" ]
+  }
   if (is_legacy_windows) {
     defines += [
-      "PSAPI_VERSION=1",
+      # Old projects may use non-standard C
       "_CRT_NONSTDC_NO_WARNINGS",
+      # Windows versions prior to 7 only support PSAPI level 1.
+      "PSAPI_VERSION=1",
     ]
   } else {
     defines += [ "PSAPI_VERSION=2" ]
